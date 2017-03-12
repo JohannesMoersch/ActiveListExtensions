@@ -1,0 +1,72 @@
+﻿<Window x:Class="ActiveListExtensionsTestProject.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ActiveListExtensionsTestProject"
+        Title="MainWindow" Height="480" Width="640" DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <DockPanel>
+		<Button DockPanel.Dock="Top" Content="Add" Click="AddButton" />
+		<Button DockPanel.Dock="Top" Content="Remove" Click="RemoveButton" />
+		<Button DockPanel.Dock="Top" Content="Move" Click="MoveButton" />
+		<Button DockPanel.Dock="Top" Content="Replace" Click="ReplaceButton" />
+		<Button DockPanel.Dock="Top" Content="Clear" Click="ResetButton" />
+		<Button DockPanel.Dock="Top" Content="Change Number" Click="ChangeNumber" />
+		<Button DockPanel.Dock="Top" Content="Change String" Click="ChangeString" />
+		<Button DockPanel.Dock="Top" Content="Replace Character Collection" Click="ReplaceCharacters" />
+		<Button DockPanel.Dock="Top" Content="Modify Character Collection" Click="ChangeCharacters" />
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<ItemsControl Grid.Column="0" ItemsSource="{Binding Source}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding One}" />
+								<TextBlock Text=" - " />
+								<TextBlock Text="{Binding Two}" />
+								<TextBlock Text=" - " />
+								<ItemsControl ItemsSource="{Binding Three}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel Orientation="Horizontal" />
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+									<ItemsControl.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding}" />
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</StackPanel>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+				<ItemsControl Grid.Column="1" ItemsSource="{Binding Data}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding}" />
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+				<ItemsControl Grid.Column="2" ItemsSource="{Binding Combined}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding}" />
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+				<ItemsControl Grid.Column="3" ItemsSource="{Binding SelectMany}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding}" />
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</Grid>
+		</ScrollViewer>
+	</DockPanel>
+</Window>
