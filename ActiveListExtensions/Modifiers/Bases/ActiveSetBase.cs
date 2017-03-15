@@ -17,65 +17,92 @@ namespace ActiveListExtensions.Modifiers.Bases
 			Remove
 		}
 
-		protected struct ResultSet
+		private class SourceSet
 		{
-			public readonly int Index;
-			public readonly T Value;
+			public int Index { get; }
+
+			public int Count { get; private set; }
+
+			public void IncrementCount() => ++Count;
+
+			public void DecrementCount() => --Count;
+
+			public SourceSet(int index) => Index = index;
+		}
+
+		private class ResultSet
+		{
+			public int Index { get; }
+
+			public T Value { get; }
 
 			public ResultSet(int index, T value)
 			{
 				Index = index;
 				Value = value;
 			}
+
+			public bool IsSameInstance(T otherValue)
+			{
+				if (typeof(T).IsClass)
+					return ReferenceEquals(Value, otherValue);
+				return Equals(Value, otherValue);
+			}
 		}
 
-		protected struct SourceSet
+		private class SourcePair
 		{
-			public readonly int Index;
-			public readonly int Count;
+			public U Key { get; }
 
-			public SourceSet(int index, int count)
+			public T Value { get; }
+
+			public SourcePair(U key, T value)
 			{
-				Index = index;
-				Count = count;
+				Key = key;
+				Value = value;
 			}
 		}
 
 		private int _nextIndex;
 
-		public override int Count => ResultList.Count;
+		public override int Count => _resultList.Count;
 
-		public override T this[int index] => ResultList[index].Value;
+		public override T this[int index] => _resultList[index].Value;
 
-		protected ObservableList<ResultSet> ResultList { get; }
+		private readonly ObservableList<ResultSet> _resultList;
 
-		protected IDictionary<U, SourceSet> LeftSource { get; }
+		private readonly IList<ResultSet> _cumulativeList;
 
-		protected IDictionary<U, SourceSet> RightSource { get; }
+		private readonly IDictionary<U, SourceSet> _leftCount;
 
-		private IList<KeyValuePair<U, T>> _leftValues;
+		private readonly IDictionary<U, SourceSet> _rightCount;
 
-		private IList<KeyValuePair<U, T>> _rightValues;
+		private readonly IList<SourcePair> _leftKeys;
 
-		private Func<T, U> _keySelector;
+		private readonly IList<SourcePair> _rightKeys;
 
-		public ActiveSetBase(IActiveList<T> leftSource, IActiveList<T> rightSource, Func<T, U> keySelector, IEnumerable<string> propertiesToWatch = null) 
+		private readonly Func<T, U> _keySelector;
+
+		public ActiveSetBase(IActiveList<T> leftSource, IActiveList<T> rightSource, Func<T, U> keySelector, IEnumerable<string> propertiesToWatch = null)
 			: base(leftSource, propertiesToWatch)
 		{
-			_leftValues = new List<KeyValuePair<U, T>>();
-			_rightValues = new List<KeyValuePair<U, T>>();
-
 			_keySelector = keySelector;
-			LeftSource = new Dictionary<U, SourceSet>();
 
-			ResultList = new ObservableList<ResultSet>();
-			ResultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(RewrapEventArgs(e));
-			ResultList.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
+			_leftKeys = new List<SourcePair>();
+			_rightKeys = new List<SourcePair>();
+
+			_cumulativeList = new List<ResultSet>();
+			_leftCount = new Dictionary<U, SourceSet>();
+
+			_resultList = new ObservableList<ResultSet>();
+			_resultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(RewrapEventArgs(e));
+			_resultList.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
 
 			Initialize();
+
 			if (rightSource != null)
 			{
-				RightSource = new Dictionary<U, SourceSet>();
+				_rightCount = new Dictionary<U, SourceSet>();
 				AddSourceCollection(0, rightSource, true);
 			}
 		}
@@ -100,7 +127,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		protected override void OnDisposed()
 		{
-			ResultList.Dispose();
+			_resultList.Dispose();
 			base.OnDisposed();
 		}
 
@@ -112,99 +139,60 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		protected abstract SetAction OnRemovedFromRight(bool existsInLeft);
 
-		// ********************************* //
-		// The problem is that when there    //
-		// are multiple objects with the     //
-		// same key, and the one that is     //
-		// exposed has its key change, the   //
-		// exposed object isn't replace by   //
-		// another that still has that key.  //
-		//                                   //
-		// Insert them all into the result   //
-		// list (duplicates and all), and    //
-		// just assure duplicates share an   //
-		// index. That way they will be side //
-		// by side, and a custom enumerator  //
-		// can just skip past the extras.    //
-		// ********************************* //
-
-		private bool AddToDictionary(IDictionary<U, SourceSet> dictionary, IDictionary<U, SourceSet> otherDictionary, U key, T value, out int index)
-		{
-			SourceSet sourceSet;
-			if (!dictionary.TryGetValue(key, out sourceSet))
-			{
-				if (otherDictionary?.TryGetValue(key, out sourceSet) ?? false)
-					index = sourceSet.Index;
-				else
-					index = ++_nextIndex;
-				dictionary.Add(key, new SourceSet(index, 1));
-				return true;
-			}
-			index = sourceSet.Index;
-			dictionary[key] = new SourceSet(sourceSet.Index, sourceSet.Count + 1);
-			return false;
-		}
-
-		private bool RemoveFromDictionary(IDictionary<U, SourceSet> dictionary, U key, T value, out int index)
-		{
-			index = -1;
-			SourceSet sourceSet;
-			if (!dictionary.TryGetValue(key, out sourceSet))
-				return false;
-			index = sourceSet.Index;
-			if (sourceSet.Count > 1)
-			{
-				dictionary[key] = new SourceSet(index, sourceSet.Count - 1);
-				return false;
-			}
-			dictionary.Remove(key);
-			return true;
-		}
-
 		private void Add(U key, T value, IDictionary<U, SourceSet> addTo, IDictionary<U, SourceSet> other, Func<bool, SetAction> onAddedMethod)
 		{
-			int index;
-			if (AddToDictionary(addTo, other, key, value, out index))
-				DictionaryModified(key, value, index, addTo, other, onAddedMethod);
+			int insertIndex;
+			if (!addTo.TryGetValue(key, out SourceSet sourceSet))
+			{
+				sourceSet = new SourceSet(++_nextIndex);
+				switch (onAddedMethod.Invoke(other.ContainsKey(key)))
+				{
+					case SetAction.Add:
+						break;
+					case SetAction.Remove:
+						break;
+				}
+				insertIndex = _cumulativeList.Count;
+			}
+			else
+				insertIndex = FindByIndex(_cumulativeList, sourceSet.Index) + 1;
+			sourceSet.IncrementCount();
+
+			var resultSet = new ResultSet(sourceSet.Index, value);
+			_cumulativeList.Insert(insertIndex, resultSet);
 		}
 
 		private void Remove(U key, T value, IDictionary<U, SourceSet> removeFrom, IDictionary<U, SourceSet> other, Func<bool, SetAction> onRemovedMethod)
 		{
-			int index;
-			if (RemoveFromDictionary(removeFrom, key, value, out index))
-				DictionaryModified(key, value, index, removeFrom, other, onRemovedMethod);
-		}
-
-		private void DictionaryModified(U key, T value, int index, IDictionary<U, SourceSet> dictionary, IDictionary<U, SourceSet> otherDictionary, Func<bool, SetAction> onChangeMethod)
-		{
-			switch (onChangeMethod.Invoke(otherDictionary?.ContainsKey(key) ?? false))
+			if (removeFrom.TryGetValue(key, out SourceSet sourceSet))
 			{
-				case SetAction.Add:
-					index = ++_nextIndex;
-					SourceSet sourceSet;
-					if (dictionary.TryGetValue(key, out sourceSet))
-						dictionary[key] = new SourceSet(index, sourceSet.Count);
-					if (otherDictionary?.TryGetValue(key, out sourceSet) ?? false)
-						otherDictionary[key] = new SourceSet(index, sourceSet.Count);
-					ResultList.Add(ResultList.Count, new ResultSet(index, value));
-					break;
-				case SetAction.Remove:
-					ResultList.Remove(FindByIndex(index));
-					break;
+				if (sourceSet.Count == 1)
+				{
+					switch (onRemovedMethod.Invoke(other.ContainsKey(key)))
+					{
+						case SetAction.Add:
+							break;
+						case SetAction.Remove:
+							break;
+					}
+					removeFrom.Remove(key);
+				}
+				else
+					sourceSet.DecrementCount();
 			}
 		}
 
-		private int FindByIndex(int index)
+		private int FindByIndex(IList<ResultSet> list, int index)
 		{
 			var bottom = 0;
-			var top = ResultList.Count - 1;
+			var top = list.Count - 1;
 			while (bottom <= top)
 			{
 				var mid = bottom + (top - bottom) / 2;
-				var midIndex = ResultList[mid].Index;
-				if (midIndex == index)
+				var midIndex = list[mid].Index;
+				if (midIndex == index && (mid + 1 >= list.Count || list[mid + 1].Index != midIndex))
 					return mid;
-				else if (midIndex < index)
+				else if (midIndex <= index)
 					bottom = mid + 1;
 				else
 					top = mid - 1;
@@ -215,50 +203,49 @@ namespace ActiveListExtensions.Modifiers.Bases
 		protected override void OnAdded(int index, T value)
 		{
 			var key = _keySelector.Invoke(value);
-			if (_leftValues != null)
-				_leftValues.Insert(index, new KeyValuePair<U, T>(key, value));
-			Add(key, value, LeftSource, RightSource, OnAddedToLeft);
+			_leftKeys.Insert(index, new SourcePair(key, value));
+			Add(key, value, _leftCount, _rightCount, OnAddedToLeft);
 		}
 
 		protected override void OnAdded(int collectionIndex, int index, T value)
 		{
 			var key = _keySelector.Invoke(value);
-			if (_rightValues != null)
-				_rightValues.Insert(index, new KeyValuePair<U, T>(key, value));
-			Add(key, value, RightSource, LeftSource, OnAddedToRight);
+			_rightKeys.Insert(index, new SourcePair(key, value));
+			Add(key, value, _rightCount, _leftCount, OnAddedToRight);
 		}
+
 		protected override void OnRemoved(int index, T value)
 		{
-			var key = _leftValues[index].Key;
-			if (_leftValues != null)
-				_leftValues.RemoveAt(index);
-			Remove(key, value, LeftSource, RightSource, OnRemovedFromLeft);
+			var sourcePair = _leftKeys[index];
+			_leftKeys.RemoveAt(index);
+			Remove(sourcePair.Key, sourcePair.Value, _leftCount, _rightCount, OnRemovedFromLeft);
 		}
 
 		protected override void OnRemoved(int collectionIndex, int index, T value)
 		{
-			var key = _rightValues[index].Key;
-			if (_rightValues != null)
-				_rightValues.RemoveAt(index);
-			Remove(key, value, RightSource, LeftSource, OnRemovedFromRight);
+			var sourcePair = _rightKeys[index];
+			_rightKeys.RemoveAt(index);
+			Remove(sourcePair.Key, sourcePair.Value, _rightCount, _leftCount, OnRemovedFromRight);
 		}
 
 		protected override void OnReplaced(int index, T oldValue, T newValue)
 		{
-			var key = _leftValues[index].Key;
-			Remove(key, oldValue, LeftSource, RightSource, OnRemovedFromLeft);
-			key = _keySelector.Invoke(newValue);
-			_leftValues[index] = new KeyValuePair<U, T>(key, newValue);
-			Add(key, newValue, LeftSource, RightSource, OnAddedToLeft);
+			var sourcePair = _leftKeys[index];
+			Remove(sourcePair.Key, sourcePair.Value, _leftCount, _rightCount, OnRemovedFromLeft);
+
+			var key = _keySelector.Invoke(newValue);
+			_leftKeys[index] = new SourcePair(key, newValue);
+			Add(key, newValue, _leftCount, _rightCount, OnAddedToLeft);
 		}
 
 		protected override void OnReplaced(int collectionIndex, int index, T oldValue, T newValue)
 		{
-			var key = _rightValues[index].Key;
-			Remove(key, oldValue, RightSource, LeftSource, OnRemovedFromRight);
-			key = _keySelector.Invoke(newValue);
-			_rightValues[index] = new KeyValuePair<U, T>(key, newValue);
-			Add(key, newValue, RightSource, LeftSource, OnAddedToRight);
+			var sourcePair = _rightKeys[index];
+			Remove(sourcePair.Key, sourcePair.Value, _rightCount, _leftCount, OnRemovedFromRight);
+
+			var key = _keySelector.Invoke(newValue);
+			_rightKeys[index] = new SourcePair(key, newValue);
+			Add(key, newValue, _rightCount, _leftCount, OnAddedToRight);
 		}
 
 		protected override void OnMoved(int oldIndex, int newIndex, T value) { }
@@ -267,51 +254,34 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		protected override void OnReset(IReadOnlyList<T> newItems)
 		{
-			foreach (var value in _leftValues)
-				Remove(value.Key, value.Value, LeftSource, RightSource, OnRemovedFromLeft);
-			_leftValues.Clear();
+			foreach (var value in _leftKeys)
+				Remove(value.Key, value.Value, _leftCount, _rightCount, OnRemovedFromLeft);
+			_leftKeys.Clear();
 			foreach (var value in newItems)
 			{
 				var key = _keySelector.Invoke(value);
-				_leftValues.Add(new KeyValuePair<U, T>(key, value));
-				Add(key, value, LeftSource, RightSource, OnAddedToLeft);
+				_leftKeys.Add(new SourcePair(key, value));
+				Add(key, value, _leftCount, _rightCount, OnAddedToLeft);
 			}
 		}
 
 		protected override void OnReset(int collectionIndex, IReadOnlyList<T> newItems)
 		{
-			foreach (var value in _rightValues)
-				Remove(value.Key, value.Value, RightSource, LeftSource, OnRemovedFromRight);
-			RightSource.Clear();
-			_rightValues.Clear();
+			foreach (var value in _rightKeys)
+				Remove(value.Key, value.Value, _rightCount, _leftCount, OnRemovedFromRight);
+			_rightKeys.Clear();
 			foreach (var value in newItems)
 			{
 				var key = _keySelector.Invoke(value);
-				_rightValues.Add(new KeyValuePair<U, T>(key, value));
-				Add(key, value, RightSource, LeftSource, OnAddedToRight);
+				_rightKeys.Add(new SourcePair(key, value));
+				Add(key, value, _rightCount, _leftCount, OnAddedToRight);
 			}
 		}
 
-		protected override void ItemModified(int index, T value)
-		{
-			var old = _leftValues[index];
-			if ((int)(object)old.Key == 644)
-				Console.WriteLine("A");
-			Remove(old.Key, old.Value, LeftSource, RightSource, OnRemovedFromLeft);
-			var key = _keySelector.Invoke(value);
-			_leftValues[index] = new KeyValuePair<U, T>(key, value);
-			Add(key, value, LeftSource, RightSource, OnAddedToLeft);
-		}
+		protected override void ItemModified(int index, T value) => OnReplaced(index, value, value);
 
-		protected override void ItemModified(int collectionIndex, int index, T value)
-		{
-			var old = _rightValues[index];
-			Remove(old.Key, old.Value, RightSource, LeftSource, OnRemovedFromRight);
-			var key = _keySelector.Invoke(value);
-			_rightValues[index] = new KeyValuePair<U, T>(key, value);
-			Add(key, value, RightSource, LeftSource, OnAddedToRight);
-		}
+		protected override void ItemModified(int collectionIndex, int index, T value) => OnReplaced(collectionIndex, index, value, value); 
 
-		public override IEnumerator<T> GetEnumerator() => ResultList.Select(v => v.Value).GetEnumerator();
+		public override IEnumerator<T> GetEnumerator() => _resultList.Select(v => v.Value).GetEnumerator();
 	}
 }
