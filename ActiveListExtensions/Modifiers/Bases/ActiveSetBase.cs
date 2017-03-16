@@ -36,6 +36,8 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 			public T Value { get; }
 
+			public bool InResultList { get; set; }
+
 			public ResultSet(int index, T value)
 			{
 				Index = index;
@@ -48,6 +50,8 @@ namespace ActiveListExtensions.Modifiers.Bases
 					return ReferenceEquals(Value, otherValue);
 				return Equals(Value, otherValue);
 			}
+
+			public override string ToString() => $"{Index}|{Value}";
 		}
 
 		private class SourcePair
@@ -71,15 +75,15 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		private readonly ObservableList<ResultSet> _resultList;
 
-		private readonly IList<ResultSet> _cumulativeList;
+		private readonly List<ResultSet> _cumulativeList;
 
 		private readonly IDictionary<U, SourceSet> _leftCount;
 
 		private readonly IDictionary<U, SourceSet> _rightCount;
 
-		private readonly IList<SourcePair> _leftKeys;
+		private readonly List<SourcePair> _leftKeys;
 
-		private readonly IList<SourcePair> _rightKeys;
+		private readonly List<SourcePair> _rightKeys;
 
 		private readonly Func<T, U> _keySelector;
 
@@ -139,50 +143,115 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		protected abstract SetAction OnRemovedFromRight(bool existsInLeft);
 
+		private void AddToResultList(ResultSet resultSet)
+		{
+			var insertIndex = FindByIndex(_resultList, resultSet.Index);
+			_resultList.Add(insertIndex, resultSet);
+			resultSet.InResultList = true;
+		}
+
+		private void RemoveFromResultList(int index)
+		{
+			var removeIndex = FindByIndex(_resultList, index);
+			_resultList[removeIndex].InResultList = false;
+			_resultList.Remove(removeIndex);
+		}
+
+		private void ReplaceInResultList(ResultSet resultSet)
+		{
+			var replaceIndex = FindByIndex(_resultList, resultSet.Index);
+			_resultList[replaceIndex].InResultList = false;
+			_resultList.Replace(replaceIndex, resultSet);
+			resultSet.InResultList = true;
+		}
+
 		private void Add(U key, T value, IDictionary<U, SourceSet> addTo, IDictionary<U, SourceSet> other, Func<bool, SetAction> onAddedMethod)
 		{
-			int insertIndex;
+			int? insertIndex = null;
+			var action = SetAction.None;
 			if (!addTo.TryGetValue(key, out SourceSet sourceSet))
 			{
-				sourceSet = new SourceSet(++_nextIndex);
-				switch (onAddedMethod.Invoke(other.ContainsKey(key)))
-				{
-					case SetAction.Add:
-						break;
-					case SetAction.Remove:
-						break;
-				}
-				insertIndex = _cumulativeList.Count;
+				int? otherIndex = null;
+				if (other != null && other.TryGetValue(key, out SourceSet otherSourceSet))
+					otherIndex = otherSourceSet.Index;
+				else
+					insertIndex = _cumulativeList.Count;
+
+				sourceSet = new SourceSet(otherIndex ?? ++_nextIndex);
+				addTo.Add(key, sourceSet);
+
+				action = onAddedMethod.Invoke(otherIndex.HasValue);
 			}
-			else
+
+			if (!insertIndex.HasValue)
 				insertIndex = FindByIndex(_cumulativeList, sourceSet.Index) + 1;
+
 			sourceSet.IncrementCount();
 
 			var resultSet = new ResultSet(sourceSet.Index, value);
-			_cumulativeList.Insert(insertIndex, resultSet);
+			_cumulativeList.Insert(insertIndex.Value, resultSet);
+			if (_cumulativeList.Zip(_cumulativeList.OrderBy(s => s.Index), (o1, o2) => o1 == o2).Any(b => !b))
+				Console.WriteLine("A");
+
+			switch (action)
+			{
+				case SetAction.Add:
+					AddToResultList(_cumulativeList[FindFirstByIndex(_cumulativeList, insertIndex.Value, sourceSet.Index)]);
+					break;
+				case SetAction.Remove:
+					RemoveFromResultList(sourceSet.Index);
+					break;
+			}
 		}
 
 		private void Remove(U key, T value, IDictionary<U, SourceSet> removeFrom, IDictionary<U, SourceSet> other, Func<bool, SetAction> onRemovedMethod)
 		{
 			if (removeFrom.TryGetValue(key, out SourceSet sourceSet))
 			{
+				var index = FindByIndex(_cumulativeList, sourceSet.Index);
+
+				var action = SetAction.None;
+
+				var removeIndex = index;
+				while (removeIndex >= 0 && !_cumulativeList[removeIndex].IsSameInstance(value))
+					--removeIndex;
+				var resultSet = _cumulativeList[removeIndex];
+				_cumulativeList.RemoveAt(removeIndex);
+
 				if (sourceSet.Count == 1)
 				{
-					switch (onRemovedMethod.Invoke(other.ContainsKey(key)))
-					{
-						case SetAction.Add:
-							break;
-						case SetAction.Remove:
-							break;
-					}
+					action = onRemovedMethod.Invoke(other?.ContainsKey(key) ?? false);
 					removeFrom.Remove(key);
 				}
 				else
 					sourceSet.DecrementCount();
+
+				switch (action)
+				{
+					case SetAction.Add:
+						AddToResultList(_cumulativeList[FindFirstByIndex(_cumulativeList, removeIndex, sourceSet.Index)]);
+						break;
+					case SetAction.Remove:
+						RemoveFromResultList(sourceSet.Index);
+						break;
+					case SetAction.None:
+						if (resultSet.InResultList)
+							ReplaceInResultList(_cumulativeList[FindFirstByIndex(_cumulativeList, removeIndex, sourceSet.Index)]);
+						break;
+				}
 			}
 		}
 
-		private int FindByIndex(IList<ResultSet> list, int index)
+		private int FindFirstByIndex(IReadOnlyList<ResultSet> list, int startPosition, int index)
+		{
+			if (startPosition >= list.Count)
+				startPosition = list.Count - 1;
+			while (startPosition > 0 && list[startPosition - 1].Index == index)
+				--startPosition;
+			return startPosition;
+		}
+
+		private int FindByIndex(IReadOnlyList<ResultSet> list, int index)
 		{
 			var bottom = 0;
 			var top = list.Count - 1;
@@ -197,7 +266,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 				else
 					top = mid - 1;
 			}
-			return -1;
+			return bottom;
 		}
 
 		protected override void OnAdded(int index, T value)
