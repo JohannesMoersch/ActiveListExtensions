@@ -97,7 +97,7 @@ namespace ActiveListExtensionsTestProject
 
 			Data = activeList.ActiveWhere(x => x.One % 2 == 0).ActiveSelect(x => $"{x.One} - {x.Two}");
 
-			Combined = activeList.ActiveSelect(x => $"{x.One} - {x.Two}").ActiveConcat(Data);
+			Combined = activeList.ActiveSelect(x => $"{x.One} - {x.Two}").ActiveConcat(Data).ActiveOrderBy(s => s);
 
 			SelectMany = activeList.ActiveSelectMany(x => x.Three).ActiveReverse().ActiveSkip(2).ActiveTake(8);
 

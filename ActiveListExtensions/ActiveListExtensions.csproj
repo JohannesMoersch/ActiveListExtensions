@@ -44,6 +44,7 @@
     <Compile Include="Modifiers\ActiveDistinct.cs" />
     <Compile Include="Modifiers\ActiveExcept.cs" />
     <Compile Include="Modifiers\ActiveIntersect.cs" />
+    <Compile Include="Modifiers\ActiveOrderBy.cs" />
     <Compile Include="Modifiers\ActiveUnion.cs" />
     <Compile Include="Modifiers\Bases\ActiveBase.cs" />
     <Compile Include="Modifiers\ActiveList.cs" />

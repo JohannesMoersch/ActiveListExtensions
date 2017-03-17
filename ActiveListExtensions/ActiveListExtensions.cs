@@ -73,13 +73,21 @@ namespace ActiveListExtensions
 
 		public static IActiveList<T> ActiveExcept<T, U>(this IActiveList<T> source, IActiveList<T> except, Func<T, U> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveExcept<T, U>(source, except, keySelector, propertiesToWatch);
 
+		public static IActiveList<T> ActiveOrderBy<T, U>(this IActiveList<T> source, Expression<Func<T, U>> keySelector) where U : IComparable<U> => ActiveOrderBy(source, keySelector.Compile(), GetReferencedProperties(keySelector));
+
+		public static IActiveList<T> ActiveOrderBy<T, U>(this IActiveList<T> source, Func<T, U> keySelector, IEnumerable<string> propertiesToWatch) where U : IComparable<U> => new ActiveOrderBy<T, U>(source, keySelector, false, propertiesToWatch);
+
+		public static IActiveList<T> ActiveOrderByDescending<T, U>(this IActiveList<T> source, Expression<Func<T, U>> keySelector) where U : IComparable<U> => ActiveOrderByDescending(source, keySelector.Compile(), GetReferencedProperties(keySelector));
+
+		public static IActiveList<T> ActiveOrderByDescending<T, U>(this IActiveList<T> source, Func<T, U> keySelector, IEnumerable<string> propertiesToWatch) where U : IComparable<U> => new ActiveOrderBy<T, U>(source, keySelector, true, propertiesToWatch);
+
 		// --Where
 		// --Select
 		// --SelectMany
 		// --Take
 		// --Skip
-		// OrderBy
-		// OrderByDescending
+		// --OrderBy
+		// --OrderByDescending
 		// GroupBy
 		// --Concat
 		// Zip
