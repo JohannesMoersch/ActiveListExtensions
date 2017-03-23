@@ -97,7 +97,7 @@ namespace ActiveListExtensions
 			return ActiveZip(source, otherSource, resultSelector.Compile(), properties.Item1, properties.Item2);
 		}
 
-        public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch) => new ActiveZip<TFirst, TSecond, TResult>(source, otherSource, resultSelector, sourcePropertiesToWatch);
+        public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch) => new ActiveZip<TFirst, TSecond, TResult>(source, otherSource, resultSelector, sourcePropertiesToWatch, otherSourcePropertiesToWatch);
 
         // --Where
         // --Select
