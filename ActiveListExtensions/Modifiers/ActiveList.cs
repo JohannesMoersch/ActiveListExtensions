@@ -10,22 +10,22 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveList<TSource> : ActiveBase<TSource, TSource>
+	internal class ActiveList<T> : ActiveBase<T, T>
 	{
 		public override int Count => _collection.Count;
 
-		public override TSource this[int index] =>  _collection[index];
+		public override T this[int index] =>  _collection[index];
 
-		private CollectionWrapper<TSource> _collection;
+		private CollectionWrapper<T> _collection;
 
-		public ActiveList(IReadOnlyList<TSource> source)
+		public ActiveList(IReadOnlyList<T> source)
 		{
-			_collection = new CollectionWrapper<TSource>(source);
+			_collection = new CollectionWrapper<T>(source);
 			_collection.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);
 		}
 
 		protected override void OnDisposed() => _collection.Dispose();
 
-		public override IEnumerator<TSource> GetEnumerator() => _collection.GetEnumerator();
+		public override IEnumerator<T> GetEnumerator() => _collection.GetEnumerator();
 	}
 }
