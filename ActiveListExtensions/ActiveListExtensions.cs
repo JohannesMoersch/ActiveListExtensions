@@ -99,36 +99,44 @@ namespace ActiveListExtensions
 
         public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch) => new ActiveZip<TFirst, TSecond, TResult>(source, otherSource, resultSelector, sourcePropertiesToWatch, otherSourcePropertiesToWatch);
 
-        // --Where
-        // --Select
-        // --SelectMany
-        // --Take
-        // --Skip
-        // --OrderBy
-        // --OrderByDescending
-        // GroupBy
-        // --Concat
-        // Zip
-        // --Distinct
-        // --Union
-        // --Intersect
-        // --Except
-        // --Reverse
+		public static IActiveList<IActiveGrouping<TKey, TSource>> ActiveGroupBy<TSource, TKey>(this IActiveList<TSource> source, Expression<Func<TSource, TKey>> keySelector) => ToActiveLookup(source, keySelector.Compile(), GetReferencedProperties(keySelector));
 
-        // ToLookup (Not an IActiveList)
+		public static IActiveList<IActiveGrouping<TKey, TSource>> ActiveGroupBy<TSource, TKey>(this IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => ToActiveLookup(source, keySelector, propertiesToWatch);
 
-        // SequenceEqual
-        // FirstOrDefault
-        // LastOrDefault
-        // ElementAtOrDefault
-        // Any
-        // All
-        // Count
-        // Contains
-        // Aggregate
-        // Sum
-        // Min
-        // Max
-        // Average
-    }
+		public static IActiveLookup<TKey, TSource> ToActiveLookup<TSource, TKey>(this IActiveList<TSource> source, Expression<Func<TSource, TKey>> keySelector) => ToActiveLookup(source, keySelector.Compile(), GetReferencedProperties(keySelector));
+
+		public static IActiveLookup<TKey, TSource> ToActiveLookup<TSource, TKey>(this IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveLookup<TSource, TKey>(keySelector, propertiesToWatch);
+
+		// --Where
+		// --Select
+		// --SelectMany
+		// --Take
+		// --Skip
+		// --OrderBy
+		// --OrderByDescending
+		// GroupBy
+		// --Concat
+		// --Zip
+		// --Distinct
+		// --Union
+		// --Intersect
+		// --Except
+		// --Reverse
+
+		// ToLookup (Not an IActiveList)
+
+		// SequenceEqual
+		// FirstOrDefault
+		// LastOrDefault
+		// ElementAtOrDefault
+		// Any
+		// All
+		// Count
+		// Contains
+		// Aggregate
+		// Sum
+		// Min
+		// Max
+		// Average
+	}
 }
