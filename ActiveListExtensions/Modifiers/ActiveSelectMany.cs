@@ -28,7 +28,7 @@ namespace ActiveListExtensions.Modifiers
 		private IList<ListInfo> _listInfo = new List<ListInfo>();
 
 		public ActiveSelectMany(IActiveList<TSource> source, Func<TSource, IEnumerable<TResult>> selector, IEnumerable<string> propertiesToWatch = null) 
-			: base(source, propertiesToWatch)
+			: base(source, propertiesToWatch, propertiesToWatch)
 		{
 			if (selector == null)
 				throw new ArgumentNullException(nameof(selector));

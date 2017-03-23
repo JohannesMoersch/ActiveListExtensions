@@ -16,8 +16,8 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		protected ObservableList<TResult> ResultList { get; }
 
-		public ActiveMultiListBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null) 
-			: base(source, propertiesToWatch)
+		public ActiveMultiListBase(IActiveList<TSource> source, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> otherSourcePropertiesToWatch = null) 
+			: base(source, sourcePropertiesToWatch, otherSourcePropertiesToWatch)
 		{
 			ResultList = new ObservableList<TResult>();
 			ResultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);

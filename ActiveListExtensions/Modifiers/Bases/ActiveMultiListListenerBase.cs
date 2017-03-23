@@ -13,12 +13,12 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		protected IReadOnlyList<IReadOnlyList<TOtherSources>> SourceLists => _sourceLists;
 
-		private string[] _propertiesToWatch;
+		private string[] _otherSourcePropertiesToWatch;
 
-		public ActiveMultiListListenerBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null) 
-			: base(source, propertiesToWatch)
+		public ActiveMultiListListenerBase(IActiveList<TSource> source, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> otherSourcePropertiesToWatch = null) 
+			: base(source, sourcePropertiesToWatch)
 		{
-			_propertiesToWatch = propertiesToWatch?.ToArray();
+			_otherSourcePropertiesToWatch = otherSourcePropertiesToWatch?.ToArray();
 		}
 
 		protected override void OnDisposed()
@@ -34,7 +34,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 			if (collectionIndex < 0 || collectionIndex > _sourceLists.Count)
 				throw new ArgumentOutOfRangeException(nameof(collectionIndex));
 
-			var wrapper = new CollectionWrapper<TOtherSources>(collection, usePropertyWatcher ? _propertiesToWatch : null);
+			var wrapper = new CollectionWrapper<TOtherSources>(collection, usePropertyWatcher ? _otherSourcePropertiesToWatch : null);
 			wrapper.ItemModified += (s, i, v) => ItemModified(wrapper.CollectionIndex, i, v);
 			wrapper.ItemAdded += (s, i, v) => OnAdded(wrapper.CollectionIndex, i, v);
 			wrapper.ItemRemoved += (s, i, v) => OnRemoved(wrapper.CollectionIndex, i, v);

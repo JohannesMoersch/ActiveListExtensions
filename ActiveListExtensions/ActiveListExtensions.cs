@@ -15,7 +15,17 @@ namespace ActiveListExtensions
     {
 		private static IEnumerable<string> GetReferencedProperties<T, U>(Expression<Func<T, U>> expression) => typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T)) ? expression.GetReferencedProperties() : Enumerable.Empty<string>();
 
-        public static IActiveList<T> ToActiveList<T>(this IList<T> source)
+		private static Tuple<IEnumerable<string>, IEnumerable<string>> GetReferencedProperties<T1, T2, U>(Expression<Func<T1, T2, U>> expression)
+		{
+			if (!typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T1)) && !typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T2)))
+				return Tuple.Create(Enumerable.Empty<string>(), Enumerable.Empty<string>());
+			var properties = expression.GetReferencedProperties();
+			var sourceProperties = typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T1)) ? properties.Item1 : Enumerable.Empty<string>();
+			var otherSourceProperties = typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T2)) ? properties.Item2 : Enumerable.Empty<string>();
+			return Tuple.Create(sourceProperties, otherSourceProperties);
+		}
+
+		public static IActiveList<T> ToActiveList<T>(this IList<T> source)
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
@@ -81,9 +91,13 @@ namespace ActiveListExtensions
 
 		public static IActiveList<TSource> ActiveOrderByDescending<TSource, TKey>(this IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) where TKey : IComparable<TKey> => new ActiveOrderBy<TSource, TKey>(source, keySelector, true, propertiesToWatch);
 
-        public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Expression<Func<TFirst, TSecond, TResult>> resultSelector) => ActiveZip(source, otherSource, resultSelector.Compile(), /*GetReferencedProperties(resultSelector)*/ null);
+		public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Expression<Func<TFirst, TSecond, TResult>> resultSelector)
+		{
+			var properties = GetReferencedProperties(resultSelector);
+			return ActiveZip(source, otherSource, resultSelector.Compile(), properties.Item1, properties.Item2);
+		}
 
-        public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, IEnumerable<string> propertiesToWatch) => new ActiveZip<TFirst, TSecond, TResult>(source, otherSource, resultSelector, propertiesToWatch);
+        public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch) => new ActiveZip<TFirst, TSecond, TResult>(source, otherSource, resultSelector, sourcePropertiesToWatch);
 
         // --Where
         // --Select

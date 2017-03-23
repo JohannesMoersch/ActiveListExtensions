@@ -13,8 +13,8 @@ namespace ActiveListExtensions.Modifiers
 
         private int SourceListCount => Math.Min(SourceList.Count, SourceLists[0].Count);
 
-        public ActiveZip(IActiveList<TSource> source, IEnumerable<TOtherSource> otherSource, Func<TSource, TOtherSource, TResult> resultSelector, IEnumerable<string> propertiesToWatch = null)
-            : base(source, propertiesToWatch)
+        public ActiveZip(IActiveList<TSource> source, IEnumerable<TOtherSource> otherSource, Func<TSource, TOtherSource, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> otherSourcePropertiesToWatch = null)
+            : base(source, sourcePropertiesToWatch, otherSourcePropertiesToWatch)
         {
             _resultSelector = resultSelector ?? throw new ArgumentNullException(nameof(resultSelector));
 
