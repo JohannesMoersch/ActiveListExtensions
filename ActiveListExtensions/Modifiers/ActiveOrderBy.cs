@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveOrderBy<T, U> : ActiveListListenerBase<T, T>
-		where U : IComparable<U>
+	internal class ActiveOrderBy<TSource, TKey> : ActiveListListenerBase<TSource, TSource>
+		where TKey : IComparable<TKey>
 	{
 		private class ItemSet
 		{
@@ -18,11 +18,11 @@ namespace ActiveListExtensions.Modifiers
 
 			public int TargetIndex { get; set; }
 
-			public U Key { get; }
+			public TKey Key { get; }
 
-			public T Value { get; }
+			public TSource Value { get; }
 
-			public ItemSet(U key, T value)
+			public ItemSet(TKey key, TSource value)
 			{
 				Key = key;
 				Value = value;
@@ -31,17 +31,17 @@ namespace ActiveListExtensions.Modifiers
 
 		public override int Count => _resultList.Count;
 
-		public override T this[int index] => _resultList[index].Value;
+		public override TSource this[int index] => _resultList[index].Value;
 
 		private ObservableList<ItemSet> _resultList;
 
 		private readonly List<ItemSet> _sourceList;
 
-		private readonly Func<T, U> _keySelector;
+		private readonly Func<TSource, TKey> _keySelector;
 
 		private readonly bool _orderByDescending;
 
-		public ActiveOrderBy(IActiveList<T> source, Func<T, U> keySelector, bool orderByDescending, IEnumerable<string> propertiesToWatch = null) 
+		public ActiveOrderBy(IActiveList<TSource> source, Func<TSource, TKey> keySelector, bool orderByDescending, IEnumerable<string> propertiesToWatch = null) 
 			: base(source, propertiesToWatch)
 		{
 			_keySelector = keySelector;
@@ -81,7 +81,7 @@ namespace ActiveListExtensions.Modifiers
 			return null;
 		}
 
-		private int FindByKey(U key, int sourceIndex)
+		private int FindByKey(TKey key, int sourceIndex)
 		{
 			var bottom = 0;
 			var top = _resultList.Count - 1;
@@ -116,7 +116,7 @@ namespace ActiveListExtensions.Modifiers
 				_resultList[i].TargetIndex = i;
 		}
 
-		protected override void OnAdded(int index, T value)
+		protected override void OnAdded(int index, TSource value)
 		{
 			var key = _keySelector.Invoke(value);
 			var targetIndex = FindByKey(key, index);
@@ -132,7 +132,7 @@ namespace ActiveListExtensions.Modifiers
 			UpdateTargetIndexes(targetIndex + 1);
 		}
 
-		protected override void OnRemoved(int index, T value)
+		protected override void OnRemoved(int index, TSource value)
 		{
 			var itemSet = _sourceList[index];
 			_sourceList.RemoveAt(itemSet.SourceIndex);
@@ -142,7 +142,7 @@ namespace ActiveListExtensions.Modifiers
 			UpdateTargetIndexes(itemSet.TargetIndex);
 		}
 
-		protected override void OnReplaced(int index, T oldValue, T newValue)
+		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
 			var oldItemSet = _sourceList[index];
 
@@ -174,7 +174,7 @@ namespace ActiveListExtensions.Modifiers
 			}
 		}
 
-		protected override void OnMoved(int oldIndex, int newIndex, T value)
+		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
 			var itemSet = _sourceList[oldIndex];
 
@@ -202,7 +202,7 @@ namespace ActiveListExtensions.Modifiers
 			}
 		}
 
-		protected override void OnReset(IReadOnlyList<T> newItems)
+		protected override void OnReset(IReadOnlyList<TSource> newItems)
 		{
 			_sourceList.Clear();
 			for (int i = 0; i < newItems.Count; ++i)
@@ -223,8 +223,8 @@ namespace ActiveListExtensions.Modifiers
 			_resultList.Reset(sortedItems);
 		}
 
-		protected override void ItemModified(int index, T value) => OnReplaced(index, value, value);
+		protected override void ItemModified(int index, TSource value) => OnReplaced(index, value, value);
 
-		public override IEnumerator<T> GetEnumerator() => _resultList.Select(kvp => kvp.Value).GetEnumerator();
+		public override IEnumerator<TSource> GetEnumerator() => _resultList.Select(kvp => kvp.Value).GetEnumerator();
 	}
 }

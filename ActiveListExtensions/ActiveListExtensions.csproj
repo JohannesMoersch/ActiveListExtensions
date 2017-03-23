@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ActiveListExtensions</RootNamespace>
     <AssemblyName>ActiveListExtensions</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,6 +47,7 @@
     <Compile Include="Modifiers\ActiveIntersect.cs" />
     <Compile Include="Modifiers\ActiveOrderBy.cs" />
     <Compile Include="Modifiers\ActiveUnion.cs" />
+    <Compile Include="Modifiers\ActiveZip.cs" />
     <Compile Include="Modifiers\Bases\ActiveBase.cs" />
     <Compile Include="Modifiers\ActiveList.cs" />
     <Compile Include="ActiveListExtensions.cs" />

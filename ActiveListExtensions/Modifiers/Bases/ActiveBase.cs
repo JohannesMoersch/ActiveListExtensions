@@ -10,11 +10,11 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers.Bases
 {
-	internal abstract class ActiveBase<T, U> : IActiveList<U>
+	internal abstract class ActiveBase<TSource, TResult> : IActiveList<TResult>
 	{
 		public abstract int Count { get; }
 
-		public abstract U this[int index] { get; }
+		public abstract TResult this[int index] { get; }
 
 		private bool _isDisposed;
 		public void Dispose()
@@ -65,7 +65,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 			}
 		}
 
-		public abstract IEnumerator<U> GetEnumerator();
+		public abstract IEnumerator<TResult> GetEnumerator();
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}

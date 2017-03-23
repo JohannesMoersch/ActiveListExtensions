@@ -7,13 +7,13 @@ using ActiveListExtensions.Modifiers.Bases;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveWhere<T> : ActiveListBase<T, T>
+	internal class ActiveWhere<TSource> : ActiveListBase<TSource, TSource>
 	{
 		private IList<int> _indexList;
 
-		private Func<T, bool> _predicate;
+		private Func<TSource, bool> _predicate;
 
-		public ActiveWhere(IActiveList<T> source, Func<T, bool> predicate, IEnumerable<string> propertiesToWatch = null) 
+		public ActiveWhere(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch = null) 
 			: base(source, propertiesToWatch)
 		{
 			if (predicate == null)
@@ -61,7 +61,7 @@ namespace ActiveListExtensions.Modifiers
 			}
 		}
 
-		protected override void OnAdded(int index, T value)
+		protected override void OnAdded(int index, TSource value)
 		{
 			if (_predicate.Invoke(value))
 				ResultList.Add(AddIndex(index, false), value);
@@ -69,7 +69,7 @@ namespace ActiveListExtensions.Modifiers
 				_indexList.Insert(index, -1);
 		}
 
-		protected override void OnRemoved(int index, T value)
+		protected override void OnRemoved(int index, TSource value)
 		{
 			var targetIndex = _indexList[index];
 			if (targetIndex >= 0)
@@ -81,7 +81,7 @@ namespace ActiveListExtensions.Modifiers
 				_indexList.RemoveAt(index);
 		}
 
-		protected override void OnMoved(int oldIndex, int newIndex, T value)
+		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
 			var oldTargetIndex = _indexList[oldIndex];
 			if (oldTargetIndex >= 0)
@@ -98,7 +98,7 @@ namespace ActiveListExtensions.Modifiers
 			}
 		}
 
-		protected override void OnReplaced(int index, T oldValue, T newValue)
+		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
 			var targetIndex = _indexList[index];
 			if (_predicate.Invoke(newValue))
@@ -116,7 +116,7 @@ namespace ActiveListExtensions.Modifiers
 			}
 		}
 
-		protected override void ItemModified(int index, T value)
+		protected override void ItemModified(int index, TSource value)
 		{
 			var targetIndex = _indexList[index];
 			if (_predicate.Invoke(value))
@@ -131,9 +131,9 @@ namespace ActiveListExtensions.Modifiers
 			}
 		}
 
-		protected override void OnReset(IReadOnlyList<T> newItems) => ResultList.Reset(ResetEnumerable(newItems));
+		protected override void OnReset(IReadOnlyList<TSource> newItems) => ResultList.Reset(ResetEnumerable(newItems));
 
-		private IEnumerable<T> ResetEnumerable(IReadOnlyList<T> newItems)
+		private IEnumerable<TSource> ResetEnumerable(IReadOnlyList<TSource> newItems)
 		{
 			_indexList.Clear();
 			int index = 0;

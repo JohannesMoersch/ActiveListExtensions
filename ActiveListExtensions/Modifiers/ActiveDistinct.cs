@@ -7,9 +7,9 @@ using ActiveListExtensions.Modifiers.Bases;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveDistinct<T, U> : ActiveSetBase<T, U>
+	internal class ActiveDistinct<TSource, TKey> : ActiveSetBase<TSource, TKey>
 	{
-		public ActiveDistinct(IActiveList<T> source, Func<T, U> keySelector, IEnumerable<string> propertiesToWatch = null) 
+		public ActiveDistinct(IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch = null) 
 			: base(source, null, keySelector, propertiesToWatch)
 		{
 		}

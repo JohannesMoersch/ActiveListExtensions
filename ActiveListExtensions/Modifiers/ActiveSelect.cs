@@ -10,11 +10,11 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveSelect<T, U> : ActiveListBase<T, U>
+	internal class ActiveSelect<TSource, TResult> : ActiveListBase<TSource, TResult>
 	{
-		private Func<T, U> _selector;
+		private Func<TSource, TResult> _selector;
 
-		public ActiveSelect(IActiveList<T> source, Func<T, U> selector, IEnumerable<string> propertiesToWatch)
+		public ActiveSelect(IActiveList<TSource> source, Func<TSource, TResult> selector, IEnumerable<string> propertiesToWatch)
 			: base(source, propertiesToWatch)
 		{
 			if (source == null)
@@ -30,17 +30,17 @@ namespace ActiveListExtensions.Modifiers
 			_selector = null;
 		}
 
-		protected override void OnAdded(int index, T value) => ResultList.Add(index, _selector.Invoke(value));
+		protected override void OnAdded(int index, TSource value) => ResultList.Add(index, _selector.Invoke(value));
 
-		protected override void OnRemoved(int index, T value) => ResultList.Remove(index);
+		protected override void OnRemoved(int index, TSource value) => ResultList.Remove(index);
 
-		protected override void OnReplaced(int index, T oldValue, T newValue) => ResultList.Replace(index, _selector.Invoke(newValue));
+		protected override void OnReplaced(int index, TSource oldValue, TSource newValue) => ResultList.Replace(index, _selector.Invoke(newValue));
 
-		protected override void OnMoved(int oldIndex, int newIndex, T value) => ResultList.Move(oldIndex, newIndex);
+		protected override void OnMoved(int oldIndex, int newIndex, TSource value) => ResultList.Move(oldIndex, newIndex);
 
-		protected override void OnReset(IReadOnlyList<T> newItems) => ResultList.Reset(newItems.Select(v => _selector.Invoke(v)));
+		protected override void OnReset(IReadOnlyList<TSource> newItems) => ResultList.Reset(newItems.Select(v => _selector.Invoke(v)));
 
-		protected override void ItemModified(int index, T value)
+		protected override void ItemModified(int index, TSource value)
 		{
 			var newValue = _selector.Invoke(value);
 			if (!Equals(ResultList[index], newValue))
