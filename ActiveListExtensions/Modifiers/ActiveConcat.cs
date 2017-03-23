@@ -16,8 +16,10 @@ namespace ActiveListExtensions.Modifiers
 		{
 			if (concat == null)
 				throw new ArgumentNullException(nameof(concat));
-			Initialize();
+
 			AddSourceCollection(0, (concat as IReadOnlyList<TSource>) ?? concat.ToArray());
+
+			Initialize();
 		}
 
 		protected override void OnAdded(int collectionIndex, int index, TSource value) => ResultList.Add(_concatIndex + index, value);

@@ -9,14 +9,22 @@ namespace ActiveListExtensions.Modifiers
 {
     internal class ActiveZip<TSource, TOtherSource, TResult> : ActiveMultiListBase<TSource, TOtherSource, TResult>
     {
+        private Func<TSource, TOtherSource, TResult> _resultSelector;
+
+        private int SourceListCount => Math.Min(SourceList.Count, SourceLists[0].Count);
+
         public ActiveZip(IActiveList<TSource> source, IEnumerable<TOtherSource> otherSource, Func<TSource, TOtherSource, TResult> resultSelector, IEnumerable<string> propertiesToWatch = null)
             : base(source, propertiesToWatch)
         {
+            _resultSelector = resultSelector ?? throw new ArgumentNullException(nameof(resultSelector));
+
             if (otherSource == null)
                 throw new ArgumentNullException(nameof(otherSource));
-            Initialize();
+            
             AddSourceCollection(0, (otherSource as IReadOnlyList<TOtherSource>) ?? otherSource.ToArray());
-        }
+
+			Initialize();
+		}
 
         protected override void OnAdded(int collectionIndex, int index, TOtherSource value) => Refresh(index);
 
@@ -44,7 +52,32 @@ namespace ActiveListExtensions.Modifiers
 
         private void Refresh(int startIndex, int? endIndex = null)
         {
+            for (int i = startIndex; i <= (endIndex ?? ResultList.Count); ++i)
+            {
+                TResult result;
+                if (!TryGetResultForIndex(i, out result))
+                {
+                    for (int j = ResultList.Count - 1; j >= i; --j)
+                        ResultList.Remove(j);
+					break;
+                }
 
+				if (i < ResultList.Count)
+					ResultList.Replace(i, result);
+				else
+					ResultList.Add(i, result);
+            }
+        }
+
+        private bool TryGetResultForIndex(int index, out TResult result)
+        {
+            if (index >= SourceListCount)
+            {
+                result = default(TResult);
+                return false;
+            }
+            result = _resultSelector.Invoke(SourceList[index], SourceLists[0][index]);
+            return true;
         }
     }
 }

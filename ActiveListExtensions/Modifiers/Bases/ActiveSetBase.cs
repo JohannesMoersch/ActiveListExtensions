@@ -90,7 +90,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 		public ActiveSetBase(IActiveList<TSource> leftSource, IActiveList<TSource> rightSource, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch = null)
 			: base(leftSource, propertiesToWatch)
 		{
-			_keySelector = keySelector;
+			_keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
 
 			_leftKeys = new List<SourcePair>();
 			_rightKeys = new List<SourcePair>();
@@ -102,13 +102,13 @@ namespace ActiveListExtensions.Modifiers.Bases
 			_resultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(RewrapEventArgs(e));
 			_resultList.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
 
-			Initialize();
-
 			if (rightSource != null)
 			{
 				_rightCount = new Dictionary<TKey, SourceSet>();
 				AddSourceCollection(0, rightSource, true);
 			}
+
+			Initialize();
 		}
 
 		private NotifyCollectionChangedEventArgs RewrapEventArgs(NotifyCollectionChangedEventArgs args)
