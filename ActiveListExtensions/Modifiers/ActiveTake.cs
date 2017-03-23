@@ -9,7 +9,7 @@ using ActiveListExtensions.Modifiers.Bases;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveTake<T> : ActiveListListenerBase<T, T>
+	internal class ActiveTake<TSource> : ActiveListListenerBase<TSource, TSource>
 	{
 		private int _lastCount;
 		public override int Count
@@ -25,7 +25,7 @@ namespace ActiveListExtensions.Modifiers
 
 		private int _skipIndex = int.MaxValue;
 
-		public override T this[int index]
+		public override TSource this[int index]
 		{
 			get
 			{
@@ -39,7 +39,7 @@ namespace ActiveListExtensions.Modifiers
 
 		private int _takeCount;
 
-		public ActiveTake(IActiveList<T> source, int count) 
+		public ActiveTake(IActiveList<TSource> source, int count) 
 			: base(source)
 		{
 			_takeCount = count;
@@ -54,7 +54,7 @@ namespace ActiveListExtensions.Modifiers
 			NotifyOfPropertyChange(new PropertyChangedEventArgs(nameof(Count)));
 		}
 
-		protected override void OnAdded(int index, T value)
+		protected override void OnAdded(int index, TSource value)
 		{
 			if (index >= _takeCount)
 				return;
@@ -68,7 +68,7 @@ namespace ActiveListExtensions.Modifiers
 			UpdateCount();
 		}
 
-		protected override void OnRemoved(int index, T value)
+		protected override void OnRemoved(int index, TSource value)
 		{
 			if (index >= _takeCount)
 				return;
@@ -80,13 +80,13 @@ namespace ActiveListExtensions.Modifiers
 			UpdateCount();
 		}
 
-		protected override void OnReplaced(int index, T oldValue, T newValue)
+		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
 			if (index < _takeCount)
 				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newValue, oldValue, index));
 		}
 
-		protected override void OnMoved(int oldIndex, int newIndex, T value)
+		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
 			if (oldIndex < _takeCount)
 			{
@@ -100,18 +100,18 @@ namespace ActiveListExtensions.Modifiers
 			UpdateCount();
 		}
 
-		protected override void OnReset(IReadOnlyList<T> newItems)
+		protected override void OnReset(IReadOnlyList<TSource> newItems)
 		{
 			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 			UpdateCount();
 		}
 
-		private IEnumerable<T> EnumerateCollection()
+		private IEnumerable<TSource> EnumerateCollection()
 		{
 			for (int i = 0; i < Count; ++i)
 				yield return this[i];
 		}
 
-		public override IEnumerator<T> GetEnumerator() => EnumerateCollection().GetEnumerator();
+		public override IEnumerator<TSource> GetEnumerator() => EnumerateCollection().GetEnumerator();
 	}
 }

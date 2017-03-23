@@ -7,18 +7,18 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers.Bases
 {
-	internal abstract class ActiveListBase<T, U> : ActiveListListenerBase<T, U>
+	internal abstract class ActiveListBase<TSource, TResult> : ActiveListListenerBase<TSource, TResult>
 	{
 		public override int Count => ResultList.Count;
 
-		public override U this[int index] => ResultList[index];
+		public override TResult this[int index] => ResultList[index];
 
-		protected ObservableList<U> ResultList { get; }
+		protected ObservableList<TResult> ResultList { get; }
 
-		public ActiveListBase(IActiveList<T> source, IEnumerable<string> propertiesToWatch = null)
+		public ActiveListBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null)
 			:  base(source, propertiesToWatch)
 		{
-			ResultList = new ObservableList<U>();
+			ResultList = new ObservableList<TResult>();
 			ResultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);
 			ResultList.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
 		}
@@ -29,6 +29,6 @@ namespace ActiveListExtensions.Modifiers.Bases
 			base.OnDisposed();
 		}
 
-		public override IEnumerator<U> GetEnumerator() => ResultList.GetEnumerator();
+		public override IEnumerator<TResult> GetEnumerator() => ResultList.GetEnumerator();
 	}
 }

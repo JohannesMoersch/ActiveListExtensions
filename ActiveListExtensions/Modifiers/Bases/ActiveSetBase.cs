@@ -8,7 +8,7 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers.Bases
 {
-	internal abstract class ActiveSetBase<T, U> : ActiveMultiListListenerBase<T, T>
+	internal abstract class ActiveSetBase<TSource, TKey> : ActiveMultiListListenerBase<TSource, TSource, TSource>
 	{
 		protected enum SetAction
 		{
@@ -34,19 +34,19 @@ namespace ActiveListExtensions.Modifiers.Bases
 		{
 			public int Index { get; }
 
-			public T Value { get; }
+			public TSource Value { get; }
 
 			public bool InResultList { get; set; }
 
-			public ResultSet(int index, T value)
+			public ResultSet(int index, TSource value)
 			{
 				Index = index;
 				Value = value;
 			}
 
-			public bool IsSameInstance(T otherValue)
+			public bool IsSameInstance(TSource otherValue)
 			{
-				if (typeof(T).IsClass)
+				if (typeof(TSource).IsClass)
 					return ReferenceEquals(Value, otherValue);
 				return Equals(Value, otherValue);
 			}
@@ -56,11 +56,11 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		private class SourcePair
 		{
-			public U Key { get; }
+			public TKey Key { get; }
 
-			public T Value { get; }
+			public TSource Value { get; }
 
-			public SourcePair(U key, T value)
+			public SourcePair(TKey key, TSource value)
 			{
 				Key = key;
 				Value = value;
@@ -71,23 +71,23 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		public override int Count => _resultList.Count;
 
-		public override T this[int index] => _resultList[index].Value;
+		public override TSource this[int index] => _resultList[index].Value;
 
 		private readonly ObservableList<ResultSet> _resultList;
 
 		private readonly List<ResultSet> _cumulativeList;
 
-		private readonly IDictionary<U, SourceSet> _leftCount;
+		private readonly IDictionary<TKey, SourceSet> _leftCount;
 
-		private readonly IDictionary<U, SourceSet> _rightCount;
+		private readonly IDictionary<TKey, SourceSet> _rightCount;
 
 		private readonly List<SourcePair> _leftKeys;
 
 		private readonly List<SourcePair> _rightKeys;
 
-		private readonly Func<T, U> _keySelector;
+		private readonly Func<TSource, TKey> _keySelector;
 
-		public ActiveSetBase(IActiveList<T> leftSource, IActiveList<T> rightSource, Func<T, U> keySelector, IEnumerable<string> propertiesToWatch = null)
+		public ActiveSetBase(IActiveList<TSource> leftSource, IActiveList<TSource> rightSource, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch = null)
 			: base(leftSource, propertiesToWatch)
 		{
 			_keySelector = keySelector;
@@ -96,7 +96,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 			_rightKeys = new List<SourcePair>();
 
 			_cumulativeList = new List<ResultSet>();
-			_leftCount = new Dictionary<U, SourceSet>();
+			_leftCount = new Dictionary<TKey, SourceSet>();
 
 			_resultList = new ObservableList<ResultSet>();
 			_resultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(RewrapEventArgs(e));
@@ -106,7 +106,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 			if (rightSource != null)
 			{
-				_rightCount = new Dictionary<U, SourceSet>();
+				_rightCount = new Dictionary<TKey, SourceSet>();
 				AddSourceCollection(0, rightSource, true);
 			}
 		}
@@ -165,7 +165,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 			resultSet.InResultList = true;
 		}
 
-		private void Add(U key, T value, IDictionary<U, SourceSet> addTo, IDictionary<U, SourceSet> other, Func<bool, SetAction> onAddedMethod)
+		private void Add(TKey key, TSource value, IDictionary<TKey, SourceSet> addTo, IDictionary<TKey, SourceSet> other, Func<bool, SetAction> onAddedMethod)
 		{
 			int? insertIndex = null;
 			var action = SetAction.None;
@@ -204,7 +204,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 			}
 		}
 
-		private void Remove(U key, T value, IDictionary<U, SourceSet> removeFrom, IDictionary<U, SourceSet> other, Func<bool, SetAction> onRemovedMethod)
+		private void Remove(TKey key, TSource value, IDictionary<TKey, SourceSet> removeFrom, IDictionary<TKey, SourceSet> other, Func<bool, SetAction> onRemovedMethod)
 		{
 			if (removeFrom.TryGetValue(key, out SourceSet sourceSet))
 			{
@@ -269,35 +269,35 @@ namespace ActiveListExtensions.Modifiers.Bases
 			return bottom;
 		}
 
-		protected override void OnAdded(int index, T value)
+		protected override void OnAdded(int index, TSource value)
 		{
 			var key = _keySelector.Invoke(value);
 			_leftKeys.Insert(index, new SourcePair(key, value));
 			Add(key, value, _leftCount, _rightCount, OnAddedToLeft);
 		}
 
-		protected override void OnAdded(int collectionIndex, int index, T value)
+		protected override void OnAdded(int collectionIndex, int index, TSource value)
 		{
 			var key = _keySelector.Invoke(value);
 			_rightKeys.Insert(index, new SourcePair(key, value));
 			Add(key, value, _rightCount, _leftCount, OnAddedToRight);
 		}
 
-		protected override void OnRemoved(int index, T value)
+		protected override void OnRemoved(int index, TSource value)
 		{
 			var sourcePair = _leftKeys[index];
 			_leftKeys.RemoveAt(index);
 			Remove(sourcePair.Key, sourcePair.Value, _leftCount, _rightCount, OnRemovedFromLeft);
 		}
 
-		protected override void OnRemoved(int collectionIndex, int index, T value)
+		protected override void OnRemoved(int collectionIndex, int index, TSource value)
 		{
 			var sourcePair = _rightKeys[index];
 			_rightKeys.RemoveAt(index);
 			Remove(sourcePair.Key, sourcePair.Value, _rightCount, _leftCount, OnRemovedFromRight);
 		}
 
-		protected override void OnReplaced(int index, T oldValue, T newValue)
+		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
 			var sourcePair = _leftKeys[index];
 			Remove(sourcePair.Key, sourcePair.Value, _leftCount, _rightCount, OnRemovedFromLeft);
@@ -307,7 +307,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 			Add(key, newValue, _leftCount, _rightCount, OnAddedToLeft);
 		}
 
-		protected override void OnReplaced(int collectionIndex, int index, T oldValue, T newValue)
+		protected override void OnReplaced(int collectionIndex, int index, TSource oldValue, TSource newValue)
 		{
 			var sourcePair = _rightKeys[index];
 			Remove(sourcePair.Key, sourcePair.Value, _rightCount, _leftCount, OnRemovedFromRight);
@@ -317,11 +317,11 @@ namespace ActiveListExtensions.Modifiers.Bases
 			Add(key, newValue, _rightCount, _leftCount, OnAddedToRight);
 		}
 
-		protected override void OnMoved(int oldIndex, int newIndex, T value) { }
+		protected override void OnMoved(int oldIndex, int newIndex, TSource value) { }
 
-		protected override void OnMoved(int collectionIndex, int oldIndex, int newIndex, T value) { }
+		protected override void OnMoved(int collectionIndex, int oldIndex, int newIndex, TSource value) { }
 
-		protected override void OnReset(IReadOnlyList<T> newItems)
+		protected override void OnReset(IReadOnlyList<TSource> newItems)
 		{
 			foreach (var value in _leftKeys)
 				Remove(value.Key, value.Value, _leftCount, _rightCount, OnRemovedFromLeft);
@@ -334,7 +334,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 			}
 		}
 
-		protected override void OnReset(int collectionIndex, IReadOnlyList<T> newItems)
+		protected override void OnReset(int collectionIndex, IReadOnlyList<TSource> newItems)
 		{
 			foreach (var value in _rightKeys)
 				Remove(value.Key, value.Value, _rightCount, _leftCount, OnRemovedFromRight);
@@ -347,10 +347,10 @@ namespace ActiveListExtensions.Modifiers.Bases
 			}
 		}
 
-		protected override void ItemModified(int index, T value) => OnReplaced(index, value, value);
+		protected override void ItemModified(int index, TSource value) => OnReplaced(index, value, value);
 
-		protected override void ItemModified(int collectionIndex, int index, T value) => OnReplaced(collectionIndex, index, value, value); 
+		protected override void ItemModified(int collectionIndex, int index, TSource value) => OnReplaced(collectionIndex, index, value, value); 
 
-		public override IEnumerator<T> GetEnumerator() => _resultList.Select(v => v.Value).GetEnumerator();
+		public override IEnumerator<TSource> GetEnumerator() => _resultList.Select(v => v.Value).GetEnumerator();
 	}
 }

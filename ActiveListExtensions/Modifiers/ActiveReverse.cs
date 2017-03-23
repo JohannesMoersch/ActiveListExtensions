@@ -9,44 +9,44 @@ using ActiveListExtensions.Modifiers.Bases;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveReverse<T> : ActiveListListenerBase<T, T>
+	internal class ActiveReverse<TSource> : ActiveListListenerBase<TSource, TSource>
 	{
 		public override int Count => SourceList.Count;
 
-		public override T this[int index] => SourceList[SourceList.Count - index - 1];
+		public override TSource this[int index] => SourceList[SourceList.Count - index - 1];
 
-		public ActiveReverse(IActiveList<T> source) 
+		public ActiveReverse(IActiveList<TSource> source) 
 			: base(source)
 		{
 
 			if (SourceList is INotifyPropertyChanged)
-				PropertyChangedEventManager.AddHandler(SourceList as INotifyPropertyChanged, SourceCountChanged, nameof(IReadOnlyList<T>.Count));
+				PropertyChangedEventManager.AddHandler(SourceList as INotifyPropertyChanged, SourceCountChanged, nameof(IReadOnlyList<TSource>.Count));
 			Initialize();
 		}
 
 		protected override void OnDisposed()
 		{
-			PropertyChangedEventManager.RemoveHandler(SourceList as INotifyPropertyChanged, SourceCountChanged, nameof(IReadOnlyList<T>.Count));
+			PropertyChangedEventManager.RemoveHandler(SourceList as INotifyPropertyChanged, SourceCountChanged, nameof(IReadOnlyList<TSource>.Count));
 		}
 
 		private void SourceCountChanged(object sender, PropertyChangedEventArgs args) => NotifyOfPropertyChange(new PropertyChangedEventArgs(nameof(Count)));
 
-		protected override void OnAdded(int index, T value) => NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, Count - index - 1));
+		protected override void OnAdded(int index, TSource value) => NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, Count - index - 1));
 
-		protected override void OnRemoved(int index, T value) => NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, Count - index));
+		protected override void OnRemoved(int index, TSource value) => NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, Count - index));
 
-		protected override void OnMoved(int oldIndex, int newIndex, T value) => NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, value, Count - newIndex - 1, Count - oldIndex - 1));
+		protected override void OnMoved(int oldIndex, int newIndex, TSource value) => NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, value, Count - newIndex - 1, Count - oldIndex - 1));
 
-		protected override void OnReplaced(int index, T oldValue, T newValue) => NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newValue, oldValue, Count - index - 1));
+		protected override void OnReplaced(int index, TSource oldValue, TSource newValue) => NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newValue, oldValue, Count - index - 1));
 
-		protected override void OnReset(IReadOnlyList<T> newItems) => NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+		protected override void OnReset(IReadOnlyList<TSource> newItems) => NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 
-		private IEnumerable<T> Reverse(IReadOnlyList<T> list)
+		private IEnumerable<TSource> Reverse(IReadOnlyList<TSource> list)
 		{
 			for (int i = list.Count - 1; i >= 0; --i)
 				yield return list[i];
 		}
 
-		public override IEnumerator<T> GetEnumerator() => Reverse(SourceList).GetEnumerator();
+		public override IEnumerator<TSource> GetEnumerator() => Reverse(SourceList).GetEnumerator();
 	}
 }

@@ -15,7 +15,7 @@ namespace ActiveListExtensions
     {
 		private static IEnumerable<string> GetReferencedProperties<T, U>(Expression<Func<T, U>> expression) => typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T)) ? expression.GetReferencedProperties() : Enumerable.Empty<string>();
 
-		public static IActiveList<T> ToActiveList<T>(this IList<T> source)
+        public static IActiveList<T> ToActiveList<T>(this IList<T> source)
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
@@ -81,36 +81,40 @@ namespace ActiveListExtensions
 
 		public static IActiveList<T> ActiveOrderByDescending<T, U>(this IActiveList<T> source, Func<T, U> keySelector, IEnumerable<string> propertiesToWatch) where U : IComparable<U> => new ActiveOrderBy<T, U>(source, keySelector, true, propertiesToWatch);
 
-		// --Where
-		// --Select
-		// --SelectMany
-		// --Take
-		// --Skip
-		// --OrderBy
-		// --OrderByDescending
-		// GroupBy
-		// --Concat
-		// Zip
-		// --Distinct
-		// --Union
-		// --Intersect
-		// --Except
-		// --Reverse
+        public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Expression<Func<TFirst, TSecond, TResult>> resultSelector) => ActiveZip(source, otherSource, resultSelector.Compile(), /*GetReferencedProperties(resultSelector)*/ null);
 
-		// ToLookup (Not an IActiveList)
+        public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, IEnumerable<string> propertiesToWatch) => new ActiveZip<TFirst, TSecond, TResult>(source, otherSource, resultSelector, propertiesToWatch);
 
-		// SequenceEqual
-		// FirstOrDefault
-		// LastOrDefault
-		// ElementAtOrDefault
-		// Any
-		// All
-		// Count
-		// Contains
-		// Aggregate
-		// Sum
-		// Min
-		// Max
-		// Average
-	}
+        // --Where
+        // --Select
+        // --SelectMany
+        // --Take
+        // --Skip
+        // --OrderBy
+        // --OrderByDescending
+        // GroupBy
+        // --Concat
+        // Zip
+        // --Distinct
+        // --Union
+        // --Intersect
+        // --Except
+        // --Reverse
+
+        // ToLookup (Not an IActiveList)
+
+        // SequenceEqual
+        // FirstOrDefault
+        // LastOrDefault
+        // ElementAtOrDefault
+        // Any
+        // All
+        // Count
+        // Contains
+        // Aggregate
+        // Sum
+        // Min
+        // Max
+        // Average
+    }
 }

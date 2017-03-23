@@ -7,15 +7,15 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers.Bases
 {
-	internal abstract class ActiveListListenerBase<T, U> : ActiveBase<T, U>
+	internal abstract class ActiveListListenerBase<TSource, TResult> : ActiveBase<TSource, TResult>
 	{
-		private CollectionWrapper<T> _sourceList;
+		private CollectionWrapper<TSource> _sourceList;
 
-		protected IReadOnlyList<T> SourceList => _sourceList;
+		protected IReadOnlyList<TSource> SourceList => _sourceList;
 
-		public ActiveListListenerBase(IActiveList<T> source, IEnumerable<string> propertiesToWatch = null)
+		public ActiveListListenerBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null)
 		{
-			_sourceList = new CollectionWrapper<T>(source, propertiesToWatch?.ToArray());
+			_sourceList = new CollectionWrapper<TSource>(source, propertiesToWatch?.ToArray());
 			_sourceList.ItemModified += (s, i, v) => ItemModified(i, v);
 			_sourceList.ItemAdded += (s, i, v) => OnAdded(i, v);
 			_sourceList.ItemRemoved += (s, i, v) => OnRemoved(i, v);
@@ -31,16 +31,16 @@ namespace ActiveListExtensions.Modifiers.Bases
 			_sourceList.Dispose();
 		}
 
-		protected abstract void OnAdded(int index, T value);
+		protected abstract void OnAdded(int index, TSource value);
 
-		protected abstract void OnRemoved(int index, T value);
+		protected abstract void OnRemoved(int index, TSource value);
 
-		protected abstract void OnReplaced(int index, T oldValue, T newValue);
+		protected abstract void OnReplaced(int index, TSource oldValue, TSource newValue);
 
-		protected abstract void OnMoved(int oldIndex, int newIndex, T value);
+		protected abstract void OnMoved(int oldIndex, int newIndex, TSource value);
 
-		protected abstract void OnReset(IReadOnlyList<T> newItems);
+		protected abstract void OnReset(IReadOnlyList<TSource> newItems);
 
-		protected virtual void ItemModified(int index, T value) { }
+		protected virtual void ItemModified(int index, TSource value) { }
 	}
 }

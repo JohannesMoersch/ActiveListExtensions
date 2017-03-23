@@ -7,15 +7,15 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers.Bases
 {
-	internal abstract class ActiveMultiListListenerBase<T, U> : ActiveListListenerBase<T, U>
+	internal abstract class ActiveMultiListListenerBase<TSource, TOtherSources, TResult> : ActiveListListenerBase<TSource, TResult>
 	{
-		private List<CollectionWrapper<U>> _sourceLists = new List<CollectionWrapper<U>>();
+		private List<CollectionWrapper<TOtherSources>> _sourceLists = new List<CollectionWrapper<TOtherSources>>();
 
-		protected IReadOnlyList<IReadOnlyList<U>> SourceLists => _sourceLists;
+		protected IReadOnlyList<IReadOnlyList<TOtherSources>> SourceLists => _sourceLists;
 
 		private string[] _propertiesToWatch;
 
-		public ActiveMultiListListenerBase(IActiveList<T> source, IEnumerable<string> propertiesToWatch = null) 
+		public ActiveMultiListListenerBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null) 
 			: base(source, propertiesToWatch)
 		{
 			_propertiesToWatch = propertiesToWatch?.ToArray();
@@ -29,12 +29,12 @@ namespace ActiveListExtensions.Modifiers.Bases
 			base.OnDisposed();
 		}
 
-		protected void AddSourceCollection(int collectionIndex, IReadOnlyList<U> collection, bool usePropertyWatcher = true)
+		protected void AddSourceCollection(int collectionIndex, IReadOnlyList<TOtherSources> collection, bool usePropertyWatcher = true)
 		{
 			if (collectionIndex < 0 || collectionIndex > _sourceLists.Count)
 				throw new ArgumentOutOfRangeException(nameof(collectionIndex));
 
-			var wrapper = new CollectionWrapper<U>(collection, usePropertyWatcher ? _propertiesToWatch : null);
+			var wrapper = new CollectionWrapper<TOtherSources>(collection, usePropertyWatcher ? _propertiesToWatch : null);
 			wrapper.ItemModified += (s, i, v) => ItemModified(wrapper.CollectionIndex, i, v);
 			wrapper.ItemAdded += (s, i, v) => OnAdded(wrapper.CollectionIndex, i, v);
 			wrapper.ItemRemoved += (s, i, v) => OnRemoved(wrapper.CollectionIndex, i, v);
@@ -54,7 +54,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 			if (collectionIndex < 0 || collectionIndex >= _sourceLists.Count)
 				throw new ArgumentOutOfRangeException(nameof(collectionIndex));
 
-			OnReset(collectionIndex, new U[0]);
+			OnReset(collectionIndex, new TOtherSources[0]);
 			var wrapper = _sourceLists[collectionIndex];
 			_sourceLists.RemoveAt(collectionIndex);
 			for (int i = collectionIndex; i < _sourceLists.Count; ++i)
@@ -63,17 +63,17 @@ namespace ActiveListExtensions.Modifiers.Bases
 			wrapper.Dispose();
 		}
 
-		protected abstract void OnAdded(int collectionIndex, int index, U value);
+		protected abstract void OnAdded(int collectionIndex, int index, TOtherSources value);
 
-		protected abstract void OnRemoved(int collectionIndex, int index, U value);
+		protected abstract void OnRemoved(int collectionIndex, int index, TOtherSources value);
 
-		protected abstract void OnReplaced(int collectionIndex, int index, U oldValue, U newValue);
+		protected abstract void OnReplaced(int collectionIndex, int index, TOtherSources oldValue, TOtherSources newValue);
 
-		protected abstract void OnMoved(int collectionIndex, int oldIndex, int newIndex, U value);
+		protected abstract void OnMoved(int collectionIndex, int oldIndex, int newIndex, TOtherSources value);
 
-		protected abstract void OnReset(int collectionIndex, IReadOnlyList<U> newItems);
+		protected abstract void OnReset(int collectionIndex, IReadOnlyList<TOtherSources> newItems);
 
-		protected virtual void ItemModified(int collectionIndex, int index, U value) { }
+		protected virtual void ItemModified(int collectionIndex, int index, TOtherSources value) { }
 
 		protected virtual void OnCollectionInserted(int collectionIndex) { }
 

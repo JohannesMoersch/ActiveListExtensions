@@ -7,9 +7,9 @@ using ActiveListExtensions.Modifiers.Bases;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveUnion<T, U> : ActiveSetBase<T, U> 
+	internal class ActiveUnion<TSource, TKey> : ActiveSetBase<TSource, TKey> 
 	{
-		public ActiveUnion(IActiveList<T> leftSource, IActiveList<T> rightSource, Func<T, U> keySelector, IEnumerable<string> propertiesToWatch = null) 
+		public ActiveUnion(IActiveList<TSource> leftSource, IActiveList<TSource> rightSource, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch = null) 
 			: base(leftSource, rightSource, keySelector, propertiesToWatch)
 		{
 		}

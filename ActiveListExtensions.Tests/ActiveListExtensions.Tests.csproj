@@ -90,6 +90,7 @@
     <Compile Include="Modifiers\ActiveTakeTests.cs" />
     <Compile Include="Modifiers\ActiveUnionTests.cs" />
     <Compile Include="Modifiers\ActiveWhereTests.cs" />
+    <Compile Include="Modifiers\ActiveZipTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ObservableListTests.cs" />
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />
