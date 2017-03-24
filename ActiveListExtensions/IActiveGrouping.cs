@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions
 {
-	public interface IActiveGrouping<out TKey, out TSource> : IActiveList<TSource>
+	public interface IActiveGrouping<out TKey, out TSource> : IActiveList<TSource>, IGrouping<TKey, TSource>
 	{
-		TKey Key { get; }
 	}
 }

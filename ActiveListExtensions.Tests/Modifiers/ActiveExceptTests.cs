@@ -27,7 +27,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		public void ResetWithRandomItems() => CollectionTestHelpers.ResetTwoCollectionsWithRandomItems((l1, l2) => l1.ActiveExcept(l2), (l1, l2) => l1.Except(l2), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10), true);
 
 		[Fact]
-		public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValuesInTwoCollections((l1, l2) => l1.ActiveExcept(l2, o => o.Property), (l1, l2) => l1.Except(l2, new KeyEqualityComparer<ActiveExceptTestClass>(o => o.Property)), () => new ActiveExceptTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, () => new ActiveExceptTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger(), o => o.Property = RandomGenerator.GenerateRandomInteger(), true, o => o.Property);
+		public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValuesInTwoCollections((l1, l2) => l1.ActiveExcept(l2, o => o.Property), (l1, l2) => l1.Except(l2, new KeyEqualityComparer<ActiveExceptTestClass>(o => o.Property, null)), () => new ActiveExceptTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, () => new ActiveExceptTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger(), o => o.Property = RandomGenerator.GenerateRandomInteger(), true, o => o.Property);
 	}
 
 	public class ActiveExceptTestClass : INotifyPropertyChanged
