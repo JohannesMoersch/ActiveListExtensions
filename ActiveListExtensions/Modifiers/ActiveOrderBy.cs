@@ -33,7 +33,7 @@ namespace ActiveListExtensions.Modifiers
 
 		public override TSource this[int index] => _resultList[index].Value;
 
-		private ObservableList<ItemSet> _resultList;
+		private readonly ObservableList<ItemSet> _resultList;
 
 		private readonly List<ItemSet> _sourceList;
 

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	internal class ObservableList<T> : IReadOnlyList<T>, IDisposable, INotifyPropertyChanged, INotifyCollectionChanged
+	internal class ObservableList<T> : IActiveList<T>
 	{
 		private int _skipStart, _skipCount;
 

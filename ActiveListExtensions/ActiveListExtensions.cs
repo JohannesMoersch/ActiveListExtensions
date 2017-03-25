@@ -105,7 +105,7 @@ namespace ActiveListExtensions
 
 		public static IActiveLookup<TKey, TSource> ToActiveLookup<TSource, TKey>(this IActiveList<TSource> source, Expression<Func<TSource, TKey>> keySelector) => ToActiveLookup(source, keySelector.Compile(), GetReferencedProperties(keySelector));
 
-		public static IActiveLookup<TKey, TSource> ToActiveLookup<TSource, TKey>(this IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveLookup<TSource, TKey>(keySelector, propertiesToWatch);
+		public static IActiveLookup<TKey, TSource> ToActiveLookup<TSource, TKey>(this IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveLookup<TSource, TKey>(source, keySelector, propertiesToWatch);
 
 		// --Where
 		// --Select
