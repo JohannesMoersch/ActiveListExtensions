@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveOrderBy<TSource, TKey> : ActiveListListenerBase<TSource, TSource>
+	internal class ActiveOrderBy<TSource, TKey> : ActiveListBase<TSource, ActiveOrderBy<TSource, TKey>.ItemSet, TSource>
 		where TKey : IComparable<TKey>
 	{
-		private class ItemSet
+		internal class ItemSet
 		{
 			public int SourceIndex { get; set; }
 
@@ -29,12 +29,6 @@ namespace ActiveListExtensions.Modifiers
 			}
 		}
 
-		public override int Count => _resultList.Count;
-
-		public override TSource this[int index] => _resultList[index].Value;
-
-		private readonly ObservableList<ItemSet> _resultList;
-
 		private readonly List<ItemSet> _sourceList;
 
 		private readonly Func<TSource, TKey> _keySelector;
@@ -42,13 +36,9 @@ namespace ActiveListExtensions.Modifiers
 		private readonly bool _orderByDescending;
 
 		public ActiveOrderBy(IActiveList<TSource> source, Func<TSource, TKey> keySelector, bool orderByDescending, IEnumerable<string> propertiesToWatch = null) 
-			: base(source, propertiesToWatch)
+			: base(source, i => i.Value, propertiesToWatch)
 		{
 			_keySelector = keySelector;
-
-			_resultList = new ObservableList<ItemSet>();
-			_resultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(RewrapEventArgs(e));
-			_resultList.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
 
 			_sourceList = new List<ItemSet>();
 
@@ -57,38 +47,14 @@ namespace ActiveListExtensions.Modifiers
 			Initialize();
 		}
 
-		protected override void OnDisposed()
-		{
-			_resultList.Dispose();
-			base.OnDisposed();
-		}
-
-		private NotifyCollectionChangedEventArgs RewrapEventArgs(NotifyCollectionChangedEventArgs args)
-		{
-			switch (args.Action)
-			{
-				case NotifyCollectionChangedAction.Add:
-					return new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, ((ItemSet)args.NewItems[0]).Value, args.NewStartingIndex);
-				case NotifyCollectionChangedAction.Remove:
-					return new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, ((ItemSet)args.OldItems[0]).Value, args.OldStartingIndex);
-				case NotifyCollectionChangedAction.Replace:
-					return new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, ((ItemSet)args.NewItems[0]).Value, ((ItemSet)args.OldItems[0]).Value, args.NewStartingIndex);
-				case NotifyCollectionChangedAction.Move:
-					return new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, ((ItemSet)args.NewItems[0]).Value, args.NewStartingIndex, args.OldStartingIndex);
-				case NotifyCollectionChangedAction.Reset:
-					return new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
-			}
-			return null;
-		}
-
 		private int FindByKey(TKey key, int sourceIndex)
 		{
 			var bottom = 0;
-			var top = _resultList.Count - 1;
+			var top = ResultList.Count - 1;
 			while (bottom <= top)
 			{
 				var mid = bottom + (top - bottom) / 2;
-				var midItem = _resultList[mid];
+				var midItem = ResultList[mid];
 				var comparison = key.CompareTo(midItem.Key) * (_orderByDescending ? -1 : 1);
 				if (comparison == 0)
 					comparison = sourceIndex.CompareTo(midItem.SourceIndex);
@@ -111,9 +77,9 @@ namespace ActiveListExtensions.Modifiers
 		private void UpdateTargetIndexes(int startIndex, int? endIndex = null)
 		{
 			if (!endIndex.HasValue)
-				endIndex = _resultList.Count - 1;
+				endIndex = ResultList.Count - 1;
 			for (int i = startIndex; i <= endIndex; ++i)
-				_resultList[i].TargetIndex = i;
+				ResultList[i].TargetIndex = i;
 		}
 
 		protected override void OnAdded(int index, TSource value)
@@ -126,7 +92,7 @@ namespace ActiveListExtensions.Modifiers
 				TargetIndex = targetIndex
 			};
 			_sourceList.Insert(index, itemSet);
-			_resultList.Add(targetIndex, itemSet);
+			ResultList.Add(targetIndex, itemSet);
 
 			UpdateSourceIndexes(index + 1);
 			UpdateTargetIndexes(targetIndex + 1);
@@ -136,7 +102,7 @@ namespace ActiveListExtensions.Modifiers
 		{
 			var itemSet = _sourceList[index];
 			_sourceList.RemoveAt(itemSet.SourceIndex);
-			_resultList.Remove(itemSet.TargetIndex);
+			ResultList.Remove(itemSet.TargetIndex);
 
 			UpdateSourceIndexes(itemSet.SourceIndex);
 			UpdateTargetIndexes(itemSet.TargetIndex);
@@ -161,11 +127,11 @@ namespace ActiveListExtensions.Modifiers
 			_sourceList[index] = newItemSet;
 
 			if (newItemSet.TargetIndex == oldItemSet.TargetIndex)
-				_resultList.Replace(newItemSet.TargetIndex, newItemSet);
+				ResultList.Replace(newItemSet.TargetIndex, newItemSet);
 			else
 			{
-				_resultList.Remove(oldItemSet.TargetIndex);
-				_resultList.Add(newItemSet.TargetIndex, newItemSet);
+				ResultList.Remove(oldItemSet.TargetIndex);
+				ResultList.Add(newItemSet.TargetIndex, newItemSet);
 
 				if (oldItemSet.TargetIndex < newItemSet.TargetIndex)
 					UpdateTargetIndexes(oldItemSet.TargetIndex, newItemSet.TargetIndex - 1);
@@ -192,8 +158,8 @@ namespace ActiveListExtensions.Modifiers
 			
 			if (itemSet.TargetIndex != newTargetIndex)
 			{
-				_resultList.Remove(itemSet.TargetIndex);
-				_resultList.Add(newTargetIndex, itemSet);
+				ResultList.Remove(itemSet.TargetIndex);
+				ResultList.Add(newTargetIndex, itemSet);
 
 				if (itemSet.TargetIndex < newTargetIndex)
 					UpdateTargetIndexes(itemSet.TargetIndex, newTargetIndex);
@@ -220,11 +186,9 @@ namespace ActiveListExtensions.Modifiers
 				return set;
 			});
 			
-			_resultList.Reset(sortedItems);
+			ResultList.Reset(sortedItems);
 		}
 
 		protected override void ItemModified(int index, TSource value) => OnReplaced(index, value, value);
-
-		public override IEnumerator<TSource> GetEnumerator() => _resultList.Select(kvp => kvp.Value).GetEnumerator();
 	}
 }

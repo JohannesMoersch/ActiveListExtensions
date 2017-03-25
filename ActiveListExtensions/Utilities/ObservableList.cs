@@ -9,11 +9,19 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	internal class ObservableList<T> : IActiveList<T>
+	internal class ObservableList<T> : ObservableList<T, T>
+	{
+		public ObservableList()
+			: base(i => i)
+		{
+		}
+	}
+
+	internal class ObservableList<TSource, TResult> : IActiveList<TResult>
 	{
 		private int _skipStart, _skipCount;
 
-		public T this[int index]
+		public TSource this[int index]
 		{
 			get
 			{
@@ -23,9 +31,18 @@ namespace ActiveListExtensions.Utilities
 			}
 		}
 
+		TResult IReadOnlyList<TResult>.this[int index] => GetResultFromItem(this[index]);
+
 		public int Count => _list.Count - _skipCount;
 
-		private IList<T> _list = new List<T>();
+		private IList<TSource> _list = new List<TSource>();
+
+		private readonly Func<TSource, TResult> _itemSelector;
+
+		public ObservableList(Func<TSource, TResult> itemSelector)
+		{
+			_itemSelector = itemSelector;
+		}
 
 		public void Dispose()
 		{
@@ -34,10 +51,10 @@ namespace ActiveListExtensions.Utilities
 			_list.Clear();
 		}
 
-		public void Add(int index, T value)
+		public void Add(int index, TSource value)
 		{
 			_list.Insert(index, value);
-			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, index));
+			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, GetResultFromItem(value), index));
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
 		}
 
@@ -45,15 +62,15 @@ namespace ActiveListExtensions.Utilities
 		{
 			var value = _list[index];
 			_list.RemoveAt(index);
-			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, index));
+			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, GetResultFromItem(value), index));
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
 		}
 
-		public void Replace(int index, T newValue)
+		public void Replace(int index, TSource newValue)
 		{
 			var oldValue = _list[index];
 			_list[index] = newValue;
-			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newValue, oldValue, index));
+			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, GetResultFromItem(newValue), GetResultFromItem(oldValue), index));
 		}
 
 		public void Move(int oldIndex, int newIndex)
@@ -61,10 +78,10 @@ namespace ActiveListExtensions.Utilities
 			var value = _list[oldIndex];
 			_list.RemoveAt(oldIndex);
 			_list.Insert(newIndex, value);
-			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, value, newIndex, oldIndex));
+			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetResultFromItem(value), newIndex, oldIndex));
 		}
 
-		public void Reset(IEnumerable<T> values)
+		public void Reset(IEnumerable<TSource> values)
 		{
 			var oldCount = Count;
 			_list.Clear();
@@ -75,7 +92,7 @@ namespace ActiveListExtensions.Utilities
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
 		}
 
-		public void ReplaceRange(int startIndex, int oldCount, IReadOnlyList<T> newValues)
+		public void ReplaceRange(int startIndex, int oldCount, IReadOnlyList<TSource> newValues)
 		{
 			try
 			{
@@ -90,7 +107,7 @@ namespace ActiveListExtensions.Utilities
 				if (diff > 0)
 				{
 					for (int i = 0; i < diff; ++i)
-						_list.Add(default(T));
+						_list.Add(default(TSource));
 					for (int i = top; i >= bottom; --i)
 						_list[i + diff] = _list[i];
 					for (int i = oldCount; i < newValues.Count; ++i)
@@ -102,7 +119,7 @@ namespace ActiveListExtensions.Utilities
 					{
 						--_skipCount;
 						++_skipStart;
-						CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, newValues[i], startIndex + i));
+						CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, GetResultFromItem(newValues[i]), startIndex + i));
 					}
 				}
 				else if (diff < 0)
@@ -113,7 +130,7 @@ namespace ActiveListExtensions.Utilities
 					for (int i = _skipStart; i >= end; --i)
 					{
 						++_skipCount;
-						CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _list[i], i));
+						CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, GetResultFromItem(_list[i]), i));
 						--_skipStart;
 					}
 
@@ -133,17 +150,21 @@ namespace ActiveListExtensions.Utilities
 			}
 		}
 
+		private TResult GetResultFromItem(TSource item) => _itemSelector.Invoke(item);
+
 		public event PropertyChangedEventHandler PropertyChanged;
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-		private IEnumerable<T> EnumerateCollection()
+		private IEnumerable<TSource> EnumerateCollection()
 		{
 			for (int i = 0; i < Count; ++i)
 				yield return this[i];
 		}
 
-		public IEnumerator<T> GetEnumerator() => EnumerateCollection().GetEnumerator();
+		public IEnumerator<TSource> GetEnumerator() => EnumerateCollection().GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+		IEnumerator<TResult> IEnumerable<TResult>.GetEnumerator() => EnumerateCollection().Select(i => GetResultFromItem(i)).GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => EnumerateCollection().Select(i => GetResultFromItem(i)).GetEnumerator();
 	}
 }

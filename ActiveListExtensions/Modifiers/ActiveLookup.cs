@@ -11,9 +11,16 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveLookup<TSource, TKey> : ActiveListListenerBase<TSource, IActiveGrouping<TKey, TSource>>, IActiveLookup<TKey, TSource>
+	internal class ActiveLookup<TSource, TKey> : ActiveListBase<TSource, ActiveLookup<TSource, TKey>.Group, IActiveGrouping<TKey, TSource>>, IActiveLookup<TKey, TSource>
 	{
-		private class ItemData
+		internal class Group : ObservableList<ItemData, TSource>, IActiveGrouping<TKey, TSource>
+		{
+			public TKey Key { get; }
+
+			public Group(TKey key) : base(i => i.Value) => Key = key;
+		}
+
+		internal class ItemData
 		{
 			public int SourceIndex { get; set; }
 
@@ -34,54 +41,26 @@ namespace ActiveListExtensions.Modifiers
 		{
 			public int TargetIndex { get; set; }
 
-			public Group<TKey, ItemData> Items { get; }
+			public Group Items { get; }
 
-			public GroupData(TKey key) => Items = new Group<TKey, ItemData>(key);
+			public GroupData(TKey key) => Items = new Group(key);
 		}
 
 		private readonly IList<ItemData> _sourceData;
-
-		private readonly ObservableList<GroupData> _resultData;
 
 		private readonly IDictionary<TKey, GroupData> _resultSet;
 
 		private readonly Func<TSource, TKey> _keySelector;
 
-		public override int Count => _resultData.Count;
-
-		public override IActiveGrouping<TKey, TSource> this[int index] => _resultData[index].Items;
-
-		public IEnumerable<TSource> this[TKey key] => throw new NotImplementedException();
+		public IEnumerable<TSource> this[TKey key] => _resultSet[key].Items;
 
 		public ActiveLookup(IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch)
-			: base(source, propertiesToWatch)
+			: base(source, i => i, propertiesToWatch)
 		{
 			_sourceData = new List<ItemData>();
-			_resultData = new ObservableList<GroupData>();
 			_resultSet = new Dictionary<TKey, GroupData>();
 
 			_keySelector = keySelector;
-
-			_resultData.CollectionChanged += (s, e) => NotifyOfCollectionChange(RewrapEventArgs(e));
-			_resultData.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
-		}
-
-		private NotifyCollectionChangedEventArgs RewrapEventArgs(NotifyCollectionChangedEventArgs args)
-		{
-			switch (args.Action)
-			{
-				case NotifyCollectionChangedAction.Add:
-					return new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, ((GroupData)args.NewItems[0]).Items, args.NewStartingIndex);
-				case NotifyCollectionChangedAction.Remove:
-					return new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, ((GroupData)args.OldItems[0]).Items, args.OldStartingIndex);
-				case NotifyCollectionChangedAction.Replace:
-					return new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, ((GroupData)args.NewItems[0]).Items, ((GroupData)args.OldItems[0]).Items, args.NewStartingIndex);
-				case NotifyCollectionChangedAction.Move:
-					return new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, ((GroupData)args.NewItems[0]).Items, args.NewStartingIndex, args.OldStartingIndex);
-				case NotifyCollectionChangedAction.Reset:
-					return new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
-			}
-			return null;
 		}
 
 		public bool Contains(TKey key) => _resultSet.ContainsKey(key);
@@ -154,8 +133,8 @@ namespace ActiveListExtensions.Modifiers
 
 				_resultSet.Add(item.Key, group);
 
-				group.TargetIndex = _resultData.Count;
-				_resultData.Add(group.TargetIndex, group);
+				group.TargetIndex = Count;
+				ResultList.Add(group.TargetIndex, group.Items);
 			}
 
 			item.TargetIndex = FindTargetIndex(group.Items, item.SourceIndex);
@@ -171,7 +150,7 @@ namespace ActiveListExtensions.Modifiers
 
 				if (group.Items.Count == 0)
 				{
-					_resultData.Remove(group.TargetIndex);
+					ResultList.Remove(group.TargetIndex);
 					group.TargetIndex = -1;
 
 					_resultSet.Remove(item.Key);
@@ -179,14 +158,14 @@ namespace ActiveListExtensions.Modifiers
 			}
 		}
 
-		private int FindTargetIndex(IReadOnlyList<ItemData> list, int sourceIndex)
+		private int FindTargetIndex(Group group, int sourceIndex)
 		{
 			var bottom = 0;
-			var top = list.Count - 1;
+			var top = group.Count - 1;
 			while (bottom <= top)
 			{
 				var mid = bottom + (top - bottom) / 2;
-				var midItem = list[mid];
+				var midItem = group[mid];
 				var comparison = sourceIndex.CompareTo(midItem.SourceIndex);
 				if (comparison > 0)
 					bottom = mid + 1;
@@ -195,7 +174,5 @@ namespace ActiveListExtensions.Modifiers
 			}
 			return bottom;
 		}
-
-		public override IEnumerator<IActiveGrouping<TKey, TSource>> GetEnumerator() => _resultData.Select(kvp => kvp.Itemsgit a).GetEnumerator();
 	}
 }
