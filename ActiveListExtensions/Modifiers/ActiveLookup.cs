@@ -117,7 +117,22 @@ namespace ActiveListExtensions.Modifiers
 
 		protected override void OnReset(IReadOnlyList<TSource> newItems)
 		{
-			throw new NotImplementedException();
+			_sourceData.Clear();
+			_resultSet.Clear();
+
+			foreach (var value in newItems)
+			{
+				var item = new ItemData(_keySelector.Invoke(value), value);
+				item.SourceIndex = _sourceData.Count;
+				_sourceData.Add(item);
+				AddToGroup(item, false);
+			}
+
+			foreach (var group in _resultSet.Values)
+			{
+				group.TargetIndex = ResultList.Count;
+				ResultList.Add(group.TargetIndex, group.Items);
+			}
 		}
 
 		protected override void ItemModified(int index, TSource value)
@@ -125,7 +140,7 @@ namespace ActiveListExtensions.Modifiers
 			throw new NotImplementedException();
 		}
 
-		private void AddToGroup(ItemData item)
+		private void AddToGroup(ItemData item, bool addToResultList = true)
 		{
 			if (!_resultSet.TryGetValue(item.Key, out GroupData group))
 			{
@@ -133,8 +148,11 @@ namespace ActiveListExtensions.Modifiers
 
 				_resultSet.Add(item.Key, group);
 
-				group.TargetIndex = Count;
-				ResultList.Add(group.TargetIndex, group.Items);
+				if (addToResultList)
+				{
+					group.TargetIndex = Count;
+					ResultList.Add(group.TargetIndex, group.Items);
+				}
 			}
 
 			item.TargetIndex = FindTargetIndex(group.Items, item.SourceIndex);
