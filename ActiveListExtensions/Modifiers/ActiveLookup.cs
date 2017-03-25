@@ -45,9 +45,11 @@ namespace ActiveListExtensions.Modifiers
 
 		private readonly IDictionary<TKey, GroupData> _resultSet;
 
+		private readonly Func<TSource, TKey> _keySelector;
+
 		public override int Count => _resultData.Count;
 
-		public override IActiveGrouping<TKey, TSource> this[int index] => throw new NotImplementedException();
+		public override IActiveGrouping<TKey, TSource> this[int index] => _resultData[index].Items;
 
 		public IEnumerable<TSource> this[TKey key] => throw new NotImplementedException();
 
@@ -57,6 +59,8 @@ namespace ActiveListExtensions.Modifiers
 			_sourceData = new List<ItemData>();
 			_resultData = new ObservableList<GroupData>();
 			_resultSet = new Dictionary<TKey, GroupData>();
+
+			_keySelector = keySelector;
 
 			_resultData.CollectionChanged += (s, e) => NotifyOfCollectionChange(RewrapEventArgs(e));
 			_resultData.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
@@ -84,22 +88,52 @@ namespace ActiveListExtensions.Modifiers
 
 		protected override void OnAdded(int index, TSource value)
 		{
-			throw new NotImplementedException();
+			var item = new ItemData(_keySelector.Invoke(value), value);
+			item.SourceIndex = index;
+			_sourceData.Insert(index, item);
+
+			for (int i = index + 1; i < _sourceData.Count; ++i)
+				_sourceData[i].SourceIndex = i;
+
+			AddToGroup(item);
 		}
 
 		protected override void OnRemoved(int index, TSource value)
 		{
-			throw new NotImplementedException();
+			var item = _sourceData[index];
+			item.SourceIndex = -1;
+			_sourceData.RemoveAt(index);
+
+			for (int i = index; i < _sourceData.Count; ++i)
+				_sourceData[i].SourceIndex = i;
+
+			RemoveFromGroup(item);
 		}
 
 		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
-			throw new NotImplementedException();
+			OnRemoved(index, oldValue);
+			OnAdded(index, newValue);
 		}
 
 		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
-			throw new NotImplementedException();
+			var item = _sourceData[oldIndex];
+			_sourceData.RemoveAt(oldIndex);
+			_sourceData.Insert(newIndex, item);
+
+			var min = oldIndex < newIndex ? oldIndex : newIndex;
+			var max = oldIndex < newIndex ? newIndex : oldIndex;
+
+			for (int i = min; i <= max; ++i)
+				_sourceData[i].SourceIndex = i;
+
+			if (_resultSet.TryGetValue(item.Key, out GroupData group))
+			{
+				var oldTargetIndex = item.TargetIndex;
+				item.TargetIndex = FindTargetIndex(group.Items, item.SourceIndex);
+				group.Items.Move(oldTargetIndex, item.TargetIndex);
+			}
 		}
 
 		protected override void OnReset(IReadOnlyList<TSource> newItems)
@@ -107,6 +141,61 @@ namespace ActiveListExtensions.Modifiers
 			throw new NotImplementedException();
 		}
 
-		public override IEnumerator<IActiveGrouping<TKey, TSource>> GetEnumerator() => _resultData.Select(kvp => kvp.Items as IActiveGrouping<TKey, TSource>).GetEnumerator();
+		protected override void ItemModified(int index, TSource value)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void AddToGroup(ItemData item)
+		{
+			if (!_resultSet.TryGetValue(item.Key, out GroupData group))
+			{
+				group = new GroupData(item.Key);
+
+				_resultSet.Add(item.Key, group);
+
+				group.TargetIndex = _resultData.Count;
+				_resultData.Add(group.TargetIndex, group);
+			}
+
+			item.TargetIndex = FindTargetIndex(group.Items, item.SourceIndex);
+			group.Items.Add(item.TargetIndex, item);
+		}
+
+		private void RemoveFromGroup(ItemData item)
+		{
+			if (_resultSet.TryGetValue(item.Key, out GroupData group))
+			{
+				group.Items.Remove(item.TargetIndex);
+				item.TargetIndex = -1;
+
+				if (group.Items.Count == 0)
+				{
+					_resultData.Remove(group.TargetIndex);
+					group.TargetIndex = -1;
+
+					_resultSet.Remove(item.Key);
+				}
+			}
+		}
+
+		private int FindTargetIndex(IReadOnlyList<ItemData> list, int sourceIndex)
+		{
+			var bottom = 0;
+			var top = list.Count - 1;
+			while (bottom <= top)
+			{
+				var mid = bottom + (top - bottom) / 2;
+				var midItem = list[mid];
+				var comparison = sourceIndex.CompareTo(midItem.SourceIndex);
+				if (comparison > 0)
+					bottom = mid + 1;
+				else
+					top = mid - 1;
+			}
+			return bottom;
+		}
+
+		public override IEnumerator<IActiveGrouping<TKey, TSource>> GetEnumerator() => _resultData.Select(kvp => kvp.Itemsgit a).GetEnumerator();
 	}
 }
