@@ -48,12 +48,12 @@ namespace ActiveListExtensions.ValueModifiers
 
 			Value = _mutator.Invoke(_value.Value);
 
-			PropertyChangedEventManager.AddHandler(_value, SourcePropertyChanged, nameof(IActiveValue<TValue>.Value));
+			PropertyChangedEventManager.AddHandler(_value, SourceChanged, nameof(IActiveValue<TValue>.Value));
 		}
 
 		protected override void OnDisposed()
 		{
-			PropertyChangedEventManager.RemoveHandler(_value, SourcePropertyChanged, nameof(IActiveValue<TValue>.Value));
+			PropertyChangedEventManager.RemoveHandler(_value, SourceChanged, nameof(IActiveValue<TValue>.Value));
 			Source = default(TValue);
 		}
 

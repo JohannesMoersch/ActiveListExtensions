@@ -16,22 +16,90 @@ namespace ActiveListExtensions.ValueModifiers
 
 		private Func<TValue1, TValue2, TResult> _valueCombiner;
 
-		public ActiveCombine(IActiveValue<TValue1> value1, IActiveValue<TValue2> value2, Func<TValue1, TValue2, TResult> valueCombiner)
+		private string[] _value1PropertiesToWatch;
+
+		private string[] _value2PropertiesToWatch;
+
+		private TValue1 _source1;
+		private TValue1 Source1
+		{
+			get => _source1;
+			set
+			{
+				if (_source1 is INotifyPropertyChanged oldPropertyChangedSource)
+				{
+					foreach (var propertyName in _value1PropertiesToWatch)
+						PropertyChangedEventManager.RemoveHandler(oldPropertyChangedSource, SourcePropertyChanged, propertyName);
+				}
+
+				_source1 = value;
+
+				if (_source1 is INotifyPropertyChanged newPropertyChangedSource)
+				{
+					foreach (var propertyName in _value1PropertiesToWatch)
+						PropertyChangedEventManager.AddHandler(newPropertyChangedSource, SourcePropertyChanged, propertyName);
+				}
+
+				Value = _valueCombiner.Invoke(Source1, Source2);
+			}
+		}
+
+		private TValue2 _source2;
+		private TValue2 Source2
+		{
+			get => _source2;
+			set
+			{
+				if (_source2 is INotifyPropertyChanged oldPropertyChangedSource)
+				{
+					foreach (var propertyName in _value2PropertiesToWatch)
+						PropertyChangedEventManager.RemoveHandler(oldPropertyChangedSource, SourcePropertyChanged, propertyName);
+				}
+
+				_source2 = value;
+
+				if (_source2 is INotifyPropertyChanged newPropertyChangedSource)
+				{
+					foreach (var propertyName in _value2PropertiesToWatch)
+						PropertyChangedEventManager.AddHandler(newPropertyChangedSource, SourcePropertyChanged, propertyName);
+				}
+
+				Value = _valueCombiner.Invoke(Source1, Source2);
+			}
+		}
+
+		public ActiveCombine(IActiveValue<TValue1> value1, IActiveValue<TValue2> value2, Func<TValue1, TValue2, TResult> valueCombiner, IEnumerable<string> value1PropertiesToWatch, IEnumerable<string> value2PropertiesToWatch)
 		{
 			_value1 = value1;
 			_value2 = value2;
 			_valueCombiner = valueCombiner;
+			_value1PropertiesToWatch = _value1PropertiesToWatch.ToArray();
+			_value2PropertiesToWatch = _value2PropertiesToWatch.ToArray();
 
 			Value = _valueCombiner.Invoke(_value1.Value, _value2.Value);
 
-			PropertyChangedEventManager.AddHandler(_value1, SourcePropertyChanged, nameof(IActiveValue<TValue1>.Value));
-			PropertyChangedEventManager.AddHandler(_value2, SourcePropertyChanged, nameof(IActiveValue<TValue2>.Value));
+			PropertyChangedEventManager.AddHandler(_value1, Source1Changed, nameof(IActiveValue<TValue1>.Value));
+			PropertyChangedEventManager.AddHandler(_value2, Source2Changed, nameof(IActiveValue<TValue2>.Value));
 		}
 
 		protected override void OnDisposed()
 		{
-			PropertyChangedEventManager.RemoveHandler(_value1, SourcePropertyChanged, nameof(IActiveValue<TValue1>.Value));
-			PropertyChangedEventManager.RemoveHandler(_value2, SourcePropertyChanged, nameof(IActiveValue<TValue2>.Value));
+			PropertyChangedEventManager.RemoveHandler(_value1, Source1Changed, nameof(IActiveValue<TValue1>.Value));
+			PropertyChangedEventManager.RemoveHandler(_value2, Source2Changed, nameof(IActiveValue<TValue2>.Value));
+			Source1 = default(TValue1);
+			Source2 = default(TValue2);
+		}
+
+		private void Source1Changed(object key, PropertyChangedEventArgs args)
+		{
+			if (!IsDisposed)
+				Source1 = _value1.Value;
+		}
+
+		private void Source2Changed(object key, PropertyChangedEventArgs args)
+		{
+			if (!IsDisposed)
+				Source2 = _value2.Value;
 		}
 
 		private void SourcePropertyChanged(object key, PropertyChangedEventArgs args) => Value = _valueCombiner.Invoke(_value1.Value, _value2.Value);
