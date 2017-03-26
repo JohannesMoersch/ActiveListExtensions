@@ -10,7 +10,7 @@ using Xunit;
 
 namespace ActiveListExtensions.Tests.Modifiers
 {
-	public class ActiveSelectMany
+	public class ActiveSelectManyTests
 	{
 		[Fact]
 		public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItems(l => l.ActiveSelectMany(o => o.Property), l => l.SelectMany(o => o.Property), () => new ActiveSelectManyTestClass() { Property = RandomGenerator.GenerateRandomIntegerList() });
