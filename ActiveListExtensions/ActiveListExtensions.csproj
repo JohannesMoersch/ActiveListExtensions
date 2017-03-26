@@ -67,7 +67,7 @@
     <Compile Include="Modifiers\ActiveWhere.cs" />
     <Compile Include="Modifiers\Bases\ActiveMultiListListenerBase.cs" />
     <Compile Include="Modifiers\Bases\ActiveSetBase.cs" />
-    <Compile Include="Utilities\ActiveValueListener.cs" />
+    <Compile Include="ValueModifiers\ActiveValueListener.cs" />
     <Compile Include="Utilities\CollectionWrapper.cs" />
     <Compile Include="Utilities\ExpressionExtensions.cs" />
     <Compile Include="IActiveList.cs" />
@@ -76,6 +76,7 @@
     <Compile Include="Utilities\ListToReadOnlyWrapper.cs" />
     <Compile Include="Utilities\ObservableList.cs" />
     <Compile Include="Utilities\PropertyWatcherList.cs" />
+    <Compile Include="ValueModifiers\ActiveCombine.cs" />
     <Compile Include="ValueModifiers\ActiveFirstOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveLastOrDefault.cs" />
     <Compile Include="ValueModifiers\Bases\ActiveListValueBase.cs" />

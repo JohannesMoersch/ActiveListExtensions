@@ -5,11 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ActiveListExtensions.Utilities
+namespace ActiveListExtensions.ValueModifiers
 {
 	internal class ActiveValueListener<TSource, TValue> : IActiveValue<TValue>
 	{
-		public TValue Value => _valueGetter.Invoke(_source);
+		private TValue _value;
+		public TValue Value
+		{
+			get => _value;
+			set
+			{
+				if (Equals(_value, value))
+					return;
+				_value = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+			}
+		}
 
 		private TSource _source;
 
@@ -46,7 +57,7 @@ namespace ActiveListExtensions.Utilities
 			}
 		}
 
-		private void SourcePropertyChanged(object key, PropertyChangedEventArgs args) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+		private void SourcePropertyChanged(object key, PropertyChangedEventArgs args) => Value = _valueGetter.Invoke(_source);
 
 		public event PropertyChangedEventHandler PropertyChanged;
 	}
