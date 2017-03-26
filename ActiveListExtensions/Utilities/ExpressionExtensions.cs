@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -44,12 +45,25 @@ namespace ActiveListExtensions.Utilities
 			}
 		}
 
-		public static IEnumerable<string> GetReferencedProperties<T, U>(this Expression<Func<T, U>> expression) => new PropertyVisitor().GetReferencedProperties(expression)[0];
+		private static IEnumerable<string> ReferencedProperties<T, U>(this Expression<Func<T, U>> expression) => new PropertyVisitor().GetReferencedProperties(expression)[0];
 
-		public static Tuple<IEnumerable<string>, IEnumerable<string>> GetReferencedProperties<T1, T2, U>(this Expression<Func<T1, T2, U>> expression)
+		private static Tuple<IEnumerable<string>, IEnumerable<string>> ReferencedProperties<T1, T2, U>(this Expression<Func<T1, T2, U>> expression)
 		{
 			var properties = new PropertyVisitor().GetReferencedProperties(expression);
 			return Tuple.Create(properties[0], properties[1]);
+		}
+
+
+		public static IEnumerable<string> GetReferencedProperties<T, U>(this Expression<Func<T, U>> expression) => typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T)) ? expression.ReferencedProperties() : Enumerable.Empty<string>();
+
+		public static Tuple<IEnumerable<string>, IEnumerable<string>> GetReferencedProperties<T1, T2, U>(this Expression<Func<T1, T2, U>> expression)
+		{
+			if (!typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T1)) && !typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T2)))
+				return Tuple.Create(Enumerable.Empty<string>(), Enumerable.Empty<string>());
+			var properties = expression.ReferencedProperties();
+			var sourceProperties = typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T1)) ? properties.Item1 : Enumerable.Empty<string>();
+			var otherSourceProperties = typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T2)) ? properties.Item2 : Enumerable.Empty<string>();
+			return Tuple.Create(sourceProperties, otherSourceProperties);
 		}
 	}
 }

@@ -42,6 +42,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActiveValueExtensions.cs" />
     <Compile Include="IActiveGrouping.cs" />
     <Compile Include="IActiveLookup.cs" />
     <Compile Include="IActiveValue.cs" />
@@ -75,6 +76,10 @@
     <Compile Include="Utilities\ListToReadOnlyWrapper.cs" />
     <Compile Include="Utilities\ObservableList.cs" />
     <Compile Include="Utilities\PropertyWatcherList.cs" />
+    <Compile Include="ValueModifiers\ActiveFirstOrDefault.cs" />
+    <Compile Include="ValueModifiers\ActiveLastOrDefault.cs" />
+    <Compile Include="ValueModifiers\Bases\ActiveListValueBase.cs" />
+    <Compile Include="ValueModifiers\Bases\ActiveValueBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

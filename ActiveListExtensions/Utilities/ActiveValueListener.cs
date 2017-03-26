@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	internal class ActiveValueListener<TSource, TValue> : IActiveValue<TValue>, IDisposable
+	internal class ActiveValueListener<TSource, TValue> : IActiveValue<TValue>
 	{
 		public TValue Value => _valueGetter.Invoke(_source);
 
