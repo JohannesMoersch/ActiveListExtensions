@@ -42,9 +42,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IActiveGrouping.cs" />
+    <Compile Include="IActiveLookup.cs" />
     <Compile Include="Modifiers\ActiveDistinct.cs" />
     <Compile Include="Modifiers\ActiveExcept.cs" />
     <Compile Include="Modifiers\ActiveIntersect.cs" />
+    <Compile Include="Modifiers\ActiveLookup.cs" />
     <Compile Include="Modifiers\ActiveOrderBy.cs" />
     <Compile Include="Modifiers\ActiveUnion.cs" />
     <Compile Include="Modifiers\ActiveZip.cs" />

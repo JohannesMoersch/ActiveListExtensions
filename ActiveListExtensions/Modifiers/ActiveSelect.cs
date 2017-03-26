@@ -19,9 +19,9 @@ namespace ActiveListExtensions.Modifiers
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
-			if (selector == null)
-				throw new ArgumentNullException(nameof(selector));
-			_selector = selector;
+
+			_selector = selector ?? throw new ArgumentNullException(nameof(selector));
+
 			Initialize();
 		}
 

@@ -9,14 +9,14 @@ namespace ActiveListExtensions.Tests.Helpers
 {
 	public static class CollectionTestHelpers
 	{
-		public static void RandomlyInsertItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null)
+		public static void RandomlyInsertItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null, Func<U, U, bool> additonalComparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
 			var list = new ObservableList<T>();
 			var sut = activeExpression.Invoke(list.ToActiveList());
 			var watcher = new CollectionSynchronizationWatcher<U>(sut);
-			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector);
+			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector, additonalComparer);
 
 			foreach (var value in Enumerable.Range(0, 100))
 			{
@@ -25,7 +25,7 @@ namespace ActiveListExtensions.Tests.Helpers
 			}
 		}
 
-		public static void RandomlyRemoveItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null)
+		public static void RandomlyRemoveItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null, Func<U, U, bool> additonalComparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -34,7 +34,7 @@ namespace ActiveListExtensions.Tests.Helpers
 				list.Add(list.Count, randomValueGenerator.Invoke());
 			var sut = activeExpression.Invoke(list.ToActiveList());
 			var watcher = new CollectionSynchronizationWatcher<U>(sut);
-			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector);
+			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector, additonalComparer);
 
 			foreach (var value in Enumerable.Range(0, 100))
 			{
@@ -43,7 +43,7 @@ namespace ActiveListExtensions.Tests.Helpers
 			}
 		}
 
-		public static void RandomlyReplaceItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null)
+		public static void RandomlyReplaceItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null, Func<U, U, bool> additonalComparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -52,7 +52,7 @@ namespace ActiveListExtensions.Tests.Helpers
 				list.Add(list.Count, randomValueGenerator.Invoke());
 			var sut = activeExpression.Invoke(list.ToActiveList());
 			var watcher = new CollectionSynchronizationWatcher<U>(sut);
-			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector);
+			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector, additonalComparer);
 
 			foreach (var value in Enumerable.Range(0, 100))
 			{
@@ -61,7 +61,7 @@ namespace ActiveListExtensions.Tests.Helpers
 			}
 		}
 
-		public static void RandomlyMoveItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null)
+		public static void RandomlyMoveItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null, Func<U, U, bool> additonalComparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -70,7 +70,7 @@ namespace ActiveListExtensions.Tests.Helpers
 				list.Add(list.Count, randomValueGenerator.Invoke());
 			var sut = activeExpression.Invoke(list.ToActiveList());
 			var watcher = new CollectionSynchronizationWatcher<U>(sut);
-			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector);
+			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector, additonalComparer);
 
 			foreach (var value in Enumerable.Range(0, 100))
 			{
@@ -79,7 +79,7 @@ namespace ActiveListExtensions.Tests.Helpers
 			}
 		}
 
-		public static void ResetWithRandomItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null)
+		public static void ResetWithRandomItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null, Func<U, U, bool> additonalComparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -88,7 +88,7 @@ namespace ActiveListExtensions.Tests.Helpers
 				list.Add(list.Count, randomValueGenerator.Invoke());
 			var sut = activeExpression.Invoke(list.ToActiveList());
 			var watcher = new CollectionSynchronizationWatcher<U>(sut);
-			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector);
+			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector, additonalComparer);
 
 			foreach (var value in Enumerable.Range(0, 20))
 			{
@@ -97,7 +97,7 @@ namespace ActiveListExtensions.Tests.Helpers
 			}
 		}
 
-		public static void RandomlyChangePropertyValues<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, Action<T> randomPropertySetter, bool useSetComparison = false, Func<U, object> keySelector = null)
+		public static void RandomlyChangePropertyValues<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, Action<T> randomPropertySetter, bool useSetComparison = false, Func<U, object> keySelector = null, Func<U, U, bool> additonalComparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -106,7 +106,7 @@ namespace ActiveListExtensions.Tests.Helpers
 				list.Add(list.Count, randomValueGenerator.Invoke());
 			var sut = activeExpression.Invoke(list.ToActiveList());
 			var watcher = new CollectionSynchronizationWatcher<U>(sut);
-			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector);
+			var validator = new LinqValidator<T, T, U>(list, sut, linqExpression, useSetComparison, keySelector, additonalComparer);
 
 			foreach (var value in Enumerable.Range(0, 100))
 			{
