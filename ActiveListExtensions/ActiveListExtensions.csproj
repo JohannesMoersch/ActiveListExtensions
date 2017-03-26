@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="IActiveGrouping.cs" />
     <Compile Include="IActiveLookup.cs" />
+    <Compile Include="IActiveValue.cs" />
     <Compile Include="Modifiers\ActiveDistinct.cs" />
     <Compile Include="Modifiers\ActiveExcept.cs" />
     <Compile Include="Modifiers\ActiveIntersect.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Modifiers\ActiveWhere.cs" />
     <Compile Include="Modifiers\Bases\ActiveMultiListListenerBase.cs" />
     <Compile Include="Modifiers\Bases\ActiveSetBase.cs" />
+    <Compile Include="Utilities\ActiveValueListener.cs" />
     <Compile Include="Utilities\CollectionWrapper.cs" />
     <Compile Include="Utilities\ExpressionExtensions.cs" />
     <Compile Include="IActiveList.cs" />

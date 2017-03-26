@@ -107,6 +107,10 @@ namespace ActiveListExtensions
 
 		public static IActiveLookup<TKey, TSource> ToActiveLookup<TSource, TKey>(this IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveLookup<TSource, TKey>(source, keySelector, propertiesToWatch);
 
+		public static IActiveValue<TValue> ToActiveValue<TSource, TValue>(this TSource source, Expression<Func<TSource, TValue>> valueGetter) => ToActiveValue<TSource, TValue>(source, valueGetter.Compile(), GetReferencedProperties(valueGetter));
+
+		public static IActiveValue<TValue> ToActiveValue<TSource, TValue>(this TSource source, Func<TSource, TValue> valueGetter, IEnumerable<string> propertiesToWatch) => new ActiveValueListener<TSource, TValue>(source, valueGetter, propertiesToWatch);
+
 		// --Where
 		// --Select
 		// --SelectMany

@@ -4,6 +4,7 @@
         xmlns:local="clr-namespace:ActiveListExtensionsTestProject"
         Title="MainWindow" Height="480" Width="640" DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <DockPanel>
+		<TextBlock DockPanel.Dock="Top" Text="{Binding SelectManyCount.Value}" />
 		<Button DockPanel.Dock="Top" Content="Add" Click="AddButton" />
 		<Button DockPanel.Dock="Top" Content="Remove" Click="RemoveButton" />
 		<Button DockPanel.Dock="Top" Content="Move" Click="MoveButton" />
