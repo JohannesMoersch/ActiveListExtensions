@@ -15,6 +15,8 @@ namespace ActiveListExtensions.ValueModifiers
 			: base(source, propertiesToWatch)
 		{
 			_predicate = predicate;
+
+			Initialize();
 		}
 
 		protected override void OnAdded(int index, TSource value)

@@ -99,6 +99,7 @@
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />
     <Compile Include="ValueModifiers\ActiveFirstOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveLastOrDefaultTests.cs" />
+    <Compile Include="ValueModifiers\ActiveSingleOrDefaultTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
