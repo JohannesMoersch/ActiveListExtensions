@@ -24,6 +24,8 @@ namespace ActiveListExtensions
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
+			if (source is IActiveList<T> list)
+				return list;
 			return new ActiveList<T>(source);
 		}
 
