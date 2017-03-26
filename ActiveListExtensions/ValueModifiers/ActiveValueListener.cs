@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ActiveListExtensions.ValueModifiers.Bases;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -7,28 +8,13 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveValueListener<TSource, TValue> : IActiveValue<TValue>
+	internal class ActiveValueListener<TSource, TValue> : ActiveValueBase<TValue>
 	{
-		private TValue _value;
-		public TValue Value
-		{
-			get => _value;
-			set
-			{
-				if (Equals(_value, value))
-					return;
-				_value = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
-			}
-		}
-
 		private TSource _source;
 
 		private Func<TSource, TValue> _valueGetter;
 
 		private string[] _propertiesToWatch;
-
-		private bool _isDisposed;
 
 		public ActiveValueListener(TSource source, Func<TSource, TValue> valueGetter, IEnumerable<string> propertiesToWatch)
 		{
@@ -43,13 +29,8 @@ namespace ActiveListExtensions.ValueModifiers
 			}
 		}
 
-		public void Dispose()
+		protected override void OnDisposed()
 		{
-			if (_isDisposed)
-				return;
-
-			_isDisposed = true;
-
 			if (_source is INotifyPropertyChanged propertyChangedSource)
 			{
 				foreach (var propertyName in _propertiesToWatch)
@@ -58,7 +39,5 @@ namespace ActiveListExtensions.ValueModifiers
 		}
 
 		private void SourcePropertyChanged(object key, PropertyChangedEventArgs args) => Value = _valueGetter.Invoke(_source);
-
-		public event PropertyChangedEventHandler PropertyChanged;
 	}
 }

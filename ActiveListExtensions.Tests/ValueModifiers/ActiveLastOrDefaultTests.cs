@@ -30,7 +30,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		public void RandomlyChangePropertyValues() => ValueTestHelpers.RandomlyChangePropertyValues(l => l.ActiveLastOrDefault(i => i.Property % 3 == 0), l => l.LastOrDefault(i => i.Property % 3 == 0), () => new ActiveLastOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
 	}
 
-	public class ActiveLastOrDefaultTestClass
+	public class ActiveLastOrDefaultTestClass : INotifyPropertyChanged
 	{
 		private int _property;
 		public int Property

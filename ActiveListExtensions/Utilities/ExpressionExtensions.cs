@@ -18,9 +18,24 @@ namespace ActiveListExtensions.Utilities
 
 			private Dictionary<ParameterExpression, int> _parameterMap;
 
+			private ParameterExpression GetParentParameter(Expression expression)
+			{
+				while (expression.NodeType != ExpressionType.Parameter)
+				{
+					if ((expression.NodeType == ExpressionType.TypeAs || expression.NodeType == ExpressionType.Convert || expression.NodeType == ExpressionType.ConvertChecked) && expression is UnaryExpression unary)
+						expression = unary.Operand;
+					else
+						break;
+				}
+				if (expression.NodeType == ExpressionType.Parameter && expression is ParameterExpression parameter)
+					return parameter;
+				return null;
+			}
+
 			protected override Expression VisitMember(MemberExpression node)
 			{
-				if (node.Expression is ParameterExpression parameter && _parameterMap.TryGetValue(parameter, out int index))
+				var parameter = GetParentParameter(node.Expression);
+				if (parameter != null && _parameterMap.TryGetValue(parameter, out int index))
 					_properties[index].Add(node.Member.Name);
 				return base.VisitMember(node);
 			}

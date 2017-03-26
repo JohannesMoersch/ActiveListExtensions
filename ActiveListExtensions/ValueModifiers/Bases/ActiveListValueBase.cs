@@ -26,7 +26,7 @@ namespace ActiveListExtensions.ValueModifiers.Bases
 
 		protected void Initialize() => _sourceList.Reset();
 
-		public override void Dispose() => _sourceList.Dispose();
+		protected override void OnDisposed() => _sourceList.Dispose();
 
 		protected abstract void OnAdded(int index, TSource value);
 

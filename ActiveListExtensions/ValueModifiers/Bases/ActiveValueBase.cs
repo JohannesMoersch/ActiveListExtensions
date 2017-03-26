@@ -22,7 +22,17 @@ namespace ActiveListExtensions.ValueModifiers.Bases
 			}
 		}
 
-		public abstract void Dispose();
+		protected bool IsDisposed { get; private set; }
+
+		void IDisposable.Dispose()
+		{
+			if (IsDisposed)
+				return;
+			IsDisposed = true;
+			OnDisposed();
+		}
+
+		protected abstract void OnDisposed();
 
 		public event PropertyChangedEventHandler PropertyChanged;
 	}

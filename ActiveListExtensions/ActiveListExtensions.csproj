@@ -67,6 +67,8 @@
     <Compile Include="Modifiers\ActiveWhere.cs" />
     <Compile Include="Modifiers\Bases\ActiveMultiListListenerBase.cs" />
     <Compile Include="Modifiers\Bases\ActiveSetBase.cs" />
+    <Compile Include="ValueModifiers\ActiveMutate.cs" />
+    <Compile Include="ValueModifiers\ActiveSingleOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveValueListener.cs" />
     <Compile Include="Utilities\CollectionWrapper.cs" />
     <Compile Include="Utilities\ExpressionExtensions.cs" />
