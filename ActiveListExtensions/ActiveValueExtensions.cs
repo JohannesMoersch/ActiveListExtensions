@@ -11,6 +11,8 @@ namespace ActiveListExtensions
 {
 	public static class ActiveValueExtensions
 	{
+		// TODO - Decide whether or not to enforce that generic type must derive from INotifyPropertyChanged! I'm thinking it should be changed to not require this!
+
 		public static IActiveValue<TValue> ToActiveValue<TSource, TValue>(this TSource source, Expression<Func<TSource, TValue>> valueGetter) => ToActiveValue<TSource, TValue>(source, valueGetter.Compile(), valueGetter.GetReferencedProperties());
 
 		public static IActiveValue<TValue> ToActiveValue<TSource, TValue>(this TSource source, Func<TSource, TValue> valueGetter, IEnumerable<string> propertiesToWatch) => new ActiveValueListener<TSource, TValue>(source, valueGetter, propertiesToWatch);
@@ -50,8 +52,8 @@ namespace ActiveListExtensions
 		public static IActiveValue<TSource> ActiveSingleOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveSingleOrDefault<TSource>(source, predicate, propertiesToWatch);
 
 		// SequenceEqual (use Zip + All?)
-		// FirstOrDefault
-		// LastOrDefault
+		// --FirstOrDefault
+		// --LastOrDefault
 		// SingleOrDefault
 		// ElementAtOrDefault
 		// ElementsAtOrDefault
