@@ -46,5 +46,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		public override string ToString() => Property.ToString();
 	}
 }

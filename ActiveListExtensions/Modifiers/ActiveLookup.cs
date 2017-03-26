@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveLookup<TSource, TKey> : ActiveListBase<TSource, ActiveLookup<TSource, TKey>.Group, IActiveGrouping<TKey, TSource>>, IActiveLookup<TKey, TSource>
+	internal class ActiveLookup<TSource, TKey> : ActiveListBase<TSource, ActiveLookup<TSource, TKey>.GroupData, IActiveGrouping<TKey, TSource>>, IActiveLookup<TKey, TSource>
 	{
 		internal class Group : ObservableList<ItemData, TSource>, IActiveGrouping<TKey, TSource>
 		{
@@ -35,9 +35,11 @@ namespace ActiveListExtensions.Modifiers
 				Key = key;
 				Value = value;
 			}
+
+			public override string ToString() => $"Source:{SourceIndex}|Target:{TargetIndex}|Value:{Value}";
 		}
 
-		private class GroupData
+		internal class GroupData
 		{
 			public int TargetIndex { get; set; }
 
@@ -55,12 +57,14 @@ namespace ActiveListExtensions.Modifiers
 		public IEnumerable<TSource> this[TKey key] => _resultSet[key].Items;
 
 		public ActiveLookup(IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch)
-			: base(source, i => i, propertiesToWatch)
+			: base(source, i => i.Items, propertiesToWatch)
 		{
 			_sourceData = new List<ItemData>();
 			_resultSet = new Dictionary<TKey, GroupData>();
 
 			_keySelector = keySelector;
+
+			Initialize();
 		}
 
 		public bool Contains(TKey key) => _resultSet.ContainsKey(key);
@@ -91,8 +95,21 @@ namespace ActiveListExtensions.Modifiers
 
 		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
-			OnRemoved(index, oldValue);
-			OnAdded(index, newValue);
+			var oldItem = _sourceData[index];
+			var newKey = _keySelector.Invoke(newValue);
+			if (Equals(oldItem.Key, newKey))
+			{
+				var newItem = new ItemData(newKey, newValue);
+				newItem.TargetIndex = oldItem.TargetIndex;
+				_resultSet[oldItem.Key].Items.Replace(oldItem.TargetIndex, newItem);
+
+				_sourceData[index] = newItem;
+			}
+			else
+			{
+				OnRemoved(index, oldValue);
+				OnAdded(index, newValue);
+			}
 		}
 
 		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
@@ -107,11 +124,24 @@ namespace ActiveListExtensions.Modifiers
 			for (int i = min; i <= max; ++i)
 				_sourceData[i].SourceIndex = i;
 
+			item.SourceIndex = oldIndex;
+
 			if (_resultSet.TryGetValue(item.Key, out GroupData group))
 			{
 				var oldTargetIndex = item.TargetIndex;
-				item.TargetIndex = FindTargetIndex(group.Items, item.SourceIndex);
+				item.TargetIndex = FindTargetIndex(group.Items, newIndex);
+				if (item.TargetIndex > oldTargetIndex)
+					--item.TargetIndex;
+
+				item.SourceIndex = newIndex;
+
 				group.Items.Move(oldTargetIndex, item.TargetIndex);
+
+				min = oldTargetIndex < item.TargetIndex ? oldTargetIndex : item.TargetIndex;
+				max = oldTargetIndex < item.TargetIndex ? item.TargetIndex : oldTargetIndex;
+
+				for (int i = min; i <= max; ++i)
+					group.Items[i].TargetIndex = i;
 			}
 		}
 
@@ -128,17 +158,14 @@ namespace ActiveListExtensions.Modifiers
 				AddToGroup(item, false);
 			}
 
-			foreach (var group in _resultSet.Values)
+			ResultList.Reset(_resultSet.Values.Select((g, i) =>
 			{
-				group.TargetIndex = ResultList.Count;
-				ResultList.Add(group.TargetIndex, group.Items);
-			}
+				g.TargetIndex = i;
+				return g;
+			}));
 		}
 
-		protected override void ItemModified(int index, TSource value)
-		{
-			throw new NotImplementedException();
-		}
+		protected override void ItemModified(int index, TSource value) => OnReplaced(index, value, value);
 
 		private void AddToGroup(ItemData item, bool addToResultList = true)
 		{
@@ -151,12 +178,18 @@ namespace ActiveListExtensions.Modifiers
 				if (addToResultList)
 				{
 					group.TargetIndex = Count;
-					ResultList.Add(group.TargetIndex, group.Items);
+					ResultList.Add(group.TargetIndex, group);
+
+					for (int i = group.TargetIndex + 1; i < ResultList.Count; ++i)
+						ResultList[i].TargetIndex = i;
 				}
 			}
 
 			item.TargetIndex = FindTargetIndex(group.Items, item.SourceIndex);
 			group.Items.Add(item.TargetIndex, item);
+
+			for (int i = item.TargetIndex + 1; i < group.Items.Count; ++i)
+				group.Items[i].TargetIndex = i;
 		}
 
 		private void RemoveFromGroup(ItemData item)
@@ -164,11 +197,19 @@ namespace ActiveListExtensions.Modifiers
 			if (_resultSet.TryGetValue(item.Key, out GroupData group))
 			{
 				group.Items.Remove(item.TargetIndex);
+
+				for (int i = item.TargetIndex; i < group.Items.Count; ++i)
+					group.Items[i].TargetIndex = i;
+
 				item.TargetIndex = -1;
 
 				if (group.Items.Count == 0)
 				{
 					ResultList.Remove(group.TargetIndex);
+
+					for (int i = group.TargetIndex; i < ResultList.Count; ++i)
+						ResultList[i].TargetIndex = i;
+
 					group.TargetIndex = -1;
 
 					_resultSet.Remove(item.Key);

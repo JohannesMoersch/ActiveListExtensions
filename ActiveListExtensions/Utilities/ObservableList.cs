@@ -75,6 +75,8 @@ namespace ActiveListExtensions.Utilities
 
 		public void Move(int oldIndex, int newIndex)
 		{
+			if (oldIndex == newIndex)
+				return;
 			var value = _list[oldIndex];
 			_list.RemoveAt(oldIndex);
 			_list.Insert(newIndex, value);

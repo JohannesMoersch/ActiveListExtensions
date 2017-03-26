@@ -114,7 +114,7 @@ namespace ActiveListExtensions
 		// --Skip
 		// --OrderBy
 		// --OrderByDescending
-		// GroupBy
+		// --GroupBy
 		// --Concat
 		// --Zip
 		// --Distinct
@@ -123,7 +123,7 @@ namespace ActiveListExtensions
 		// --Except
 		// --Reverse
 
-		// ToLookup (Not an IActiveList)
+		// --ToLookup (Not an IActiveList)
 
 		// SequenceEqual
 		// FirstOrDefault
