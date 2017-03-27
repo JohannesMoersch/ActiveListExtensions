@@ -97,8 +97,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ObservableListTests.cs" />
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />
+    <Compile Include="ValueModifiers\ActiveCombineTests.cs" />
     <Compile Include="ValueModifiers\ActiveFirstOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveLastOrDefaultTests.cs" />
+    <Compile Include="ValueModifiers\ActiveMutateTests.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefaultTests.cs" />
   </ItemGroup>
   <ItemGroup>

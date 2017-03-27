@@ -26,7 +26,7 @@ namespace ActiveListExtensions.ValueModifiers
 			get => _source1;
 			set
 			{
-				if (_source1 is INotifyPropertyChanged oldPropertyChangedSource)
+				if (_source1 is INotifyPropertyChanged oldPropertyChangedSource && _value1PropertiesToWatch != null)
 				{
 					foreach (var propertyName in _value1PropertiesToWatch)
 						PropertyChangedEventManager.RemoveHandler(oldPropertyChangedSource, SourcePropertyChanged, propertyName);
@@ -34,13 +34,14 @@ namespace ActiveListExtensions.ValueModifiers
 
 				_source1 = value;
 
-				if (_source1 is INotifyPropertyChanged newPropertyChangedSource)
+				if (_source1 is INotifyPropertyChanged newPropertyChangedSource && _value1PropertiesToWatch != null)
 				{
 					foreach (var propertyName in _value1PropertiesToWatch)
 						PropertyChangedEventManager.AddHandler(newPropertyChangedSource, SourcePropertyChanged, propertyName);
 				}
 
-				Value = _valueCombiner.Invoke(Source1, Source2);
+				if (_valueCombiner != null)
+					Value = _valueCombiner.Invoke(Source1, Source2);
 			}
 		}
 
@@ -50,7 +51,7 @@ namespace ActiveListExtensions.ValueModifiers
 			get => _source2;
 			set
 			{
-				if (_source2 is INotifyPropertyChanged oldPropertyChangedSource)
+				if (_source2 is INotifyPropertyChanged oldPropertyChangedSource && _value2PropertiesToWatch != null)
 				{
 					foreach (var propertyName in _value2PropertiesToWatch)
 						PropertyChangedEventManager.RemoveHandler(oldPropertyChangedSource, SourcePropertyChanged, propertyName);
@@ -58,13 +59,14 @@ namespace ActiveListExtensions.ValueModifiers
 
 				_source2 = value;
 
-				if (_source2 is INotifyPropertyChanged newPropertyChangedSource)
+				if (_source2 is INotifyPropertyChanged newPropertyChangedSource && _value2PropertiesToWatch != null)
 				{
 					foreach (var propertyName in _value2PropertiesToWatch)
 						PropertyChangedEventManager.AddHandler(newPropertyChangedSource, SourcePropertyChanged, propertyName);
 				}
 
-				Value = _valueCombiner.Invoke(Source1, Source2);
+				if (_valueCombiner != null)
+					Value = _valueCombiner.Invoke(Source1, Source2);
 			}
 		}
 
@@ -72,14 +74,17 @@ namespace ActiveListExtensions.ValueModifiers
 		{
 			_value1 = value1;
 			_value2 = value2;
-			_valueCombiner = valueCombiner;
-			_value1PropertiesToWatch = _value1PropertiesToWatch.ToArray();
-			_value2PropertiesToWatch = _value2PropertiesToWatch.ToArray();
-
-			Value = _valueCombiner.Invoke(_value1.Value, _value2.Value);
+			_value1PropertiesToWatch = value1PropertiesToWatch?.ToArray();
+			_value2PropertiesToWatch = value2PropertiesToWatch?.ToArray();
 
 			PropertyChangedEventManager.AddHandler(_value1, Source1Changed, nameof(IActiveValue<TValue1>.Value));
 			PropertyChangedEventManager.AddHandler(_value2, Source2Changed, nameof(IActiveValue<TValue2>.Value));
+
+			Source1 = _value1.Value;
+
+			_valueCombiner = valueCombiner;
+
+			Source2 = _value2.Value;
 		}
 
 		protected override void OnDisposed()

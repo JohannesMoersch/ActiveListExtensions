@@ -22,7 +22,7 @@ namespace ActiveListExtensions.ValueModifiers
 			get => _source;
 			set
 			{
-				if (_source is INotifyPropertyChanged oldPropertyChangedSource)
+				if (_source is INotifyPropertyChanged oldPropertyChangedSource && _propertiesToWatch != null)
 				{
 					foreach (var propertyName in _propertiesToWatch)
 						PropertyChangedEventManager.RemoveHandler(oldPropertyChangedSource, SourcePropertyChanged, propertyName);
@@ -30,7 +30,7 @@ namespace ActiveListExtensions.ValueModifiers
 
 				_source = value;
 
-				if (_source is INotifyPropertyChanged newPropertyChangedSource)
+				if (_source is INotifyPropertyChanged newPropertyChangedSource && _propertiesToWatch != null)
 				{
 					foreach (var propertyName in _propertiesToWatch)
 						PropertyChangedEventManager.AddHandler(newPropertyChangedSource, SourcePropertyChanged, propertyName);
@@ -44,11 +44,11 @@ namespace ActiveListExtensions.ValueModifiers
 		{
 			_value = value;
 			_mutator = mutator;
-			_propertiesToWatch = propertiesToWatch.ToArray();
-
-			Value = _mutator.Invoke(_value.Value);
+			_propertiesToWatch = propertiesToWatch?.ToArray();
 
 			PropertyChangedEventManager.AddHandler(_value, SourceChanged, nameof(IActiveValue<TValue>.Value));
+
+			Source = _value.Value;
 		}
 
 		protected override void OnDisposed()

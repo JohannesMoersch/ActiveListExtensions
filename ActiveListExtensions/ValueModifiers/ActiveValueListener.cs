@@ -20,13 +20,15 @@ namespace ActiveListExtensions.ValueModifiers
 		{
 			_source = source;
 			_valueGetter = valueGetter;
-			_propertiesToWatch = propertiesToWatch.ToArray();
+			_propertiesToWatch = propertiesToWatch?.ToArray();
 
-			if (_source is INotifyPropertyChanged propertyChangedSource)
+			if (_source is INotifyPropertyChanged propertyChangedSource && _propertiesToWatch != null)
 			{
 				foreach (var propertyName in _propertiesToWatch)
 					PropertyChangedEventManager.AddHandler(propertyChangedSource, SourcePropertyChanged, propertyName);
 			}
+
+			Value = _valueGetter.Invoke(_source);
 		}
 
 		protected override void OnDisposed()
