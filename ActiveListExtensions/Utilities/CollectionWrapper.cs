@@ -40,8 +40,7 @@ namespace ActiveListExtensions.Utilities
 			if ((propertiesToWatch?.Length ?? 0) > 0)
 				_propertiesToWatch = propertiesToWatch;
 
-			if (typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T)))
-				_watcherList = SetupPropertyWatcher();
+			_watcherList = SetupPropertyWatcher();
 
 			if (_collection is INotifyCollectionChanged)
 				CollectionChangedEventManager.AddHandler(_collection as INotifyCollectionChanged, HandleCollectionChange);

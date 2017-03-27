@@ -32,8 +32,6 @@ namespace ActiveListExtensions.Utilities
 
 		public PropertyWatcherList(string[] propertiesToWatch)
 		{
-			if (!typeof(INotifyPropertyChanged).IsAssignableFrom(typeof(T)))
-				throw new ArgumentException($"\"{typeof(T).Name}\" does not derive from {nameof(INotifyPropertyChanged)}.");
 			_propertiesToWatch = propertiesToWatch;
 		}
 
@@ -81,8 +79,11 @@ namespace ActiveListExtensions.Utilities
 		{
 			for (int i = 0; i < _data.Count; ++i)
 			{
-				foreach (var property in _propertiesToWatch)
-					PropertyChangedEventManager.RemoveHandler(_data[i].Value as INotifyPropertyChanged, _data[i].Handler, property);
+				if (_data[i].Value is INotifyPropertyChanged)
+				{
+					foreach (var property in _propertiesToWatch)
+						PropertyChangedEventManager.RemoveHandler(_data[i].Value as INotifyPropertyChanged, _data[i].Handler, property);
+				}
 			}
 			_data.Clear();
 			_keyToIndexMap.Clear();
