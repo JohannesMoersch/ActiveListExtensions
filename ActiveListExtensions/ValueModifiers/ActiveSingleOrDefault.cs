@@ -71,8 +71,8 @@ namespace ActiveListExtensions.ValueModifiers
 			}
 			else if (index == FirstMatchIndex)
 			{
-				_firstMatchIndex = SecondMatchIndex;
-				SecondMatchIndex = FindFirstMatch(_firstMatchIndex + 1);
+				_firstMatchIndex = SecondMatchIndex - 1;
+				SecondMatchIndex = FindFirstMatch(FirstMatchIndex + 1);
 			}
 			else if (index < SecondMatchIndex)
 				--_secondMatchIndex;
@@ -82,6 +82,69 @@ namespace ActiveListExtensions.ValueModifiers
 
 		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
+			if (oldIndex < FirstMatchIndex)
+			{
+				if (newIndex >= FirstMatchIndex)
+					--_firstMatchIndex;
+				if (newIndex >= SecondMatchIndex)
+					--_secondMatchIndex;
+			}
+			else if (oldIndex == FirstMatchIndex)
+			{
+				if (newIndex < SecondMatchIndex)
+					_firstMatchIndex = newIndex;
+				else if (newIndex == SecondMatchIndex)
+					FirstMatchIndex = SecondMatchIndex - 1;
+				else
+				{
+					_firstMatchIndex = SecondMatchIndex - 1;
+					SecondMatchIndex = FindFirstMatch(FirstMatchIndex + 1);
+				}
+			}
+			else if (oldIndex < SecondMatchIndex)
+			{
+				if (newIndex <= FirstMatchIndex)
+					++_firstMatchIndex;
+				else if (newIndex >= SecondMatchIndex)
+					--_secondMatchIndex;
+			}
+			else if (oldIndex == SecondMatchIndex)
+			{
+				if (newIndex <= FirstMatchIndex)
+				{
+					var oldFirstIndex = FirstMatchIndex;
+					_firstMatchIndex = newIndex;
+					SecondMatchIndex = oldFirstIndex + 1;
+				}
+				else if (newIndex <= SecondMatchIndex)
+					_secondMatchIndex = newIndex;
+				else
+					SecondMatchIndex = FindFirstMatch(SecondMatchIndex);
+			}
+			else
+			{
+				if (newIndex <= FirstMatchIndex)
+				{
+					if (_predicate.Invoke(value))
+					{
+						var oldFirstIndex = FirstMatchIndex;
+						_firstMatchIndex = newIndex;
+						SecondMatchIndex = oldFirstIndex + 1;
+					}
+					else
+					{
+						++_firstMatchIndex;
+						++_secondMatchIndex;
+					}
+				}
+				else if (newIndex <= SecondMatchIndex)
+				{
+					if (_predicate.Invoke(value))
+						SecondMatchIndex = newIndex;
+					else
+						++_secondMatchIndex;
+				}
+			}
 		}
 
 		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)

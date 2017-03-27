@@ -12,22 +12,22 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 	public class ActiveFirstOrDefaultTests
 	{
 		[Fact]
-		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveFirstOrDefault(i => i.Property % 3 == 0), l => l.FirstOrDefault(i => i.Property % 3 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveFirstOrDefault(i => i.Property % 20 == 0), l => l.FirstOrDefault(i => i.Property % 20 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyRemoveItems() => ValueTestHelpers.RandomlyRemoveItems(l => l.ActiveFirstOrDefault(i => i.Property % 3 == 0), l => l.FirstOrDefault(i => i.Property % 3 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyRemoveItems() => ValueTestHelpers.RandomlyRemoveItems(l => l.ActiveFirstOrDefault(i => i.Property % 20 == 0), l => l.FirstOrDefault(i => i.Property % 20 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyReplaceItems() => ValueTestHelpers.RandomlyReplaceItems(l => l.ActiveFirstOrDefault(i => i.Property % 3 == 0), l => l.FirstOrDefault(i => i.Property % 3 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyReplaceItems() => ValueTestHelpers.RandomlyReplaceItems(l => l.ActiveFirstOrDefault(i => i.Property % 20 == 0), l => l.FirstOrDefault(i => i.Property % 20 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyMoveItems() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveFirstOrDefault(i => i.Property % 3 == 0), l => l.FirstOrDefault(i => i.Property % 3 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyMoveItems() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveFirstOrDefault(i => i.Property % 20 == 0), l => l.FirstOrDefault(i => i.Property % 20 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void ResetWithRandomItems() => ValueTestHelpers.ResetWithRandomItems(l => l.ActiveFirstOrDefault(i => i.Property % 3 == 0), l => l.FirstOrDefault(i => i.Property % 3 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void ResetWithRandomItems() => ValueTestHelpers.ResetWithRandomItems(l => l.ActiveFirstOrDefault(i => i.Property % 20 == 0), l => l.FirstOrDefault(i => i.Property % 20 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyChangePropertyValues() => ValueTestHelpers.RandomlyChangePropertyValues(l => l.ActiveFirstOrDefault(i => i.Property % 3 == 0), l => l.FirstOrDefault(i => i.Property % 3 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
+		public void RandomlyChangePropertyValues() => ValueTestHelpers.RandomlyChangePropertyValues(l => l.ActiveFirstOrDefault(i => i.Property % 20 == 0), l => l.FirstOrDefault(i => i.Property % 20 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
 	}
 
 	public class ActiveFirstOrDefaultTestClass : INotifyPropertyChanged

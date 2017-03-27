@@ -15,6 +15,6 @@ namespace ActiveListExtensions.Utilities
 
 		public void Dispose() { }
 
-		public event PropertyChangedEventHandler PropertyChanged;
+		event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged { add { } remove { } }
 	}
 }

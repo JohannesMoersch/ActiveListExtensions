@@ -54,7 +54,7 @@ namespace ActiveListExtensions
 		// SequenceEqual (use Zip + All?)
 		// --FirstOrDefault
 		// --LastOrDefault
-		// SingleOrDefault
+		// --SingleOrDefault
 		// ElementAtOrDefault
 		// ElementsAtOrDefault
 		// Any

@@ -71,6 +71,37 @@ namespace ActiveListExtensions.Tests.Helpers
 			}
 		}
 
+		public static void RandomMixedOperations<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator)
+		{
+			RandomGenerator.ResetRandomGenerator();
+
+			var list = new ObservableList<T>();
+			foreach (var value in Enumerable.Range(0, 100))
+				list.Add(list.Count, randomValueGenerator.Invoke());
+			var sut = activeExpression.Invoke(list);
+
+			foreach (var value in Enumerable.Range(0, 1000))
+			{
+				switch (RandomGenerator.GenerateRandomInteger(0, 4))
+				{
+					case 0:
+						list.Add(RandomGenerator.GenerateRandomInteger(0, list.Count), randomValueGenerator.Invoke());
+						break;
+					case 1:
+						if (list.Count > 0)
+							list.Remove(RandomGenerator.GenerateRandomInteger(0, list.Count));
+						break;
+					case 2:
+						list.Replace(RandomGenerator.GenerateRandomInteger(0, list.Count), randomValueGenerator.Invoke());
+						break;
+					case 3:
+						list.Move(RandomGenerator.GenerateRandomInteger(0, list.Count), RandomGenerator.GenerateRandomInteger(0, list.Count));
+						break;
+				}
+				ValidateResult(sut, linqExpression.Invoke(list));
+			}
+		}
+
 		public static void ResetWithRandomItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator)
 		{
 			RandomGenerator.ResetRandomGenerator();

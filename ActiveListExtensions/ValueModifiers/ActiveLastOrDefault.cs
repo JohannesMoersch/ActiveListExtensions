@@ -18,7 +18,7 @@ namespace ActiveListExtensions.ValueModifiers
 			set
 			{
 				_lastMatchIndex = value;
-				if (_lastMatchIndex > 0)
+				if (_lastMatchIndex >= 0)
 					Value = SourceList[_lastMatchIndex];
 				else
 					Value = default(TSource);

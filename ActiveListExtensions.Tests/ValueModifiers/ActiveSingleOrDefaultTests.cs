@@ -12,22 +12,31 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 	public class ActiveSingleOrDefaultTests
 	{
 		[Fact]
-		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveSingleOrDefault(i => i.Property % 50 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 50 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyRemoveItems() => ValueTestHelpers.RandomlyRemoveItems(l => l.ActiveSingleOrDefault(i => i.Property % 50 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 50 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyRemoveItems() => ValueTestHelpers.RandomlyRemoveItems(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyReplaceItems() => ValueTestHelpers.RandomlyReplaceItems(l => l.ActiveSingleOrDefault(i => i.Property % 50 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 50 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyReplaceItems() => ValueTestHelpers.RandomlyReplaceItems(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyMoveItems() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveSingleOrDefault(i => i.Property == 550), l => { try { return l.SingleOrDefault(i => i.Property == 550); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyMoveItemsWithNoMatches() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveSingleOrDefault(i => i.Property == -1), l => { try { return l.SingleOrDefault(i => i.Property == -1); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void ResetWithRandomItems() => ValueTestHelpers.ResetWithRandomItems(l => l.ActiveSingleOrDefault(i => i.Property % 50 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 50 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyMoveItemsWithOneMatch() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveSingleOrDefault(i => i.Property == 550), l => { try { return l.SingleOrDefault(i => i.Property == 550); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyChangePropertyValues() => ValueTestHelpers.RandomlyChangePropertyValues(l => l.ActiveSingleOrDefault(i => i.Property % 50 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 50 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
+		public void RandomlyMoveItemsWithManyMatches() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+
+		[Fact]
+		public void RandomMixedOperations() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+
+		[Fact]
+		public void ResetWithRandomItems() => ValueTestHelpers.ResetWithRandomItems(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+
+		[Fact]
+		public void RandomlyChangePropertyValues() => ValueTestHelpers.RandomlyChangePropertyValues(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
 	}
 
 	public class ActiveSingleOrDefaultTestClass : INotifyPropertyChanged
@@ -46,5 +55,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		public override string ToString() => Property.ToString();
 	}
 }
