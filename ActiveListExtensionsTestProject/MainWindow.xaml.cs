@@ -81,6 +81,8 @@ namespace ActiveListExtensionsTestProject
 
 		public IActiveList<char> SelectMany { get; }
 
+		public IActiveValue<int> SelectManyCount { get; }
+
 		public MainWindow()
 		{
 			var a = new[] { 1, 2, 3, 4, 4, 4 };
@@ -97,9 +99,13 @@ namespace ActiveListExtensionsTestProject
 
 			Data = activeList.ActiveWhere(x => x.One % 2 == 0).ActiveSelect(x => $"{x.One} - {x.Two}");
 
+			Data.ToActiveValue(s => (s as IReadOnlyList<string>).Count);
+
 			Combined = activeList.ActiveSelect(x => $"{x.One} - {x.Two}").ActiveConcat(Data).ActiveOrderBy(s => s);
 
 			SelectMany = activeList.ActiveSelectMany(x => x.Three).ActiveReverse().ActiveSkip(2).ActiveTake(8);
+
+			SelectManyCount = SelectMany.ToActiveValue(l => l.Count);
 
 			InitializeComponent();
 		}
