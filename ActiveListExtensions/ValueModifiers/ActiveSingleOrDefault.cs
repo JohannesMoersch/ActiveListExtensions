@@ -64,21 +64,61 @@ namespace ActiveListExtensions.ValueModifiers
 
 		protected override void OnRemoved(int index, TSource value)
 		{
+			if (index < FirstMatchIndex)
+			{
+				--_firstMatchIndex;
+				--_secondMatchIndex;
+			}
+			else if (index == FirstMatchIndex)
+			{
+				_firstMatchIndex = SecondMatchIndex;
+				SecondMatchIndex = FindFirstMatch(_firstMatchIndex + 1);
+			}
+			else if (index < SecondMatchIndex)
+				--_secondMatchIndex;
+			else if (index == SecondMatchIndex)
+				SecondMatchIndex = FindFirstMatch(index);
 		}
 
-		// TEST NOT FAILING! ALWAYS MORE THAN ONE RESULT!
 		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
 		}
 
 		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
+			if (index < FirstMatchIndex)
+			{
+				if (_predicate.Invoke(newValue))
+				{
+					_secondMatchIndex = FirstMatchIndex;
+					FirstMatchIndex = index;
+				}
+			}
+			else if (index == FirstMatchIndex)
+			{
+				if (!_predicate.Invoke(newValue))
+				{
+					var oldSecondIndex = SecondMatchIndex;
+
+					if (SecondMatchIndex < SourceList.Count)
+						_secondMatchIndex = FindFirstMatch(FirstMatchIndex + 1);
+
+					FirstMatchIndex = oldSecondIndex;
+				}
+			}
+			else if (index <= SecondMatchIndex)
+			{
+				if (_predicate.Invoke(newValue))
+					SecondMatchIndex = index;
+				else if (index == SecondMatchIndex)
+					SecondMatchIndex = FindFirstMatch(index + 1);
+			}
 		}
 
 		protected override void OnReset(IReadOnlyList<TSource> newItems)
 		{
-			//_firstMatchIndex = FindFirstMatch(0);
-			//SecondMatchIndex = FindFirstMatch(FirstMatchIndex);
+			_firstMatchIndex = FindFirstMatch(0);
+			SecondMatchIndex = FindFirstMatch(FirstMatchIndex + 1);
 		}
 
 		protected override void ItemModified(int index, TSource value) => OnReplaced(index, value, value);
