@@ -49,11 +49,15 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<TSource> ActiveSingleOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveSingleOrDefault<TSource>(source, predicate, propertiesToWatch);
 
+		public static IActiveValue<TSource> ActiveElementAtOrDefault<TSource>(this IActiveList<TSource> source, int index) => ActiveElementAtOrDefault(source, new ActiveValueWrapper<int>(index));
+
+		public static IActiveValue<TSource> ActiveElementAtOrDefault<TSource>(this IActiveList<TSource> source, IActiveValue<int> index) => new ActiveElementAtOrDefault<TSource>(source, index);
+
 		// SequenceEqual (use Zip + All?)
 		// --FirstOrDefault
 		// --LastOrDefault
 		// --SingleOrDefault
-		// ElementAtOrDefault
+		// --ElementAtOrDefault
 		// ElementsAtOrDefault
 		// Any
 		// All

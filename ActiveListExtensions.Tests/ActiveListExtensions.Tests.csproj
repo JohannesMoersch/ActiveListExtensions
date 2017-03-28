@@ -95,9 +95,11 @@
     <Compile Include="Modifiers\ActiveWhereTests.cs" />
     <Compile Include="Modifiers\ActiveZipTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\CustomActiveValue.cs" />
     <Compile Include="Utilities\ObservableListTests.cs" />
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />
     <Compile Include="ValueModifiers\ActiveCombineTests.cs" />
+    <Compile Include="ValueModifiers\ActiveElementAtOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveFirstOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveLastOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveMutateTests.cs" />

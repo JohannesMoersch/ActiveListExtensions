@@ -30,7 +30,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		public void RandomlyMoveItemsWithManyMatches() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomMixedOperations() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomMixedOperations() => ValueTestHelpers.RandomMixedOperations(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
 		public void ResetWithRandomItems() => ValueTestHelpers.ResetWithRandomItems(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });

@@ -24,7 +24,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		public void RandomlyMoveItems() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveFirstOrDefault(i => i.Property % 20 == 0), l => l.FirstOrDefault(i => i.Property % 20 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomMixedOperations() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveFirstOrDefault(i => i.Property % 20 == 0), l => l.FirstOrDefault(i => i.Property % 20 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomMixedOperations() => ValueTestHelpers.RandomMixedOperations(l => l.ActiveFirstOrDefault(i => i.Property % 20 == 0), l => l.FirstOrDefault(i => i.Property % 20 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
 		public void ResetWithRandomItems() => ValueTestHelpers.ResetWithRandomItems(l => l.ActiveFirstOrDefault(i => i.Property % 20 == 0), l => l.FirstOrDefault(i => i.Property % 20 == 0), () => new ActiveFirstOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
