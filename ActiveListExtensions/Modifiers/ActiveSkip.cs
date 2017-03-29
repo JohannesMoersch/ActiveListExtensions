@@ -16,7 +16,7 @@ namespace ActiveListExtensions.Modifiers
 		{
 			get
 			{
-				var count = SourceList.Count > _skipCount ? SourceList.Count - _skipCount : 0;
+				var count = SourceList.Count > _currentSkipCount ? SourceList.Count - _currentSkipCount : 0;
 				if (count > _skipIndex)
 					--count;
 				return count;
@@ -33,18 +33,62 @@ namespace ActiveListExtensions.Modifiers
 					throw new ArgumentOutOfRangeException(nameof(index));
 				if (index >= _skipIndex)
 					++index;
-				return SourceList[index + _skipCount];
+				return SourceList[index + _currentSkipCount];
 			}
 		}
 
-		private int _skipCount;
+		private int _currentSkipCount;
 
-		public ActiveSkip(IActiveList<TSource> source, int count) 
+		private IActiveValue<int> _skipCount;
+
+		public ActiveSkip(IActiveList<TSource> source, IActiveValue<int> count) 
 			: base(source)
 		{
 			_skipCount = count;
+
+			PropertyChangedEventManager.AddHandler(_skipCount, SkipCountChanged, nameof(IActiveValue<int>.Value));
+
+			UpdateSkipCount();
+
 			Initialize();
 		}
+
+		protected override void OnDisposed()
+		{
+			PropertyChangedEventManager.RemoveHandler(_skipCount, SkipCountChanged, nameof(IActiveValue<int>.Value));
+			base.OnDisposed();
+		}
+
+		private void SkipCountChanged(object key, PropertyChangedEventArgs args)
+		{
+			if (_skipCount.Value > _currentSkipCount)
+			{
+				var start = _currentSkipCount < SourceList.Count ? _currentSkipCount : SourceList.Count - 1;
+
+				var max = _skipCount.Value < SourceList.Count ? _skipCount.Value : SourceList.Count;
+
+				for (int i = start; i < max; ++i)
+				{
+					_currentSkipCount = i + 1;
+					NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, SourceList[i], 0));
+				}
+			}
+			else
+			{
+				var start = _currentSkipCount - 1 < SourceList.Count ? _currentSkipCount - 1 : SourceList.Count - 1;
+
+				var min = _skipCount.Value >= 0 ? _skipCount.Value : 0;
+
+				for (int i = start; i >= min; --i)
+				{
+					_currentSkipCount = i;
+					NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, SourceList[i], 0));
+				}
+			}
+			UpdateSkipCount();
+		}
+
+		private void UpdateSkipCount() => _currentSkipCount = _skipCount.Value >= 0 ? _skipCount.Value : 0;
 
 		private void UpdateCount()
 		{
@@ -56,35 +100,35 @@ namespace ActiveListExtensions.Modifiers
 
 		protected override void OnAdded(int index, TSource value)
 		{
-			if (index >= _skipCount)
-				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, index - _skipCount));
-			else if (SourceList.Count > _skipCount)
-				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, SourceList[_skipCount], 0));
+			if (index >= _currentSkipCount)
+				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, index - _currentSkipCount));
+			else if (SourceList.Count > _currentSkipCount)
+				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, SourceList[_currentSkipCount], 0));
 			UpdateCount();
 		}
 
 		protected override void OnRemoved(int index, TSource value)
 		{
-			if (index >= _skipCount)
-				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, index - _skipCount));
-			else if (SourceList.Count >= _skipCount)
-				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, SourceList[_skipCount - 1], 0));
+			if (index >= _currentSkipCount)
+				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, index - _currentSkipCount));
+			else if (SourceList.Count >= _currentSkipCount)
+				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, SourceList[_currentSkipCount - 1], 0));
 			UpdateCount();
 		}
 
 		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
-			if (index >= _skipCount)
-				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newValue, oldValue, index - _skipCount));
+			if (index >= _currentSkipCount)
+				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newValue, oldValue, index - _currentSkipCount));
 		}
 
 		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
-			if (oldIndex >= _skipCount && newIndex >= _skipCount)
-				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, value, newIndex - _skipCount, oldIndex - _skipCount));
-			else if (oldIndex >= _skipCount || newIndex >= _skipCount)
+			if (oldIndex >= _currentSkipCount && newIndex >= _currentSkipCount)
+				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, value, newIndex - _currentSkipCount, oldIndex - _currentSkipCount));
+			else if (oldIndex >= _currentSkipCount || newIndex >= _currentSkipCount)
 			{
-				_skipIndex = newIndex - _skipCount;
+				_skipIndex = newIndex - _currentSkipCount;
 				try { OnRemoved(oldIndex, value); }
 				finally { _skipIndex = int.MaxValue; }
 				OnAdded(newIndex, value);

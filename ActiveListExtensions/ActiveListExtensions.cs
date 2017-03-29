@@ -41,9 +41,13 @@ namespace ActiveListExtensions
 
 		public static IActiveList<TResult> ActiveSelectMany<TSource, TResult>(this IActiveList<TSource> source, Func<TSource, IEnumerable<TResult>> selector, IEnumerable<string> propertiesToWatch) => new ActiveSelectMany<TSource, TResult>(source, selector, propertiesToWatch);
 
-		public static IActiveList<TSource> ActiveTake<TSource>(this IActiveList<TSource> source, int count) => new ActiveTake<TSource>(source, count);
+		public static IActiveList<TSource> ActiveTake<TSource>(this IActiveList<TSource> source, int count) => new ActiveTake<TSource>(source, new ActiveValueWrapper<int>(count));
 
-		public static IActiveList<TSource> ActiveSkip<TSource>(this IActiveList<TSource> source, int count) => new ActiveSkip<TSource>(source, count);
+		public static IActiveList<TSource> ActiveTake<TSource>(this IActiveList<TSource> source, IActiveValue<int> count) => new ActiveTake<TSource>(source, count);
+
+		public static IActiveList<TSource> ActiveSkip<TSource>(this IActiveList<TSource> source, int count) => new ActiveSkip<TSource>(source, new ActiveValueWrapper<int>(count));
+
+		public static IActiveList<TSource> ActiveSkip<TSource>(this IActiveList<TSource> source, IActiveValue<int> count) => new ActiveSkip<TSource>(source, count);
 
 		public static IActiveList<TSource> ActiveConcat<TSource>(this IActiveList<TSource> source, IEnumerable<TSource> concat) => new ActiveConcat<TSource>(source, concat);
 
