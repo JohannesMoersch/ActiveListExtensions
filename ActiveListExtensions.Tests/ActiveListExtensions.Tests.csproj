@@ -98,6 +98,8 @@
     <Compile Include="Utilities\CustomActiveValue.cs" />
     <Compile Include="Utilities\ObservableListTests.cs" />
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />
+    <Compile Include="ValueModifiers\ActiveAllTests.cs" />
+    <Compile Include="ValueModifiers\ActiveAnyTests.cs" />
     <Compile Include="ValueModifiers\ActiveCombineTests.cs" />
     <Compile Include="ValueModifiers\ActiveElementAtOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveFirstOrDefaultTests.cs" />

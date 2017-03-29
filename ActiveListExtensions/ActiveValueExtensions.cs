@@ -53,14 +53,22 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<TSource> ActiveElementAtOrDefault<TSource>(this IActiveList<TSource> source, IActiveValue<int> index) => new ActiveElementAtOrDefault<TSource>(source, index);
 
+		public static IActiveValue<bool> ActiveAll<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveAll(source, predicate.Compile(), predicate.GetReferencedProperties());
+
+		public static IActiveValue<bool> ActiveAll<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveAll<TSource>(source, predicate, propertiesToWatch);
+
+		public static IActiveValue<bool> ActiveAny<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveAny(source, predicate.Compile(), predicate.GetReferencedProperties());
+
+		public static IActiveValue<bool> ActiveAny<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveAny<TSource>(source, predicate, propertiesToWatch);
+
 		// SequenceEqual (use Zip + All?)
 		// --FirstOrDefault
 		// --LastOrDefault
 		// --SingleOrDefault
 		// --ElementAtOrDefault
 		// ElementsAtOrDefault
-		// Any
-		// All
+		// --Any
+		// --All
 		// Count
 		// Contains
 		// AggregateOrDefault

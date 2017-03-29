@@ -68,6 +68,8 @@
     <Compile Include="Modifiers\Bases\ActiveMultiListListenerBase.cs" />
     <Compile Include="Modifiers\Bases\ActiveSetBase.cs" />
     <Compile Include="Utilities\ActiveValueWrapper.cs" />
+    <Compile Include="ValueModifiers\ActiveAll.cs" />
+    <Compile Include="ValueModifiers\ActiveAny.cs" />
     <Compile Include="ValueModifiers\ActiveElementAtOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveMutate.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefault.cs" />
