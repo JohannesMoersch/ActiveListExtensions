@@ -70,6 +70,7 @@
     <Compile Include="Utilities\ActiveValueWrapper.cs" />
     <Compile Include="ValueModifiers\ActiveAll.cs" />
     <Compile Include="ValueModifiers\ActiveAny.cs" />
+    <Compile Include="ValueModifiers\ActiveCount.cs" />
     <Compile Include="ValueModifiers\ActiveElementAtOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveMutate.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefault.cs" />
