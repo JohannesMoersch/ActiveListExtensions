@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveContains<TSource> : ActiveListPredicateBase<TSource, bool>
+	internal class ActiveContains<TSource> : ActiveListPredicateBase<TSource>
 	{
 		private IActiveValue<TSource> _value;
 
@@ -30,6 +30,6 @@ namespace ActiveListExtensions.ValueModifiers
 			base.OnDisposed();
 		}
 
-		protected override bool GetValue(int count) => count > 0;
+		protected override bool GetValue(bool predicateMet) => predicateMet;
 	}
 }

@@ -6,97 +6,98 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers.Bases
 {
-	internal abstract class ActiveListPredicateBase<TSource, TResult> : ActiveListValueBase<TSource, TResult>
+	internal abstract class ActiveListPredicateBase<TSource> : ActiveListValueBase<TSource, bool>
 	{
-		private readonly Func<TSource, bool> _predicate;
+		private Func<TSource, bool> _predicate;
 
-		private readonly List<bool> _values;
-
-		private int _count;
+		private int? _valueIndex;
 
 		public ActiveListPredicateBase(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch = null)
 			: base(source, propertiesToWatch)
 		{
 			_predicate = predicate;
 
-			_values = new List<bool>();
+			Value = GetValue(false);
 
-			Value = GetValue(_count);
+			Initialize();
 		}
 
-		protected abstract TResult GetValue(int count);
+		protected abstract bool GetValue(bool predicateMet);
 
 		protected sealed override void OnAdded(int index, TSource value)
 		{
-			if (_predicate.Invoke(value))
+			if (_valueIndex.HasValue)
 			{
-				_values.Insert(index, true);
-				++_count;
+				if (index <= _valueIndex)
+					++_valueIndex;
 			}
-			else
-				_values.Insert(index, false);
+			else if (_predicate.Invoke(value))
+				_valueIndex = index;
 
-			Value = GetValue(_count);
+			Value = GetValue(_valueIndex.HasValue);
 		}
 
 		protected sealed override void OnRemoved(int index, TSource value)
 		{
-			var currentValue = _values[index];
-			_values.RemoveAt(index);
-			if (currentValue)
-				--_count;
+			if (!_valueIndex.HasValue)
+				return;
 
-			Value = GetValue(_count);
+			if (_valueIndex == index)
+				_valueIndex = FindMatch();
+			else if (index < _valueIndex)
+				--_valueIndex;
+
+			Value = GetValue(_valueIndex.HasValue);
 		}
 
 		protected sealed override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
-			var currentValue = _values[oldIndex];
-			_values.RemoveAt(oldIndex);
-			_values.Insert(newIndex, currentValue);
+			if (!_valueIndex.HasValue)
+				return;
 
-			Value = GetValue(_count);
+			if (oldIndex == _valueIndex)
+				_valueIndex = newIndex;
+			else if (oldIndex < _valueIndex)
+			{
+				if (newIndex > _valueIndex)
+					--_valueIndex;
+			}
+			else if (newIndex < _valueIndex)
+				++_valueIndex;
+
+			Value = GetValue(_valueIndex.HasValue);
 		}
 
 		protected sealed override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
 			if (_predicate.Invoke(newValue))
 			{
-				var currentValue = _values[index];
-				_values[index] = true;
-				if (!currentValue)
-					++_count;
+				if (!_valueIndex.HasValue)
+					_valueIndex = index;
 			}
-			else if (_values[index])
-			{
-				_values[index] = false;
-				--_count;
-			}
+			else if (_valueIndex == index)
+				_valueIndex = FindMatch();
 
-			Value = GetValue(_count);
+			Value = GetValue(_valueIndex.HasValue);
 		}
 
 		protected sealed override void OnReset(IReadOnlyList<TSource> newItems)
 		{
-			_values.Clear();
+			_valueIndex = FindMatch();
 
-			var newCount = 0;
-			for (int i = 0; i < newItems.Count; ++i)
-			{
-				if (_predicate.Invoke(newItems[i]))
-				{
-					_values.Add(true);
-					++newCount;
-				}
-				else
-					_values.Add(false);
-			}
-
-			_count = newCount;
-
-			Value = GetValue(_count);
+			Value = GetValue(_valueIndex.HasValue);
 		}
 
 		protected sealed override void ItemModified(int index, TSource value) => OnReplaced(index, value, value);
+
+		private int? FindMatch()
+		{
+			for (int i = 0; i < SourceList.Count; ++i)
+			{
+				if (_predicate.Invoke(SourceList[i]))
+					return i;
+			}
+			return null;
+		}
 	}
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveAny<TSource> : ActiveListPredicateBase<TSource, bool>
+	internal class ActiveAny<TSource> : ActiveListPredicateBase<TSource>
 	{
 		public ActiveAny(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch = null)
 			: base(source, predicate, propertiesToWatch)
@@ -15,6 +15,6 @@ namespace ActiveListExtensions.ValueModifiers
 			Initialize();
 		}
 
-		protected override bool GetValue(int count) => count > 0;
+		protected override bool GetValue(bool predicateMet) => predicateMet;
 	}
 }
