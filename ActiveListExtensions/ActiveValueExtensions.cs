@@ -15,9 +15,9 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<TValue> ToActiveValue<TSource, TValue>(this TSource source, Func<TSource, TValue> valueGetter, IEnumerable<string> propertiesToWatch) => new ActiveValueListener<TSource, TValue>(source, valueGetter, propertiesToWatch);
 
-		public static IActiveValue<TResult> ActiveMutate<TValue, TResult>(this IActiveValue<TValue> source, Expression<Func<TValue, TResult>> mutator) => ActiveMutate(source, mutator.Compile(), mutator.GetReferencedProperties());
+		public static IActiveValue<TResult> ActiveSelect<TValue, TResult>(this IActiveValue<TValue> source, Expression<Func<TValue, TResult>> mutator) => ActiveSelect(source, mutator.Compile(), mutator.GetReferencedProperties());
 
-		public static IActiveValue<TResult> ActiveMutate<TValue, TResult>(this IActiveValue<TValue> source, Func<TValue, TResult> mutator, IEnumerable<string> propertiesToWatch) => new ActiveMutate<TValue, TResult>(source, mutator, propertiesToWatch);
+		public static IActiveValue<TResult> ActiveSelect<TValue, TResult>(this IActiveValue<TValue> source, Func<TValue, TResult> mutator, IEnumerable<string> propertiesToWatch) => new ActiveSelectValue<TValue, TResult>(source, mutator, propertiesToWatch);
 
 		public static IActiveValue<TResult> ActiveCombine<TValue1, TValue2, TResult>(this IActiveValue<TValue1> value1, TValue2 value2, Expression<Func<TValue1, TValue2, TResult>> resultCombiner) => ActiveCombine(value1, new ActiveValueWrapper<TValue2>(value2), resultCombiner);
 
@@ -75,6 +75,18 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<bool> ActiveContains<TSource>(this IActiveList<TSource> source, IActiveValue<TSource> value) => new ActiveContains<TSource>(source, value);
 
+		public static IActiveValue<TSource> ActiveMaxOrDefault<TSource>(this IActiveList<TSource> source) => ActiveMaxOrDefault(source, i => i, null);
+
+		public static IActiveValue<TResult> ActiveMaxOrDefault<TSource, TResult>(this IActiveList<TSource> source, Expression<Func<TSource, TResult>> selector) => ActiveMaxOrDefault(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<TResult> ActiveMaxOrDefault<TSource, TResult>(this IActiveList<TSource> source, Func<TSource, TResult> selector, IEnumerable<string> propertiesToWatch) => new ActiveMaxOrDefault<TSource, TResult>(source, selector, propertiesToWatch);
+
+		public static IActiveValue<TSource> ActiveMinOrDefault<TSource>(this IActiveList<TSource> source) => ActiveMinOrDefault(source, i => i, null);
+
+		public static IActiveValue<TResult> ActiveMinOrDefault<TSource, TResult>(this IActiveList<TSource> source, Expression<Func<TSource, TResult>> selector) => ActiveMinOrDefault(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<TResult> ActiveMinOrDefault<TSource, TResult>(this IActiveList<TSource> source, Func<TSource, TResult> selector, IEnumerable<string> propertiesToWatch) => new ActiveMinOrDefault<TSource, TResult>(source, selector, propertiesToWatch);
+
 		// SequenceEqual (use Zip + All?)
 		// --FirstOrDefault
 		// --LastOrDefault
@@ -87,8 +99,8 @@ namespace ActiveListExtensions
 		// --Contains
 		// AggregateOrDefault
 		// SumOrDefault
-		// MinOrDefault
-		// MaxOrDefault
+		// --MinOrDefault
+		// --MaxOrDefault
 		// AverageOrDefault
 	}
 }

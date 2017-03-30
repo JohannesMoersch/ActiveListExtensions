@@ -106,6 +106,8 @@
     <Compile Include="ValueModifiers\ActiveElementAtOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveFirstOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveLastOrDefaultTests.cs" />
+    <Compile Include="ValueModifiers\ActiveMaxOrDefaultTests.cs" />
+    <Compile Include="ValueModifiers\ActiveMinOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveMutateTests.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefaultTests.cs" />
   </ItemGroup>

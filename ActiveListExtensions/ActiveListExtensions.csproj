@@ -73,7 +73,9 @@
     <Compile Include="ValueModifiers\ActiveContains.cs" />
     <Compile Include="ValueModifiers\ActiveCount.cs" />
     <Compile Include="ValueModifiers\ActiveElementAtOrDefault.cs" />
-    <Compile Include="ValueModifiers\ActiveMutate.cs" />
+    <Compile Include="ValueModifiers\ActiveMaxOrDefault.cs" />
+    <Compile Include="ValueModifiers\ActiveMinOrDefault.cs" />
+    <Compile Include="ValueModifiers\ActiveSelectValue.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveValueListener.cs" />
     <Compile Include="Utilities\CollectionWrapper.cs" />
@@ -87,6 +89,7 @@
     <Compile Include="ValueModifiers\ActiveCombine.cs" />
     <Compile Include="ValueModifiers\ActiveFirstOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveLastOrDefault.cs" />
+    <Compile Include="ValueModifiers\Bases\ActiveListCompareBase.cs" />
     <Compile Include="ValueModifiers\Bases\ActiveListValueBase.cs" />
     <Compile Include="ValueModifiers\Bases\ActiveListPredicateBase.cs" />
     <Compile Include="ValueModifiers\Bases\ActiveValueBase.cs" />

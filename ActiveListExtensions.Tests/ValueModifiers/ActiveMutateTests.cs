@@ -14,7 +14,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		public void WhenMutatingContainerValueChanged()
 		{
 			var source = new ActiveMutateTestOuterClass() { Container = new ActiveMutateTestInnerClass() { Property = 100 } };
-			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
+			var sut = source.ToActiveValue(c => c.Container).ActiveSelect(c => c.Property);
 
 			source.Container = new ActiveMutateTestInnerClass() { Property = 200 };
 
@@ -25,7 +25,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		public void WhenMutatingPropertyValueChanged()
 		{
 			var source = new ActiveMutateTestOuterClass() { Container = new ActiveMutateTestInnerClass() { Property = 100 } };
-			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
+			var sut = source.ToActiveValue(c => c.Container).ActiveSelect(c => c.Property);
 
 			source.Container.Property = 200;
 
@@ -36,7 +36,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		public void WhenMutatingPropertyChangeNotificationIsThrown()
 		{
 			var source = new ActiveMutateTestOuterClass() { Container = new ActiveMutateTestInnerClass() { Property = 100 } };
-			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
+			var sut = source.ToActiveValue(c => c.Container).ActiveSelect(c => c.Property);
 
 			bool called = false;
 
