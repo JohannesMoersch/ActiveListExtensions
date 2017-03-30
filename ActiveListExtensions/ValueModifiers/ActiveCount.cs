@@ -12,6 +12,7 @@ namespace ActiveListExtensions.ValueModifiers
 		public ActiveCount(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch = null)
 			: base(source, predicate, propertiesToWatch)
 		{
+			Initialize();
 		}
 
 		protected override int GetValue(int count) => count;

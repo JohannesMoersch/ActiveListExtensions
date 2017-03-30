@@ -12,6 +12,7 @@ namespace ActiveListExtensions.ValueModifiers
 		public ActiveAny(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch = null)
 			: base(source, predicate, propertiesToWatch)
 		{
+			Initialize();
 		}
 
 		protected override bool GetValue(int count) => count > 0;

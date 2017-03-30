@@ -22,8 +22,6 @@ namespace ActiveListExtensions.ValueModifiers.Bases
 			_values = new List<bool>();
 
 			Value = GetValue(_count);
-
-			Initialize();
 		}
 
 		protected abstract TResult GetValue(int count);

@@ -71,6 +71,10 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<int> ActiveCount<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveCount<TSource>(source, predicate, propertiesToWatch);
 
+		public static IActiveValue<bool> ActiveContains<TSource>(this IActiveList<TSource> source, TSource value) => ActiveContains(source, new ActiveValueWrapper<TSource>(value));
+
+		public static IActiveValue<bool> ActiveContains<TSource>(this IActiveList<TSource> source, IActiveValue<TSource> value) => new ActiveContains<TSource>(source, value);
+
 		// SequenceEqual (use Zip + All?)
 		// --FirstOrDefault
 		// --LastOrDefault
@@ -80,7 +84,7 @@ namespace ActiveListExtensions
 		// --Any
 		// --All
 		// --Count
-		// Contains
+		// --Contains
 		// AggregateOrDefault
 		// SumOrDefault
 		// MinOrDefault
