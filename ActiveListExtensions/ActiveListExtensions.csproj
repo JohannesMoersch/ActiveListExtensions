@@ -87,6 +87,7 @@
     <Compile Include="ValueModifiers\ActiveFirstOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveLastOrDefault.cs" />
     <Compile Include="ValueModifiers\Bases\ActiveListValueBase.cs" />
+    <Compile Include="ValueModifiers\Bases\ActiveListPredicateBase.cs" />
     <Compile Include="ValueModifiers\Bases\ActiveValueBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
