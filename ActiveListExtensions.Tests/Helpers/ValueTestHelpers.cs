@@ -9,7 +9,7 @@ namespace ActiveListExtensions.Tests.Helpers
 {
 	public static class ValueTestHelpers
 	{
-		public static void RandomlyInsertItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator)
+		public static void RandomlyInsertItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator, Func<U, U, bool> comparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -19,11 +19,11 @@ namespace ActiveListExtensions.Tests.Helpers
 			foreach (var value in Enumerable.Range(0, 100))
 			{
 				list.Add(RandomGenerator.GenerateRandomInteger(0, list.Count), randomValueGenerator.Invoke());
-				ValidateResult(sut, linqExpression.Invoke(list));
+				ValidateResult(sut, linqExpression.Invoke(list), comparer);
 			}
 		}
 
-		public static void RandomlyRemoveItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator)
+		public static void RandomlyRemoveItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator, Func<U, U, bool> comparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -35,11 +35,11 @@ namespace ActiveListExtensions.Tests.Helpers
 			foreach (var value in Enumerable.Range(0, 100))
 			{
 				list.Remove(RandomGenerator.GenerateRandomInteger(0, list.Count));
-				ValidateResult(sut, linqExpression.Invoke(list));
+				ValidateResult(sut, linqExpression.Invoke(list), comparer);
 			}
 		}
 
-		public static void RandomlyReplaceItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator)
+		public static void RandomlyReplaceItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator, Func<U, U, bool> comparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -51,11 +51,11 @@ namespace ActiveListExtensions.Tests.Helpers
 			foreach (var value in Enumerable.Range(0, 100))
 			{
 				list.Replace(RandomGenerator.GenerateRandomInteger(0, list.Count), randomValueGenerator.Invoke());
-				ValidateResult(sut, linqExpression.Invoke(list));
+				ValidateResult(sut, linqExpression.Invoke(list), comparer);
 			}
 		}
 
-		public static void RandomlyMoveItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator)
+		public static void RandomlyMoveItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator, Func<U, U, bool> comparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -67,11 +67,11 @@ namespace ActiveListExtensions.Tests.Helpers
 			foreach (var value in Enumerable.Range(0, 100))
 			{
 				list.Move(RandomGenerator.GenerateRandomInteger(0, list.Count), RandomGenerator.GenerateRandomInteger(0, list.Count));
-				ValidateResult(sut, linqExpression.Invoke(list));
+				ValidateResult(sut, linqExpression.Invoke(list), comparer);
 			}
 		}
 
-		public static void RandomMixedOperations<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator)
+		public static void RandomMixedOperations<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator, Func<U, U, bool> comparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -98,11 +98,11 @@ namespace ActiveListExtensions.Tests.Helpers
 						list.Move(RandomGenerator.GenerateRandomInteger(0, list.Count), RandomGenerator.GenerateRandomInteger(0, list.Count));
 						break;
 				}
-				ValidateResult(sut, linqExpression.Invoke(list));
+				ValidateResult(sut, linqExpression.Invoke(list), comparer);
 			}
 		}
 
-		public static void ResetWithRandomItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator)
+		public static void ResetWithRandomItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator, Func<U, U, bool> comparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -114,11 +114,11 @@ namespace ActiveListExtensions.Tests.Helpers
 			foreach (var value in Enumerable.Range(0, 20))
 			{
 				list.Reset(Enumerable.Range(0, RandomGenerator.GenerateRandomInteger(0, 30)).Select(i => randomValueGenerator.Invoke()));
-				ValidateResult(sut, linqExpression.Invoke(list));
+				ValidateResult(sut, linqExpression.Invoke(list), comparer);
 			}
 		}
 
-		public static void RandomlyChangePropertyValues<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator, Action<T> randomPropertySetter)
+		public static void RandomlyChangePropertyValues<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator, Action<T> randomPropertySetter, Func<U, U, bool> comparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -130,13 +130,13 @@ namespace ActiveListExtensions.Tests.Helpers
 			foreach (var value in Enumerable.Range(0, 100))
 			{
 				randomPropertySetter.Invoke(list[RandomGenerator.GenerateRandomInteger(0, list.Count)]);
-				ValidateResult(sut, linqExpression.Invoke(list));
+				ValidateResult(sut, linqExpression.Invoke(list), comparer);
 			}
 		}
 
-		private static void ValidateResult<T>(IActiveValue<T> value, T otherValue)
+		private static void ValidateResult<T>(IActiveValue<T> value, T otherValue, Func<T, T, bool> comparer)
 		{
-			if (!Equals(value.Value, otherValue))
+			if (!(comparer?.Invoke(value.Value, otherValue) ?? Equals(value.Value, otherValue)))
 				throw new Exception("Linq equivalent differs from processed value.");
 		}
 	}

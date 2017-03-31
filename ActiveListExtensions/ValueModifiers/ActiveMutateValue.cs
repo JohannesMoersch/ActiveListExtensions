@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveSelectValue<TValue, TResult> : ActiveValueBase<TResult>
+	internal class ActiveMutateValue<TValue, TResult> : ActiveValueBase<TResult>
 	{
 		private IActiveValue<TValue> _value;
 
@@ -40,7 +40,7 @@ namespace ActiveListExtensions.ValueModifiers
 			}
 		}
 
-		public ActiveSelectValue(IActiveValue<TValue> value, Func<TValue, TResult> mutator, IEnumerable<string> propertiesToWatch)
+		public ActiveMutateValue(IActiveValue<TValue> value, Func<TValue, TResult> mutator, IEnumerable<string> propertiesToWatch)
 		{
 			_value = value;
 			_mutator = mutator;

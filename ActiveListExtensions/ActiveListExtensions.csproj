@@ -75,7 +75,8 @@
     <Compile Include="ValueModifiers\ActiveElementAtOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveMaxOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveMinOrDefault.cs" />
-    <Compile Include="ValueModifiers\ActiveSelectValue.cs" />
+    <Compile Include="ValueModifiers\ActiveMutateList.cs" />
+    <Compile Include="ValueModifiers\ActiveMutateValue.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveValueListener.cs" />
     <Compile Include="Utilities\CollectionWrapper.cs" />

@@ -8,15 +8,15 @@ using Xunit;
 
 namespace ActiveListExtensions.Tests.ValueModifiers
 {
-	public class ActiveSelectValueTests
+	public class ActiveMutateValueTests
 	{
 		[Fact]
 		public void WhenMutatingContainerValueChanged()
 		{
-			var source = new ActiveSelectValueTestOuterClass() { Container = new ActiveSelectValueTestInnerClass() { Property = 100 } };
-			var sut = source.ToActiveValue(c => c.Container).ActiveSelect(c => c.Property);
+			var source = new ActiveMutateValueTestOuterClass() { Container = new ActiveMutateValueTestInnerClass() { Property = 100 } };
+			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
 
-			source.Container = new ActiveSelectValueTestInnerClass() { Property = 200 };
+			source.Container = new ActiveMutateValueTestInnerClass() { Property = 200 };
 
 			Assert.Equal(source.Container.Property, sut.Value);
 		}
@@ -24,8 +24,8 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		[Fact]
 		public void WhenMutatingPropertyValueChanged()
 		{
-			var source = new ActiveSelectValueTestOuterClass() { Container = new ActiveSelectValueTestInnerClass() { Property = 100 } };
-			var sut = source.ToActiveValue(c => c.Container).ActiveSelect(c => c.Property);
+			var source = new ActiveMutateValueTestOuterClass() { Container = new ActiveMutateValueTestInnerClass() { Property = 100 } };
+			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
 
 			source.Container.Property = 200;
 
@@ -35,8 +35,8 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		[Fact]
 		public void WhenMutatingPropertyChangeNotificationIsThrown()
 		{
-			var source = new ActiveSelectValueTestOuterClass() { Container = new ActiveSelectValueTestInnerClass() { Property = 100 } };
-			var sut = source.ToActiveValue(c => c.Container).ActiveSelect(c => c.Property);
+			var source = new ActiveMutateValueTestOuterClass() { Container = new ActiveMutateValueTestInnerClass() { Property = 100 } };
+			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
 
 			bool called = false;
 
@@ -48,7 +48,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		}
 	}
 
-	public class ActiveSelectValueTestInnerClass : INotifyPropertyChanged
+	public class ActiveMutateValueTestInnerClass : INotifyPropertyChanged
 	{
 		private int _property;
 		public int Property
@@ -66,10 +66,10 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		public event PropertyChangedEventHandler PropertyChanged;
 	}
 
-	public class ActiveSelectValueTestOuterClass : INotifyPropertyChanged
+	public class ActiveMutateValueTestOuterClass : INotifyPropertyChanged
 	{
-		private ActiveSelectValueTestInnerClass _container;
-		public ActiveSelectValueTestInnerClass Container
+		private ActiveMutateValueTestInnerClass _container;
+		public ActiveMutateValueTestInnerClass Container
 		{
 			get { return _container; }
 			set
