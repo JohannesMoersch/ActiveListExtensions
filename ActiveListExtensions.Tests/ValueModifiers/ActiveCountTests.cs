@@ -12,22 +12,40 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 	public class ActiveCountTests
 	{
 		[Fact]
-		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveCount(), l => l.Count(), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyRemoveItems() => ValueTestHelpers.RandomlyRemoveItems(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyRemoveItems() => ValueTestHelpers.RandomlyRemoveItems(l => l.ActiveCount(), l => l.Count(), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyReplaceItems() => ValueTestHelpers.RandomlyReplaceItems(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyReplaceItems() => ValueTestHelpers.RandomlyReplaceItems(l => l.ActiveCount(), l => l.Count(), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyMoveItems() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyMoveItems() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveCount(), l => l.Count(), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomMixedOperations() => ValueTestHelpers.RandomMixedOperations(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomMixedOperations() => ValueTestHelpers.RandomMixedOperations(l => l.ActiveCount(), l => l.Count(), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void ResetWithRandomItems() => ValueTestHelpers.ResetWithRandomItems(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void ResetWithRandomItems() => ValueTestHelpers.ResetWithRandomItems(l => l.ActiveCount(), l => l.Count(), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+
+		[Fact]
+		public void RandomlyInsertItemsWithPredicate() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+
+		[Fact]
+		public void RandomlyRemoveItemsWithPredicate() => ValueTestHelpers.RandomlyRemoveItems(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+
+		[Fact]
+		public void RandomlyReplaceItemsWithPredicate() => ValueTestHelpers.RandomlyReplaceItems(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+
+		[Fact]
+		public void RandomlyMoveItemsWithPredicate() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+
+		[Fact]
+		public void RandomMixedOperationsWithPredicate() => ValueTestHelpers.RandomMixedOperations(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+
+		[Fact]
+		public void ResetWithRandomItemsWithPredicate() => ValueTestHelpers.ResetWithRandomItems(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
 		public void RandomlyChangePropertyValues() => ValueTestHelpers.RandomlyChangePropertyValues(l => l.ActiveCount(i => i.Property > 50), l => l.Count(i => i.Property > 50), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());

@@ -53,19 +53,17 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<TSource> ActiveElementAtOrDefault<TSource>(this IActiveList<TSource> source, IActiveValue<int> index) => new ActiveElementAtOrDefault<TSource>(source, index);
 
-		public static IActiveValue<bool> ActiveAll<TSource>(this IActiveList<TSource> source) => ActiveAll(source, o => true, null);
-
 		public static IActiveValue<bool> ActiveAll<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveAll(source, predicate.Compile(), predicate.GetReferencedProperties());
 
 		public static IActiveValue<bool> ActiveAll<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveAll<TSource>(source, predicate, propertiesToWatch);
 
-		public static IActiveValue<bool> ActiveAny<TSource>(this IActiveList<TSource> source) => ActiveAny(source, o => true, null);
+		public static IActiveValue<bool> ActiveAny<TSource>(this IActiveList<TSource> source) => ToActiveValue(source, l => l.Count > 0, new[] { nameof(IActiveList<TSource>.Count) });
 
 		public static IActiveValue<bool> ActiveAny<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveAny(source, predicate.Compile(), predicate.GetReferencedProperties());
 
 		public static IActiveValue<bool> ActiveAny<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveAny<TSource>(source, predicate, propertiesToWatch);
 
-		public static IActiveValue<int> ActiveCount<TSource>(this IActiveList<TSource> source) => ActiveCount(source, o => true, null);
+		public static IActiveValue<int> ActiveCount<TSource>(this IActiveList<TSource> source) => ToActiveValue(source, l => l.Count, new[] { nameof(IActiveList<TSource>.Count) });
 
 		public static IActiveValue<int> ActiveCount<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveCount(source, predicate.Compile(), predicate.GetReferencedProperties());
 
