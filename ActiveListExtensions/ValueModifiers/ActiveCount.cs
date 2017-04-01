@@ -1,4 +1,5 @@
-﻿using ActiveListExtensions.ValueModifiers.Bases;
+﻿using ActiveListExtensions.Utilities;
+using ActiveListExtensions.ValueModifiers.Bases;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +12,14 @@ namespace ActiveListExtensions.ValueModifiers
 	{
 		private readonly Func<TSource, bool> _predicate;
 
-		private readonly List<bool> _values;
+		private readonly BooleanList _values;
 
 		public ActiveCount(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch = null)
 			: base(source, propertiesToWatch)
 		{
 			_predicate = predicate;
 
-			_values = new List<bool>();
+			_values = new BooleanList();
 
 			Initialize();
 		}

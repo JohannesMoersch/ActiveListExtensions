@@ -82,14 +82,13 @@ namespace ActiveListExtensions.Tests.Helpers
 
 			foreach (var value in Enumerable.Range(0, 1000))
 			{
-				switch (RandomGenerator.GenerateRandomInteger(0, 4))
+				switch (list.Count > 0 ? RandomGenerator.GenerateRandomInteger(0, 4) : 0)
 				{
 					case 0:
 						list.Add(RandomGenerator.GenerateRandomInteger(0, list.Count), randomValueGenerator.Invoke());
 						break;
 					case 1:
-						if (list.Count > 0)
-							list.Remove(RandomGenerator.GenerateRandomInteger(0, list.Count));
+						list.Remove(RandomGenerator.GenerateRandomInteger(0, list.Count));
 						break;
 					case 2:
 						list.Replace(RandomGenerator.GenerateRandomInteger(0, list.Count), randomValueGenerator.Invoke());
