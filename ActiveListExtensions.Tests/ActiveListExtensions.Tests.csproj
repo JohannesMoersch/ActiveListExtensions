@@ -96,7 +96,6 @@
     <Compile Include="Modifiers\ActiveZipTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\BooleanListTests.cs" />
-    <Compile Include="Utilities\CustomActiveValue.cs" />
     <Compile Include="Utilities\ObservableListTests.cs" />
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />
     <Compile Include="ValueModifiers\ActiveAllTests.cs" />

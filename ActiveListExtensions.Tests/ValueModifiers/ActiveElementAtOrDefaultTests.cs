@@ -40,7 +40,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 			foreach (var value in Enumerable.Range(0, 100))
 				list.Add(list.Count, RandomGenerator.GenerateRandomInteger());
 
-			var index = new CustomActiveValue<int>();
+			var index = new ActiveValue<int>();
 
 			var sut = list.ActiveElementAtOrDefault(index);
 

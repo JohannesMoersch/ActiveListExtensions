@@ -16,12 +16,13 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		public abstract TResult this[int index] { get; }
 
-		private bool _isDisposed;
+		protected bool IsDisposed { get; private set; }
+
 		public void Dispose()
 		{
-			if (_isDisposed)
+			if (IsDisposed)
 				return;
-			_isDisposed = true;
+			IsDisposed = true;
 			OnDisposed();
 			_propertyChanged = null;
 			_collectionChanged = null;
@@ -37,12 +38,12 @@ namespace ActiveListExtensions.Modifiers.Bases
 		{
 			add
 			{
-				if (!_isDisposed)
+				if (!IsDisposed)
 					_propertyChanged += value;
 			}
 			remove
 			{
-				if (!_isDisposed)
+				if (!IsDisposed)
 					_propertyChanged -= value;
 			}
 		}
@@ -55,12 +56,12 @@ namespace ActiveListExtensions.Modifiers.Bases
 		{
 			add
 			{
-				if (!_isDisposed)
+				if (!IsDisposed)
 					_collectionChanged += value;
 			}
 			remove
 			{
-				if (!_isDisposed)
+				if (!IsDisposed)
 					_collectionChanged -= value;
 			}
 		}

@@ -7,19 +7,29 @@ using ActiveListExtensions.Modifiers.Bases;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveWhere<TSource> : ActiveListBase<TSource, TSource>
+	internal class ActiveWhere<TSource, TParameter> : ActiveListBase<TSource, TSource, TParameter, TSource>
 	{
 		private IList<int> _indexList;
 
 		private Func<TSource, bool> _predicate;
 
-		public ActiveWhere(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch = null) 
-			: base(source, propertiesToWatch)
+		public ActiveWhere(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> sourcePropertiesToWatch)
+			: this(source, predicate, null, sourcePropertiesToWatch, null)
 		{
-			if (predicate == null)
-				throw new ArgumentNullException(nameof(predicate));
+		}
+
+		public ActiveWhere(IActiveList<TSource> source, Func<TSource, TParameter, bool> predicate, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) 
+			: this(source, i => predicate.Invoke(i, parameter.Value), parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
+		{
+		}
+
+		private ActiveWhere(IActiveList<TSource> source, Func<TSource, bool> predicate, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: base(source, i => i, parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
+		{
+			_predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
+
 			_indexList = new List<int>();
-			_predicate = predicate;
+
 			Initialize();
 		}
 

@@ -31,7 +31,15 @@ namespace ActiveListExtensions
 
 		public static IActiveList<TSource> ActiveWhere<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveWhere(source, predicate.Compile(), predicate.GetReferencedProperties());
 
-		public static IActiveList<TSource> ActiveWhere<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveWhere<TSource>(source, predicate, propertiesToWatch);
+		public static IActiveList<TSource> ActiveWhere<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveWhere<TSource, object>(source, predicate, propertiesToWatch);
+
+		public static IActiveList<TSource> ActiveWhere<TSource, TParameter>(this IActiveList<TSource> source, Expression<Func<TSource, TParameter, bool>> predicate, IActiveValue<TParameter> parameter)
+		{
+			var properties = predicate.GetReferencedProperties();
+			return ActiveWhere(source, predicate.Compile(), parameter, properties.Item1, properties.Item2);
+		}
+
+		public static IActiveList<TSource> ActiveWhere<TSource, TParameter>(this IActiveList<TSource> source, Func<TSource, TParameter, bool> predicate, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWacth) => new ActiveWhere<TSource, TParameter>(source, predicate, parameter, sourcePropertiesToWatch, parameterPropertiesToWacth);
 
 		public static IActiveList<TResult> ActiveSelect<TSource, TResult>(this IActiveList<TSource> source, Expression<Func<TSource, TResult>> selector) => ActiveSelect(source, selector.Compile(), selector.GetReferencedProperties());
 

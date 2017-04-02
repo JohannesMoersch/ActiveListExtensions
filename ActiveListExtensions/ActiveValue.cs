@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ActiveListExtensions.Tests.Utilities
+namespace ActiveListExtensions
 {
-	public class CustomActiveValue<TValue> : IActiveValue<TValue>
+	public class ActiveValue<TValue> : IActiveValue<TValue>
 	{
 		private TValue _value;
 		public TValue Value

@@ -9,6 +9,25 @@ namespace ActiveListExtensions.Tests.Helpers
 {
 	public static class CollectionTestHelpers
 	{
+		public static void RandomlyChangeParameter<T, U>(Func<IActiveList<T>, IActiveValue<int>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, int, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null, Func<U, U, bool> additonalComparer = null)
+		{
+			RandomGenerator.ResetRandomGenerator();
+
+			var list = new ObservableList<T>();
+			foreach (var value in Enumerable.Range(0, 100))
+				list.Add(list.Count, randomValueGenerator.Invoke());
+
+			var parameter = new ActiveValue<int>() { Value = 1 };
+			var sut = activeExpression.Invoke(list.ToActiveList(), parameter);
+			var validator = new LinqValidator<T, T, U>(list, sut, l => linqExpression.Invoke(l, parameter.Value), useSetComparison, keySelector, additonalComparer);
+
+			foreach (var value in Enumerable.Range(0, 30))
+			{
+				parameter.Value = RandomGenerator.GenerateRandomInteger(1, 11);
+				validator.Validate();
+			}
+		}
+
 		public static void RandomlyInsertItems<T, U>(Func<IActiveList<T>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null, Func<U, U, bool> additonalComparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
