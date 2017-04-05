@@ -27,10 +27,10 @@ namespace ActiveListExtensions.Modifiers.Bases
 		private IActiveValue<TParameter> _parameter;
 
 		private TParameter _parameterValue;
-		private TParameter ParameterValue
+		protected TParameter ParameterValue
 		{
 			get => _parameterValue;
-			set
+			private set
 			{
 				if (_parameterValue is INotifyPropertyChanged oldPropertyChangedSource && _parameterPropertiesToWatch != null)
 				{

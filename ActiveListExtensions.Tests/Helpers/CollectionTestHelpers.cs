@@ -4,12 +4,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ActiveListExtensions.Utilities;
+using System.ComponentModel;
 
 namespace ActiveListExtensions.Tests.Helpers
 {
+	public class ParameterTestClass : INotifyPropertyChanged
+	{
+		private int _property;
+		public int Property
+		{
+			get { return _property; }
+			set
+			{
+				if (_property == value)
+					return;
+				_property = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property)));
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+	}
+
 	public static class CollectionTestHelpers
 	{
-		public static void RandomlyChangeParameter<T, U>(Func<IActiveList<T>, IActiveValue<int>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, int, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null, Func<U, U, bool> additonalComparer = null)
+		public static void RandomlyChangeParameter<T, U>(Func<IActiveList<T>, IActiveValue<ParameterTestClass>, IActiveList<U>> activeExpression, Func<IReadOnlyList<T>, ParameterTestClass, IEnumerable<U>> linqExpression, Func<T> randomValueGenerator, bool useSetComparison = false, Func<U, object> keySelector = null, Func<U, U, bool> additonalComparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();
 
@@ -17,13 +36,13 @@ namespace ActiveListExtensions.Tests.Helpers
 			foreach (var value in Enumerable.Range(0, 100))
 				list.Add(list.Count, randomValueGenerator.Invoke());
 
-			var parameter = new ActiveValue<int>() { Value = 1 };
+			var parameter = new ActiveValue<ParameterTestClass>() { Value = new ParameterTestClass() { Property = 1 } };
 			var sut = activeExpression.Invoke(list.ToActiveList(), parameter);
 			var validator = new LinqValidator<T, T, U>(list, sut, l => linqExpression.Invoke(l, parameter.Value), useSetComparison, keySelector, additonalComparer);
 
 			foreach (var value in Enumerable.Range(0, 30))
 			{
-				parameter.Value = RandomGenerator.GenerateRandomInteger(1, 11);
+				parameter.Value.Property = RandomGenerator.GenerateRandomInteger(1, 11);
 				validator.Validate();
 			}
 		}

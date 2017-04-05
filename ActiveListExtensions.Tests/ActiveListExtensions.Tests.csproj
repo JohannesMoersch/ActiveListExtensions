@@ -84,7 +84,6 @@
     <Compile Include="Modifiers\ActiveExceptTests.cs" />
     <Compile Include="Modifiers\ActiveGroupByTests.cs" />
     <Compile Include="Modifiers\ActiveIntersectTests.cs" />
-    <Compile Include="Modifiers\ActiveOrderByDescendingTests.cs" />
     <Compile Include="Modifiers\ActiveOrderByTests.cs" />
     <Compile Include="Modifiers\ActiveReverseTests.cs" />
     <Compile Include="Modifiers\ActiveSelectTests.cs" />

@@ -3,13 +3,14 @@ using ActiveListExtensions.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveOrderBy<TSource, TKey> : ActiveListBase<TSource, ActiveOrderBy<TSource, TKey>.ItemSet, TSource>
+	internal class ActiveOrderBy<TSource, TKey> : ActiveListBase<TSource, ActiveOrderBy<TSource, TKey>.ItemSet, ListSortDirection, TSource>
 		where TKey : IComparable<TKey>
 	{
 		internal class ItemSet
@@ -33,16 +34,12 @@ namespace ActiveListExtensions.Modifiers
 
 		private readonly Func<TSource, TKey> _keySelector;
 
-		private readonly bool _orderByDescending;
-
-		public ActiveOrderBy(IActiveList<TSource> source, Func<TSource, TKey> keySelector, bool orderByDescending, IEnumerable<string> propertiesToWatch = null) 
-			: base(source, i => i.Value, propertiesToWatch)
+		public ActiveOrderBy(IActiveList<TSource> source, Func<TSource, TKey> keySelector, IActiveValue<ListSortDirection> sortDirection, IEnumerable<string> propertiesToWatch = null) 
+			: base(source, i => i.Value, sortDirection, propertiesToWatch)
 		{
 			_keySelector = keySelector;
 
 			_sourceList = new List<ItemSet>();
-
-			_orderByDescending = orderByDescending;
 
 			Initialize();
 		}
@@ -55,7 +52,7 @@ namespace ActiveListExtensions.Modifiers
 			{
 				var mid = bottom + (top - bottom) / 2;
 				var midItem = ResultList[mid];
-				var comparison = key.CompareTo(midItem.Key) * (_orderByDescending ? -1 : 1);
+				var comparison = key.CompareTo(midItem.Key) * (ParameterValue == ListSortDirection.Ascending ? 1 : -1);
 				if (comparison == 0)
 					comparison = sourceIndex.CompareTo(midItem.SourceIndex);
 				if (comparison > 0)
@@ -175,10 +172,10 @@ namespace ActiveListExtensions.Modifiers
 				_sourceList.Add(new ItemSet(_keySelector.Invoke(newItems[i]), newItems[i]) { SourceIndex = i });
 
 			IEnumerable<ItemSet> sortedItems;
-			if (_orderByDescending)
-				sortedItems = _sourceList.OrderByDescending(set => set.Key);
-			else
+			if (ParameterValue == ListSortDirection.Ascending)
 				sortedItems = _sourceList.OrderBy(set => set.Key);
+			else
+				sortedItems = _sourceList.OrderByDescending(set => set.Key);
 
 			sortedItems = sortedItems.Select((set, index) =>
 			{
