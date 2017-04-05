@@ -8,7 +8,7 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers.Bases
 {
-	internal abstract class ActiveSetBase<TSource, TKey> : ActiveMultiListListenerBase<TSource, TSource, TSource>
+	internal abstract class ActiveSetBase<TSource, TKey> : ActiveMultiListListenerBase<TSource, TSource, object, TSource>
 	{
 		protected enum SetAction
 		{
@@ -88,7 +88,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 		private readonly Func<TSource, TKey> _keySelector;
 
 		public ActiveSetBase(IActiveList<TSource> leftSource, IActiveList<TSource> rightSource, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch = null)
-			: base(leftSource, propertiesToWatch, propertiesToWatch)
+			: base(leftSource, null, propertiesToWatch, propertiesToWatch)
 		{
 			_keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
 

@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Modifiers
 {
-    internal class ActiveZip<TSource, TOtherSource, TResult> : ActiveMultiListBase<TSource, TOtherSource, TResult>
+    internal class ActiveZip<TSource, TOtherSource, TResult> : ActiveMultiListBase<TSource, TOtherSource, object, TResult>
     {
         private Func<TSource, TOtherSource, TResult> _resultSelector;
 
         private int SourceListCount => Math.Min(SourceList.Count, SourceLists[0].Count);
 
         public ActiveZip(IActiveList<TSource> source, IEnumerable<TOtherSource> otherSource, Func<TSource, TOtherSource, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> otherSourcePropertiesToWatch = null)
-            : base(source, sourcePropertiesToWatch, otherSourcePropertiesToWatch)
+            : base(source, null, sourcePropertiesToWatch, otherSourcePropertiesToWatch)
         {
             _resultSelector = resultSelector ?? throw new ArgumentNullException(nameof(resultSelector));
 
