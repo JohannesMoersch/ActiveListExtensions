@@ -12,6 +12,9 @@ namespace ActiveListExtensions.Tests.Modifiers
 	public class ActiveSelectTests
 	{
 		[Fact]
+		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameter((l, p) => l.ActiveSelect((o, i) => o.Property * i.Property, p), (l, p) => l.Select(o => o.Property * p.Property), () => new ActiveSelectTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+
+		[Fact]
 		public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new ActiveSelectTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]

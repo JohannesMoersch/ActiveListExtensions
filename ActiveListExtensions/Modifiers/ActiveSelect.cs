@@ -10,12 +10,22 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveSelect<TSource, TResult> : ActiveListBase<TSource, TResult, TResult>
+	internal class ActiveSelect<TSource, TParameter, TResult> : ActiveListBase<TSource, TResult, TParameter, TResult>
 	{
 		private Func<TSource, TResult> _selector;
 
 		public ActiveSelect(IActiveList<TSource> source, Func<TSource, TResult> selector, IEnumerable<string> propertiesToWatch)
-			: base(source, i => i, propertiesToWatch)
+			: this(source, selector, null, propertiesToWatch, null)
+		{
+		}
+
+		public ActiveSelect(IActiveList<TSource> source, Func<TSource, TParameter, TResult> selector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: this(source, i => selector.Invoke(i, parameter.Value), parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
+		{
+		}
+
+		private ActiveSelect(IActiveList<TSource> source, Func<TSource, TResult> selector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: base(source, i => i, parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
