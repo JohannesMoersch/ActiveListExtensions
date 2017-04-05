@@ -117,13 +117,23 @@ namespace ActiveListExtensions
 		private static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveZip<TFirst, TSecond, TResult>(source, otherSource, resultSelector, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
-		public static IActiveList<IActiveGrouping<TKey, TSource>> ActiveGroupBy<TSource, TKey>(this IActiveList<TSource> source, Expression<Func<TSource, TKey>> keySelector) => ToActiveLookup(source, keySelector.Compile(), keySelector.GetReferencedProperties());
+		public static IActiveList<IActiveGrouping<TKey, TSource>> ActiveGroupBy<TKey, TSource>(this IActiveList<TSource> source, Expression<Func<TSource, TKey>> keySelector) => ToActiveLookup(source, keySelector.Compile(), keySelector.GetReferencedProperties());
 
-		public static IActiveList<IActiveGrouping<TKey, TSource>> ActiveGroupBy<TSource, TKey>(this IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => ToActiveLookup(source, keySelector, propertiesToWatch);
+		public static IActiveList<IActiveGrouping<TKey, TSource>> ActiveGroupBy<TKey, TSource>(this IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => ToActiveLookup(source, keySelector, propertiesToWatch);
+
+		public static IActiveList<IActiveGrouping<TKey, TSource>> ActiveGroupBy<TKey, TSource, TParameter>(this IActiveList<TSource> source, Expression<Func<TSource, TParameter, TKey>> keySelector, IActiveValue<TParameter> parameter) => ToActiveLookup(source, keySelector.Compile(), parameter, keySelector.GetReferencedProperties());
+
+		public static IActiveList<IActiveGrouping<TKey, TSource>> ActiveGroupBy<TKey, TSource, TParameter>(this IActiveList<TSource> source, Func<TSource, TParameter, TKey> keySelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ToActiveLookup(source, keySelector, parameter, sourcePropertiesToWatch, parameterPropertiesToWatch);
 
 
-		public static IActiveLookup<TKey, TSource> ToActiveLookup<TSource, TKey>(this IActiveList<TSource> source, Expression<Func<TSource, TKey>> keySelector) => ToActiveLookup(source, keySelector.Compile(), keySelector.GetReferencedProperties());
+		public static IActiveLookup<TKey, TSource> ToActiveLookup<TKey, TSource>(this IActiveList<TSource> source, Expression<Func<TSource, TKey>> keySelector) => ToActiveLookup(source, keySelector.Compile(), keySelector.GetReferencedProperties());
 
-		public static IActiveLookup<TKey, TSource> ToActiveLookup<TSource, TKey>(this IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveLookup<TSource, TKey>(source, keySelector, propertiesToWatch);
+		public static IActiveLookup<TKey, TSource> ToActiveLookup<TKey, TSource>(this IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveLookup<TKey, TSource, object>(source, keySelector, propertiesToWatch);
+
+		public static IActiveLookup<TKey, TSource> ToActiveLookup<TKey, TSource, TParameter>(this IActiveList<TSource> source, Expression<Func<TSource, TParameter, TKey>> keySelector, IActiveValue<TParameter> parameter) => ToActiveLookup(source, keySelector.Compile(), parameter, keySelector.GetReferencedProperties());
+
+		public static IActiveLookup<TKey, TSource> ToActiveLookup<TKey, TSource, TParameter>(this IActiveList<TSource> source, Func<TSource, TParameter, TKey> keySelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ToActiveLookup(source, keySelector, parameter, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveLookup<TKey, TSource> ToActiveLookup<TKey, TSource, TParameter>(this IActiveList<TSource> source, Func<TSource, TParameter, TKey> keySelector, IActiveValue<TParameter> parameter, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveLookup<TKey, TSource, TParameter>(source, keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
 	}
 }

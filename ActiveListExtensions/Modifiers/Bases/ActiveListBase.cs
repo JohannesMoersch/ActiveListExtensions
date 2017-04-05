@@ -7,14 +7,6 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers.Bases
 {
-	internal abstract class ActiveListBase<TSource, TResultItem, TResult> : ActiveListBase<TSource, TResultItem, object, TResult>
-	{
-		public ActiveListBase(IActiveList<TSource> source, Func<TResultItem, TResult> resultSelector, IEnumerable<string> propertiesToWatch = null)
-			: base(source, resultSelector, null, propertiesToWatch)
-		{
-		}
-	}
-
 	internal abstract class ActiveListBase<TSource, TResultItem, TParameter, TResult> : ActiveListListenerBase<TSource, TParameter, TResult>
 	{
 		public override int Count => ResultList.Count;
