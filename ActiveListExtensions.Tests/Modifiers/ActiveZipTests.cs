@@ -11,7 +11,10 @@ namespace ActiveListExtensions.Tests.Modifiers
 {
     public class ActiveZipTests
     {
-        [Fact]
+		[Fact]
+		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameterInTwoCollections((l1, l2, p) => l1.ActiveZip(l2, (i1, i2, i) => i1 + i2 + i.Property, p), (l1, l2, p) => l1.Zip(l2, (i1, i2) => i1 + i2 + p.Property), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10));
+
+		[Fact]
         public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItemsIntoTwoCollections((l1, l2) => l1.ActiveZip(l2, (i1, i2) => i1 + i2), (l1, l2) => l1.Zip(l2, (i1, i2) => i1 + i2), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10));
 
         [Fact]

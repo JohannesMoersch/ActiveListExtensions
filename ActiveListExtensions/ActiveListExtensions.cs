@@ -120,7 +120,13 @@ namespace ActiveListExtensions
 
         public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch) => ActiveZip(source, otherSource, resultSelector, Tuple.Create(sourcePropertiesToWatch, otherSourcePropertiesToWatch));
 
-		private static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveZip<TFirst, TSecond, TResult>(source, otherSource, resultSelector, propertiesToWatch.Item1, propertiesToWatch.Item2);
+		private static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveZip<TFirst, TSecond, object, TResult>(source, otherSource, resultSelector, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+		public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TParameter, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Expression<Func<TFirst, TSecond, TParameter, TResult>> resultSelector, IActiveValue<TParameter> parameter) => ActiveZip(source, otherSource, resultSelector.Compile(), parameter, resultSelector.GetReferencedProperties());
+
+		public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TParameter, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TParameter, TResult> resultSelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveZip(source, otherSource, resultSelector, parameter, Tuple.Create(sourcePropertiesToWatch, otherSourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveList<TResult> ActiveZip<TFirst, TSecond, TParameter, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TParameter, TResult> resultSelector, IActiveValue<TParameter> parameter, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveZip<TFirst, TSecond, TParameter, TResult>(source, otherSource, resultSelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2, propertiesToWatch.Item3);
 
 
 		public static IActiveList<IActiveGrouping<TKey, TSource>> ActiveGroupBy<TKey, TSource>(this IActiveList<TSource> source, Expression<Func<TSource, TKey>> keySelector) => ToActiveLookup(source, keySelector.Compile(), keySelector.GetReferencedProperties());
