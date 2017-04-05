@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Helpers\CollectionSynchronizationWatcher.cs" />
     <Compile Include="Helpers\CollectionTestHelpers.cs" />
+    <Compile Include="Helpers\IntegerTestClass.cs" />
     <Compile Include="Helpers\KeyEqualityComparer.cs" />
     <Compile Include="Helpers\LinqValidator.cs" />
     <Compile Include="Helpers\RandomGenerator.cs" />

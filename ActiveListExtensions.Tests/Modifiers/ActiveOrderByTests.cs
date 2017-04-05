@@ -13,40 +13,40 @@ namespace ActiveListExtensions.Tests.Modifiers
 	public class ActiveOrderByTests
 	{
 		[Fact]
-		public void RandomlyInsertItemsAscending() => CollectionTestHelpers.RandomlyInsertItems(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyInsertItemsAscending() => CollectionTestHelpers.RandomlyInsertItems(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyRemoveItemsAscending() => CollectionTestHelpers.RandomlyRemoveItems(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyRemoveItemsAscending() => CollectionTestHelpers.RandomlyRemoveItems(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyReplaceItemsAscending() => CollectionTestHelpers.RandomlyReplaceItems(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyReplaceItemsAscending() => CollectionTestHelpers.RandomlyReplaceItems(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyMoveItemsAscending() => CollectionTestHelpers.RandomlyMoveItems(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyMoveItemsAscending() => CollectionTestHelpers.RandomlyMoveItems(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void ResetWithRandomItemsAscending() => CollectionTestHelpers.ResetWithRandomItems(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void ResetWithRandomItemsAscending() => CollectionTestHelpers.ResetWithRandomItems(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyChangePropertyValuesAscending() => CollectionTestHelpers.RandomlyChangePropertyValues(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
+		public void RandomlyChangePropertyValuesAscending() => CollectionTestHelpers.RandomlyChangePropertyValues(l => l.ActiveOrderBy(o => o.Property), l => l.OrderBy(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
 
 		[Fact]
-		public void RandomlyInsertItemsDescending() => CollectionTestHelpers.RandomlyInsertItems(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyInsertItemsDescending() => CollectionTestHelpers.RandomlyInsertItems(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyRemoveItemsDescending() => CollectionTestHelpers.RandomlyRemoveItems(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyRemoveItemsDescending() => CollectionTestHelpers.RandomlyRemoveItems(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyReplaceItemsDescending() => CollectionTestHelpers.RandomlyReplaceItems(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyReplaceItemsDescending() => CollectionTestHelpers.RandomlyReplaceItems(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyMoveItemsDescending() => CollectionTestHelpers.RandomlyMoveItems(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyMoveItemsDescending() => CollectionTestHelpers.RandomlyMoveItems(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void ResetWithRandomItemsDescending() => CollectionTestHelpers.ResetWithRandomItems(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void ResetWithRandomItemsDescending() => CollectionTestHelpers.ResetWithRandomItems(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyChangePropertyValuesDescending() => CollectionTestHelpers.RandomlyChangePropertyValues(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new ActiveOrderByTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
+		public void RandomlyChangePropertyValuesDescending() => CollectionTestHelpers.RandomlyChangePropertyValues(l => l.ActiveOrderBy(o => o.Property, ListSortDirection.Descending), l => l.OrderByDescending(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
 
 		[Fact]
 		public void RandomlyChangeDirection()
@@ -70,23 +70,5 @@ namespace ActiveListExtensions.Tests.Modifiers
 				validator.Validate();
 			}
 		}
-	}
-
-	public class ActiveOrderByTestClass : INotifyPropertyChanged
-	{
-		private int _property;
-		public int Property
-		{
-			get { return _property; }
-			set
-			{
-				if (_property == value)
-					return;
-				_property = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property)));
-			}
-		}
-
-		public event PropertyChangedEventHandler PropertyChanged;
 	}
 }

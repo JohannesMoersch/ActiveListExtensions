@@ -12,42 +12,24 @@ namespace ActiveListExtensions.Tests.Modifiers
 	public class ActiveSelectTests
 	{
 		[Fact]
-		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameter((l, p) => l.ActiveSelect((o, i) => o.Property * i.Property, p), (l, p) => l.Select(o => o.Property * p.Property), () => new ActiveSelectTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameter((l, p) => l.ActiveSelect((o, i) => o.Property * i.Property, p), (l, p) => l.Select(o => o.Property * p.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new ActiveSelectTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyRemoveItems() => CollectionTestHelpers.RandomlyRemoveItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new ActiveSelectTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyRemoveItems() => CollectionTestHelpers.RandomlyRemoveItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyReplaceItems() => CollectionTestHelpers.RandomlyReplaceItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new ActiveSelectTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyReplaceItems() => CollectionTestHelpers.RandomlyReplaceItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyMoveItems() => CollectionTestHelpers.RandomlyMoveItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new ActiveSelectTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyMoveItems() => CollectionTestHelpers.RandomlyMoveItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void ResetWithRandomItems() => CollectionTestHelpers.ResetWithRandomItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new ActiveSelectTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void ResetWithRandomItems() => CollectionTestHelpers.ResetWithRandomItems(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
-		public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValues(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new ActiveSelectTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
-	}
-
-	public class ActiveSelectTestClass : INotifyPropertyChanged
-	{
-		private int _property;
-		public int Property
-		{
-			get { return _property; }
-			set
-			{
-				if (_property == value)
-					return;
-				_property = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property)));
-			}
-		}
-
-		public event PropertyChangedEventHandler PropertyChanged;
+		public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValues(l => l.ActiveSelect(o => o.Property), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
 	}
 }
