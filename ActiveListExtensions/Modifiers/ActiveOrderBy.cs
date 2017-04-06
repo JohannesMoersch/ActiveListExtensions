@@ -34,7 +34,7 @@ namespace ActiveListExtensions.Modifiers
 
 		private readonly Func<TSource, TKey> _keySelector;
 
-		public ActiveOrderBy(IActiveList<TSource> source, Func<TSource, TKey> keySelector, IActiveValue<ListSortDirection> sortDirection, IEnumerable<string> propertiesToWatch = null) 
+		public ActiveOrderBy(IActiveList<TSource> source, Func<TSource, TKey> keySelector, IActiveValue<ListSortDirection> sortDirection, IEnumerable<string> propertiesToWatch) 
 			: base(source, i => i.Value, sortDirection, propertiesToWatch)
 		{
 			_keySelector = keySelector;

@@ -12,6 +12,9 @@ namespace ActiveListExtensions.Tests.Modifiers
 	public class ActiveExceptTests
 	{
 		[Fact]
+		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameterInTwoCollections((l1, l2, p) => l1.ActiveExcept(l2, p, (o, i) => o + i.Property), (l1, l2, p) => l1.Except(l2, new KeyEqualityComparer<int>(o => o + p.Property, null)), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10), true);
+
+		[Fact]
 		public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItemsIntoTwoCollections((l1, l2) => l1.ActiveExcept(l2), (l1, l2) => l1.Except(l2), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10), true);
 
 		[Fact]

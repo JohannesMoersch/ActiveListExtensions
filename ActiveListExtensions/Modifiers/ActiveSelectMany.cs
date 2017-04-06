@@ -27,12 +27,12 @@ namespace ActiveListExtensions.Modifiers
 
 		private IList<ListInfo> _listInfo = new List<ListInfo>();
 
-		public ActiveSelectMany(IActiveList<TSource> source, Func<TSource, IEnumerable<TResult>> selector, IEnumerable<string> propertiesToWatch = null)
+		public ActiveSelectMany(IActiveList<TSource> source, Func<TSource, IEnumerable<TResult>> selector, IEnumerable<string> propertiesToWatch)
 			: this(source, selector, null, propertiesToWatch, null)
 		{
 		}
 
-		public ActiveSelectMany(IActiveList<TSource> source, Func<TSource, TParameter, IEnumerable<TResult>> selector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> parameterPropertiesToWatch = null) 
+		public ActiveSelectMany(IActiveList<TSource> source, Func<TSource, TParameter, IEnumerable<TResult>> selector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) 
 			: this(source, i => selector.Invoke(i, parameter.Value), parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 		}

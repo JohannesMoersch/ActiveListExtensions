@@ -41,7 +41,7 @@ namespace ActiveListExtensions.Tests.Helpers
 			if (_useSetComparison)
 			{
 				if (!SetCompare(fromLinq, _processedCollection, _comparer))
-				throw new Exception("Linq equivalent differs from processed collection.");
+					throw new Exception("Linq equivalent differs from processed collection.");
 			}
 			else if (!ListCompare(fromLinq, _processedCollection, _comparer))
 				throw new Exception("Linq equivalent differs from processed collection.");

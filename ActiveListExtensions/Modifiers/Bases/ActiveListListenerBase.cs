@@ -48,7 +48,9 @@ namespace ActiveListExtensions.Modifiers.Bases
 			}
 		}
 
-		private void SourcePropertyChanged(object key, PropertyChangedEventArgs args) => OnReset(SourceList);
+		private void SourcePropertyChanged(object key, PropertyChangedEventArgs args) => OnParameterChanged();
+
+		protected virtual void OnParameterChanged() => OnReset(SourceList);
 
 		public ActiveListListenerBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null)
 			: this(source, null, propertiesToWatch)
@@ -93,7 +95,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 			if (!IsDisposed)
 			{
 				ParameterValue = _parameter.Value;
-				OnReset(SourceList);
+				OnParameterChanged();
 			}
 		}
 
