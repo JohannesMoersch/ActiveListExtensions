@@ -12,7 +12,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 	public class ActiveWhereTests
 	{
 		[Fact]
-		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameter((l, p) => l.ActiveWhere((o, i) => o.Property % i.Property == 0, p), (l, p) => l.Where(o => o.Property % p.Property == 0), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
+		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameter((l, p) => l.ActiveWhere(p, (o, i) => o.Property % i.Property == 0), (l, p) => l.Where(o => o.Property % p.Property == 0), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]
 		public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItems(l => l.ActiveWhere(o => o.Property % 2 == 0), l => l.Where(o => o.Property % 2 == 0), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
