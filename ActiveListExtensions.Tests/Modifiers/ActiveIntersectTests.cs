@@ -12,6 +12,9 @@ namespace ActiveListExtensions.Tests.Modifiers
 	public class ActiveIntersectTests
 	{
 		[Fact]
+		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameterInTwoCollections((l1, l2, p) => l1.ActiveIntersect(l2, p, (o, i) => o + i.Property), (l1, l2, p) => l1.Intersect(l2, new KeyEqualityComparer<int>(o => o + p.Property, null)), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10), true);
+
+		[Fact]
 		public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItemsIntoTwoCollections((l1, l2) => l1.ActiveIntersect(l2), (l1, l2) => l1.Intersect(l2), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10), true);
 
 		[Fact]
@@ -27,24 +30,6 @@ namespace ActiveListExtensions.Tests.Modifiers
 		public void ResetWithRandomItems() => CollectionTestHelpers.ResetTwoCollectionsWithRandomItems((l1, l2) => l1.ActiveIntersect(l2), (l1, l2) => l1.Intersect(l2), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10), true);
 
 		[Fact]
-		public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValuesInTwoCollections((l1, l2) => l1.ActiveIntersect(l2, o => o.Property), (l1, l2) => l1.Intersect(l2, new KeyEqualityComparer<ActiveIntersectTestClass>(o => o.Property, null)), () => new ActiveIntersectTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, () => new ActiveIntersectTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger(), o => o.Property = RandomGenerator.GenerateRandomInteger(), true, o => o.Property);
-	}
-
-	public class ActiveIntersectTestClass : INotifyPropertyChanged
-	{
-		private int _property;
-		public int Property
-		{
-			get { return _property; }
-			set
-			{
-				if (_property == value)
-					return;
-				_property = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property)));
-			}
-		}
-
-		public event PropertyChangedEventHandler PropertyChanged;
+		public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValuesInTwoCollections((l1, l2) => l1.ActiveIntersect(l2, o => o.Property), (l1, l2) => l1.Intersect(l2, new KeyEqualityComparer<IntegerTestClass>(o => o.Property, null)), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger(), o => o.Property = RandomGenerator.GenerateRandomInteger(), true, o => o.Property);
 	}
 }

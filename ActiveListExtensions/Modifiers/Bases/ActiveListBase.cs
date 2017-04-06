@@ -7,15 +7,7 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers.Bases
 {
-	internal abstract class ActiveListBase<TSource, TResult> : ActiveListBase<TSource, TResult, TResult>
-	{
-		public ActiveListBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null)
-			: base(source, i => i, propertiesToWatch)
-		{
-		}
-	}
-
-	internal abstract class ActiveListBase<TSource, TResultItem, TResult> : ActiveListListenerBase<TSource, TResult>
+	internal abstract class ActiveListBase<TSource, TResultItem, TParameter, TResult> : ActiveListListenerBase<TSource, TParameter, TResult>
 	{
 		public override int Count => ResultList.Count;
 
@@ -23,8 +15,8 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		protected ObservableList<TResultItem, TResult> ResultList { get; }
 
-		public ActiveListBase(IActiveList<TSource> source, Func<TResultItem, TResult> resultSelector, IEnumerable<string> propertiesToWatch = null)
-			:  base(source, propertiesToWatch)
+		public ActiveListBase(IActiveList<TSource> source, Func<TResultItem, TResult> resultSelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcerPropertiesToWatch = null, IEnumerable<string> parameterPropertiesToWatch = null)
+			: base(source, parameter, sourcerPropertiesToWatch, parameterPropertiesToWatch)
 		{
 			ResultList = new ObservableList<TResultItem, TResult>(resultSelector);
 			ResultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);

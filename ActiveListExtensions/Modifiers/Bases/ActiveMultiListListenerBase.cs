@@ -7,7 +7,7 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers.Bases
 {
-	internal abstract class ActiveMultiListListenerBase<TSource, TOtherSources, TResult> : ActiveListListenerBase<TSource, TResult>
+	internal abstract class ActiveMultiListListenerBase<TSource, TOtherSources, TParameter, TResult> : ActiveListListenerBase<TSource, TParameter, TResult>
 	{
 		private List<CollectionWrapper<TOtherSources>> _sourceLists = new List<CollectionWrapper<TOtherSources>>();
 
@@ -15,8 +15,8 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		private string[] _otherSourcePropertiesToWatch;
 
-		public ActiveMultiListListenerBase(IActiveList<TSource> source, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> otherSourcePropertiesToWatch = null) 
-			: base(source, sourcePropertiesToWatch)
+		public ActiveMultiListListenerBase(IActiveList<TSource> source, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> otherSourcePropertiesToWatch = null, IEnumerable<string> parameterPropertiesToWatch = null) 
+			: base(source, parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 			_otherSourcePropertiesToWatch = otherSourcePropertiesToWatch?.ToArray();
 		}

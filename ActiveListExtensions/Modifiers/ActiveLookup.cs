@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveLookup<TSource, TKey> : ActiveListBase<TSource, ActiveLookup<TSource, TKey>.GroupData, IActiveGrouping<TKey, TSource>>, IActiveLookup<TKey, TSource>
+	internal class ActiveLookup<TKey, TSource, TParameter> : ActiveListBase<TSource, ActiveLookup<TKey, TSource, TParameter>.GroupData, TParameter, IActiveGrouping<TKey, TSource>>, IActiveLookup<TKey, TSource>
 	{
 		internal class Group : ObservableList<ItemData, TSource>, IActiveGrouping<TKey, TSource>
 		{
@@ -57,7 +57,17 @@ namespace ActiveListExtensions.Modifiers
 		public IEnumerable<TSource> this[TKey key] => _resultSet[key].Items;
 
 		public ActiveLookup(IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch)
-			: base(source, i => i.Items, propertiesToWatch)
+			: this(source, keySelector, null, propertiesToWatch, null)
+		{
+		}
+
+		public ActiveLookup(IActiveList<TSource> source, Func<TSource, TParameter, TKey> keySelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: this(source, i => keySelector.Invoke(i, parameter.Value), parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
+		{
+		}
+
+		private ActiveLookup(IActiveList<TSource> source, Func<TSource, TKey> keySelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: base(source, i => i.Items, parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 			_sourceData = new List<ItemData>();
 			_resultSet = new Dictionary<TKey, GroupData>();

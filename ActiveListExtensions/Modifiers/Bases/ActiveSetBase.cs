@@ -8,7 +8,7 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.Modifiers.Bases
 {
-	internal abstract class ActiveSetBase<TSource, TKey> : ActiveMultiListListenerBase<TSource, TSource, TSource>
+	internal abstract class ActiveSetBase<TKey, TSource, TParameter> : ActiveMultiListListenerBase<TSource, TSource, TParameter, TSource>
 	{
 		protected enum SetAction
 		{
@@ -87,8 +87,8 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		private readonly Func<TSource, TKey> _keySelector;
 
-		public ActiveSetBase(IActiveList<TSource> leftSource, IActiveList<TSource> rightSource, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch = null)
-			: base(leftSource, propertiesToWatch, propertiesToWatch)
+		public ActiveSetBase(IActiveList<TSource> leftSource, IActiveList<TSource> rightSource, Func<TSource, TKey> keySelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: base(leftSource, parameter, sourcePropertiesToWatch, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 			_keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
 
@@ -190,8 +190,6 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 			var resultSet = new ResultSet(sourceSet.Index, value);
 			_cumulativeList.Insert(insertIndex.Value, resultSet);
-			if (_cumulativeList.Zip(_cumulativeList.OrderBy(s => s.Index), (o1, o2) => o1 == o2).Any(b => !b))
-				Console.WriteLine("A");
 
 			switch (action)
 			{
@@ -345,6 +343,13 @@ namespace ActiveListExtensions.Modifiers.Bases
 				_rightKeys.Add(new SourcePair(key, value));
 				Add(key, value, _rightCount, _leftCount, OnAddedToRight);
 			}
+		}
+
+		protected override void OnParameterChanged()
+		{
+			OnReset(SourceList);
+			if (SourceLists.Count > 0)
+				OnReset(0, SourceLists[0]);
 		}
 
 		protected override void ItemModified(int index, TSource value) => OnReplaced(index, value, value);

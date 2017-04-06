@@ -7,14 +7,24 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Modifiers
 {
-    internal class ActiveZip<TSource, TOtherSource, TResult> : ActiveMultiListBase<TSource, TOtherSource, TResult>
+    internal class ActiveZip<TSource, TOtherSource, TParameter, TResult> : ActiveMultiListBase<TSource, TOtherSource, TParameter, TResult>
     {
         private Func<TSource, TOtherSource, TResult> _resultSelector;
 
         private int SourceListCount => Math.Min(SourceList.Count, SourceLists[0].Count);
 
-        public ActiveZip(IActiveList<TSource> source, IEnumerable<TOtherSource> otherSource, Func<TSource, TOtherSource, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> otherSourcePropertiesToWatch = null)
-            : base(source, sourcePropertiesToWatch, otherSourcePropertiesToWatch)
+		public ActiveZip(IActiveList<TSource> source, IEnumerable<TOtherSource> otherSource, Func<TSource, TOtherSource, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch)
+			: this(source, otherSource, resultSelector, null, sourcePropertiesToWatch, otherSourcePropertiesToWatch, null)
+		{
+		}
+
+		public ActiveZip(IActiveList<TSource> source, IEnumerable<TOtherSource> otherSource, Func<TSource, TOtherSource, TParameter, TResult> resultSelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: this(source, otherSource, (i1, i2) => resultSelector.Invoke(i1, i2, parameter.Value), parameter, sourcePropertiesToWatch, otherSourcePropertiesToWatch, parameterPropertiesToWatch)
+		{
+		}
+
+		private ActiveZip(IActiveList<TSource> source, IEnumerable<TOtherSource> otherSource, Func<TSource, TOtherSource, TResult> resultSelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+            : base(source, parameter, sourcePropertiesToWatch, otherSourcePropertiesToWatch, parameterPropertiesToWatch)
         {
             _resultSelector = resultSelector ?? throw new ArgumentNullException(nameof(resultSelector));
 

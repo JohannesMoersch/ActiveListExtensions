@@ -7,12 +7,12 @@ using ActiveListExtensions.Modifiers.Bases;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveConcat<TSource> : ActiveMultiListBase<TSource, TSource, TSource>
+	internal class ActiveConcat<TSource> : ActiveMultiListBase<TSource, TSource, object, TSource>
 	{
 		private int _concatIndex;
 
 		public ActiveConcat(IActiveList<TSource> source, IEnumerable<TSource> concat)
-			: base(source)
+			: base(source, null)
 		{
 			if (concat == null)
 				throw new ArgumentNullException(nameof(concat));

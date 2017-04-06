@@ -11,7 +11,10 @@ namespace ActiveListExtensions.Tests.Modifiers
 {
     public class ActiveZipTests
     {
-        [Fact]
+		[Fact]
+		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameterInTwoCollections((l1, l2, p) => l1.ActiveZip(l2, p, (i1, i2, i) => i1 + i2 + i.Property), (l1, l2, p) => l1.Zip(l2, (i1, i2) => i1 + i2 + p.Property), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10));
+
+		[Fact]
         public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItemsIntoTwoCollections((l1, l2) => l1.ActiveZip(l2, (i1, i2) => i1 + i2), (l1, l2) => l1.Zip(l2, (i1, i2) => i1 + i2), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10));
 
         [Fact]
@@ -27,28 +30,10 @@ namespace ActiveListExtensions.Tests.Modifiers
         public void ResetWithRandomItems() => CollectionTestHelpers.ResetTwoCollectionsWithRandomItems((l1, l2) => l1.ActiveZip(l2, (i1, i2) => i1 + i2), (l1, l2) => l1.Zip(l2, (i1, i2) => i1 + i2), () => RandomGenerator.GenerateRandomInteger(0, 10), () => RandomGenerator.GenerateRandomInteger(0, 10));
 
         [Fact]
-        public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValuesInTwoCollections((l1, l2) => l1.ActiveZip(l2, (i1, i2) => i1.Property + i2.OtherProperty), (l1, l2) => l1.Zip(l2, (i1, i2) => i1.Property + i2.OtherProperty), () => new ActiveZipTestClassOne() { Property = RandomGenerator.GenerateRandomInteger() }, () => new ActiveZipTestClassTwo() { OtherProperty = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger(), o => o.OtherProperty = RandomGenerator.GenerateRandomInteger());
+        public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValuesInTwoCollections((l1, l2) => l1.ActiveZip(l2, (i1, i2) => i1.Property + i2.OtherProperty), (l1, l2) => l1.Zip(l2, (i1, i2) => i1.Property + i2.OtherProperty), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, () => new ActiveZipTestClass() { OtherProperty = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger(), o => o.OtherProperty = RandomGenerator.GenerateRandomInteger());
     }
 
-    public class ActiveZipTestClassOne : INotifyPropertyChanged
-    {
-        private int _property;
-        public int Property
-        {
-            get { return _property; }
-            set
-            {
-                if (_property == value)
-                    return;
-                _property = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property)));
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-    }
-
-    public class ActiveZipTestClassTwo : INotifyPropertyChanged
+    public class ActiveZipTestClass : INotifyPropertyChanged
     {
         private int _otherProperty;
         public int OtherProperty

@@ -7,7 +7,7 @@ using ActiveListExtensions.Modifiers.Bases;
 
 namespace ActiveListExtensions.Modifiers
 {
-	internal class ActiveSelectMany<TSource, TResult> : ActiveMultiListBase<TSource, TResult, TResult>
+	internal class ActiveSelectMany<TSource, TParameter, TResult> : ActiveMultiListBase<TSource, TResult, TParameter, TResult>
 	{
 		private struct ListInfo
 		{
@@ -27,12 +27,21 @@ namespace ActiveListExtensions.Modifiers
 
 		private IList<ListInfo> _listInfo = new List<ListInfo>();
 
-		public ActiveSelectMany(IActiveList<TSource> source, Func<TSource, IEnumerable<TResult>> selector, IEnumerable<string> propertiesToWatch = null) 
-			: base(source, propertiesToWatch, propertiesToWatch)
+		public ActiveSelectMany(IActiveList<TSource> source, Func<TSource, IEnumerable<TResult>> selector, IEnumerable<string> propertiesToWatch)
+			: this(source, selector, null, propertiesToWatch, null)
 		{
-			if (selector == null)
-				throw new ArgumentNullException(nameof(selector));
-			_selector = selector;
+		}
+
+		public ActiveSelectMany(IActiveList<TSource> source, Func<TSource, TParameter, IEnumerable<TResult>> selector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) 
+			: this(source, i => selector.Invoke(i, parameter.Value), parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
+		{
+		}
+
+		private ActiveSelectMany(IActiveList<TSource> source, Func<TSource, IEnumerable<TResult>> selector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: base(source, parameter, sourcePropertiesToWatch, sourcePropertiesToWatch, parameterPropertiesToWatch)
+		{
+			_selector = selector ?? throw new ArgumentNullException(nameof(selector));
+
 			Initialize();
 		}
 

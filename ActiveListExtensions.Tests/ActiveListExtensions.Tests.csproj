@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Helpers\CollectionSynchronizationWatcher.cs" />
     <Compile Include="Helpers\CollectionTestHelpers.cs" />
+    <Compile Include="Helpers\IntegerTestClass.cs" />
     <Compile Include="Helpers\KeyEqualityComparer.cs" />
     <Compile Include="Helpers\LinqValidator.cs" />
     <Compile Include="Helpers\RandomGenerator.cs" />
@@ -84,7 +85,6 @@
     <Compile Include="Modifiers\ActiveExceptTests.cs" />
     <Compile Include="Modifiers\ActiveGroupByTests.cs" />
     <Compile Include="Modifiers\ActiveIntersectTests.cs" />
-    <Compile Include="Modifiers\ActiveOrderByDescendingTests.cs" />
     <Compile Include="Modifiers\ActiveOrderByTests.cs" />
     <Compile Include="Modifiers\ActiveReverseTests.cs" />
     <Compile Include="Modifiers\ActiveSelectTests.cs" />
@@ -96,7 +96,6 @@
     <Compile Include="Modifiers\ActiveZipTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\BooleanListTests.cs" />
-    <Compile Include="Utilities\CustomActiveValue.cs" />
     <Compile Include="Utilities\ObservableListTests.cs" />
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />
     <Compile Include="ValueModifiers\ActiveAllTests.cs" />

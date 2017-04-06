@@ -67,5 +67,11 @@ namespace ActiveListExtensions.Utilities
 			var properties = new PropertyVisitor().GetReferencedProperties(expression);
 			return Tuple.Create(properties[0], properties[1]);
 		}
+
+		public static Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> GetReferencedProperties<T1, T2, T3, U>(this Expression<Func<T1, T2, T3, U>> expression)
+		{
+			var properties = new PropertyVisitor().GetReferencedProperties(expression);
+			return Tuple.Create(properties[0], properties[1], properties[2]);
+		}
 	}
 }

@@ -39,7 +39,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 			foreach (var value in Enumerable.Range(0, 100))
 				list.Add(list.Count, RandomGenerator.GenerateRandomInteger());
 
-			var compareValue = new CustomActiveValue<int>();
+			var compareValue = new ActiveValue<int>();
 
 			var sut = list.ActiveContains(compareValue);
 

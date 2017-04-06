@@ -11,6 +11,10 @@ namespace ActiveListExtensions.Tests.Modifiers
 {
 	public class ActiveDistinctTests
 	{
+
+		[Fact]
+		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameter((l, p) => l.ActiveDistinct(p, (o, i) => o.Property * i.Property), (l, p) => l.Distinct(new KeyEqualityComparer<IntegerTestClass>(o => o.Property * p.Property, null)), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, true);
+
 		[Fact]
 		public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItems(l => l.ActiveDistinct(), l => l.Distinct(), () => RandomGenerator.GenerateRandomInteger(0, 10), true);
 
@@ -27,26 +31,6 @@ namespace ActiveListExtensions.Tests.Modifiers
 		public void ResetWithRandomItems() => CollectionTestHelpers.ResetWithRandomItems(l => l.ActiveDistinct(), l => l.Distinct(), () => RandomGenerator.GenerateRandomInteger(0, 10), true);
 
 		[Fact]
-		public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValues(l => l.ActiveDistinct(o => o.Property), l => l.Distinct(new KeyEqualityComparer<ActiveDistinctTestClass>(o => o.Property, null)), () => new ActiveDistinctTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger(), true, o => o.Property);
-	}
-
-	public class ActiveDistinctTestClass : INotifyPropertyChanged
-	{
-		private int _property;
-		public int Property
-		{
-			get { return _property; }
-			set
-			{
-				if (_property == value)
-					return;
-				_property = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property)));
-			}
-		}
-
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		public override string ToString() => $"{Property}";
+		public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValues(l => l.ActiveDistinct(o => o.Property), l => l.Distinct(new KeyEqualityComparer<IntegerTestClass>(o => o.Property, null)), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger(), true, o => o.Property);
 	}
 }
