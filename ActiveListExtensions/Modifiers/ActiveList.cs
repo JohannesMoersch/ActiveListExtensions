@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ActiveListExtensions.Modifiers.Bases;
 using ActiveListExtensions.Utilities;
+using System.ComponentModel;
 
 namespace ActiveListExtensions.Modifiers
 {
@@ -16,15 +17,31 @@ namespace ActiveListExtensions.Modifiers
 
 		public override T this[int index] =>  _collection[index];
 
+		private IActiveValue<IReadOnlyList<T>> _source;
+
 		private CollectionWrapper<T> _collection;
 
-		public ActiveList(IReadOnlyList<T> source)
+		public ActiveList(IActiveValue<IReadOnlyList<T>> source)
 		{
-			_collection = new CollectionWrapper<T>(source);
+			_source = source;
+
+			_collection = new CollectionWrapper<T>(_source.Value);
 			_collection.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);
+
+			PropertyChangedEventManager.AddHandler(source, SourceChanged, nameof(IActiveValue<IReadOnlyList<T>>.Value));
 		}
 
-		protected override void OnDisposed() => _collection.Dispose();
+		private void SourceChanged(object key, PropertyChangedEventArgs args)
+		{
+			if (!IsDisposed)
+				_collection.ReplaceCollection(_source.Value);
+		}
+
+		protected override void OnDisposed()
+		{
+			PropertyChangedEventManager.RemoveHandler(_source, SourceChanged, nameof(IActiveValue<IReadOnlyList<T>>.Value));
+			_collection.Dispose();
+		}
 
 		public override IEnumerator<T> GetEnumerator() => _collection.GetEnumerator();
 	}

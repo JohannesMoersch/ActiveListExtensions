@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions
 {
-	public interface IActiveValue<T> : INotifyPropertyChanged, IDisposable
+	public interface IActiveValue<out T> : INotifyPropertyChanged, IDisposable
 	{
 		T Value { get; }
 	}

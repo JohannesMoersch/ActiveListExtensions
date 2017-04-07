@@ -35,12 +35,22 @@ namespace ActiveListExtensions.Utilities
 		{
 			if (collection == null)
 				throw new ArgumentNullException(nameof(collection));
-			_collection = collection;
 
 			if ((propertiesToWatch?.Length ?? 0) > 0)
 				_propertiesToWatch = propertiesToWatch;
 
 			_watcherList = SetupPropertyWatcher();
+
+			ReplaceCollection(collection);
+		}
+
+		public void ReplaceCollection(IReadOnlyList<T> collection)
+		{
+			if (_collection is INotifyCollectionChanged)
+				CollectionChangedEventManager.RemoveHandler(_collection as INotifyCollectionChanged, HandleCollectionChange);
+
+			_collection = collection;
+			_watcherList?.Reset(_collection ?? Enumerable.Empty<T>());
 
 			if (_collection is INotifyCollectionChanged)
 				CollectionChangedEventManager.AddHandler(_collection as INotifyCollectionChanged, HandleCollectionChange);
@@ -67,7 +77,7 @@ namespace ActiveListExtensions.Utilities
 
 		private PropertyWatcherList<T> SetupPropertyWatcher()
 		{
-			if (_collection is INotifyCollectionChanged && _propertiesToWatch != null)
+			if (_propertiesToWatch != null)
 			{
 				var watcherList = new PropertyWatcherList<T>(_propertiesToWatch);
 				watcherList.ValueChanged += (i, v) => ItemModified?.Invoke(this, i, v);

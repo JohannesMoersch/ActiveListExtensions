@@ -13,22 +13,23 @@ namespace ActiveListExtensions
 {
     public static class ActiveListExtensions
     {
-		public static IActiveList<T> ToActiveList<T>(this IList<T> source)
-		{
-			if (source == null)
-				throw new ArgumentNullException(nameof(source));
-			return ToActiveList(source as IReadOnlyList<T> ?? new ListToReadOnlyWrapper<T>(source));
-		}
-
-		public static IActiveList<T> ToActiveList<T>(this IReadOnlyList<T> source)
+		public static IActiveList<T> ToActiveList<T>(this IEnumerable<T> source)
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
 			if (source is IActiveList<T> list)
 				return list;
-			return new ActiveList<T>(source);
+			var readonlyList = source as IReadOnlyList<T> ?? new ListToReadOnlyWrapper<T>(source as IList<T> ?? source.ToList());
+			return new ActiveList<T>(new ActiveValueWrapper<IReadOnlyList<T>>(readonlyList));
 		}
 
+		public static IActiveList<T> ToActiveList<T>(this IActiveValue<IEnumerable<T>> source)
+		{
+			if (source == null)
+				throw new ArgumentNullException(nameof(source));
+			var readonlyListValue = source as IActiveValue<IReadOnlyList<T>> ?? source.ActiveMutate(l => l as IReadOnlyList<T> ?? new ListToReadOnlyWrapper<T>(l as IList<T> ?? l.ToList()));
+			return new ActiveList<T>(readonlyListValue);
+		}
 
 		public static IActiveList<TSource> ActiveWhere<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveWhere(source, predicate.Compile(), predicate.GetReferencedProperties());
 
