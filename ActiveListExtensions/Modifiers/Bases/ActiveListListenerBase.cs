@@ -22,35 +22,9 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		protected IReadOnlyList<TSource> SourceList => _sourceList;
 
-		private IEnumerable<string> _parameterPropertiesToWatch;
+		private ValueWatcher<TParameter> _parameterWatcher;
 
-		private IActiveValue<TParameter> _parameter;
-
-		private TParameter _parameterValue;
-		protected TParameter ParameterValue
-		{
-			get => _parameterValue;
-			private set
-			{
-				if (_parameterValue is INotifyPropertyChanged oldPropertyChangedSource && _parameterPropertiesToWatch != null)
-				{
-					foreach (var propertyName in _parameterPropertiesToWatch)
-						PropertyChangedEventManager.RemoveHandler(oldPropertyChangedSource, SourcePropertyChanged, propertyName);
-				}
-
-				_parameterValue = value;
-
-				if (_parameterValue is INotifyPropertyChanged newPropertyChangedSource && _parameterPropertiesToWatch != null)
-				{
-					foreach (var propertyName in _parameterPropertiesToWatch)
-						PropertyChangedEventManager.AddHandler(newPropertyChangedSource, SourcePropertyChanged, propertyName);
-				}
-			}
-		}
-
-		private void SourcePropertyChanged(object key, PropertyChangedEventArgs args) => OnParameterChanged();
-
-		protected virtual void OnParameterChanged() => OnReset(SourceList);
+		protected TParameter ParameterValue => _parameterWatcher != null ? _parameterWatcher.Value : default(TParameter);
 
 		public ActiveListListenerBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null)
 			: this(source, null, propertiesToWatch)
@@ -59,9 +33,6 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		public ActiveListListenerBase(IActiveList<TSource> source, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> parameterPropertiesToWatch = null)
 		{
-			_parameter = parameter;
-			_parameterPropertiesToWatch = parameterPropertiesToWatch;
-
 			_sourceList = new CollectionWrapper<TSource>(source, sourcePropertiesToWatch?.ToArray());
 			_sourceList.ItemModified += (s, i, v) => ItemModified(i, v);
 			_sourceList.ItemAdded += (s, i, v) => OnAdded(i, v);
@@ -70,10 +41,10 @@ namespace ActiveListExtensions.Modifiers.Bases
 			_sourceList.ItemMoved += (s, o, n, v) => OnMoved(o, n, v);
 			_sourceList.ItemsReset += s => OnReset(s);
 
-			if (_parameter != null)
+			if (parameter != null)
 			{
-				PropertyChangedEventManager.AddHandler(_parameter, SourceChanged, nameof(IActiveValue<TParameter>.Value));
-				ParameterValue = _parameter.Value;
+				_parameterWatcher = new ValueWatcher<TParameter>(parameter, parameterPropertiesToWatch);
+				_parameterWatcher.ValueOrValuePropertyChanged += () => OnParameterChanged();
 			}
 		}
 
@@ -82,22 +53,10 @@ namespace ActiveListExtensions.Modifiers.Bases
 		protected override void OnDisposed()
 		{
 			_sourceList.Dispose();
-
-			if (_parameter != null)
-			{
-				PropertyChangedEventManager.RemoveHandler(_parameter, SourceChanged, nameof(IActiveValue<TParameter>.Value));
-				ParameterValue = default(TParameter);
-			}
+			_parameterWatcher?.Dispose();
 		}
 
-		private void SourceChanged(object key, PropertyChangedEventArgs args)
-		{
-			if (!IsDisposed)
-			{
-				ParameterValue = _parameter.Value;
-				OnParameterChanged();
-			}
-		}
+		protected virtual void OnParameterChanged() => OnReset(SourceList);
 
 		protected abstract void OnAdded(int index, TSource value);
 

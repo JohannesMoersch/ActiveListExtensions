@@ -12,7 +12,7 @@ namespace ActiveListExtensions.Utilities
 		private IActiveValue<TValue> _activeValue;
 
 		private TValue _value;
-		protected TValue Value
+		public TValue Value
 		{
 			get => _value;
 			private set
@@ -31,7 +31,6 @@ namespace ActiveListExtensions.Utilities
 						PropertyChangedEventManager.AddHandler(newPropertyChangedSource, SourcePropertyChanged, propertyName);
 				}
 
-				ValueChanged?.Invoke(_value);
 				ValueOrValuePropertyChanged?.Invoke();
 			}
 		}
@@ -72,8 +71,6 @@ namespace ActiveListExtensions.Utilities
 		}
 
 		private void SourcePropertyChanged(object key, PropertyChangedEventArgs args) => ValueOrValuePropertyChanged?.Invoke();
-
-		public event Action<TValue> ValueChanged;
 
 		public event Action ValueOrValuePropertyChanged;
 	}
