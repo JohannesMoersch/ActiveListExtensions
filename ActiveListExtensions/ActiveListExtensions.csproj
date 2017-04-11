@@ -70,6 +70,7 @@
     <Compile Include="Modifiers\Bases\ActiveSetBase.cs" />
     <Compile Include="Utilities\ActiveValueWrapper.cs" />
     <Compile Include="Utilities\BooleanList.cs" />
+    <Compile Include="Utilities\ValueWatcher.cs" />
     <Compile Include="ValueModifiers\ActiveAll.cs" />
     <Compile Include="ValueModifiers\ActiveAny.cs" />
     <Compile Include="ValueModifiers\ActiveContains.cs" />
