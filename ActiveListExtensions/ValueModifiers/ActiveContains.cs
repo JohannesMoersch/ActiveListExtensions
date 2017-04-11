@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveContains<TSource> : ActiveListPredicateBase<TSource>
+	internal class ActiveContains<TSource> : ActiveListPredicateBase<TSource, object>
 	{
 		private IActiveValue<TSource> _value;
 
 		public ActiveContains(IActiveList<TSource> source, IActiveValue<TSource> value)
-			: base(source, item => Equals(item, value.Value))
+			: base(source, null, item => Equals(item, value.Value))
 		{
 			_value = value;
 

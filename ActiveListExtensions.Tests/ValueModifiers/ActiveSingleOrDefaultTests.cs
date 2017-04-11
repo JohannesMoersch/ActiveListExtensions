@@ -12,6 +12,9 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 	public class ActiveSingleOrDefaultTests
 	{
 		[Fact]
+		public void RandomlyChangeParameter() => ValueTestHelpers.RandomlyChangeParameter((l, p) => l.ActiveSingleOrDefault(p, (o, i) => o.Property > i.Property), (l, p) => { try { return l.SingleOrDefault(i => i.Property > p.Property); } catch { return null; } }, () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger(0, 100) }, () => RandomGenerator.GenerateRandomInteger(-50, 150));
+
+		[Fact]
 		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveSingleOrDefault(i => i.Property % 20 == 0), l => { try { return l.SingleOrDefault(i => i.Property % 20 == 0); } catch { return null; } }, () => new ActiveSingleOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]

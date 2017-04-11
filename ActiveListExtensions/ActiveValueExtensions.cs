@@ -38,21 +38,39 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<TSource> ActiveFirstOrDefault<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveFirstOrDefault(source, predicate.Compile(), predicate.GetReferencedProperties());
 
-		public static IActiveValue<TSource> ActiveFirstOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveFirstOrDefault<TSource>(source, predicate, propertiesToWatch);
+		public static IActiveValue<TSource> ActiveFirstOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveFirstOrDefault<TSource, object>(source, predicate, propertiesToWatch);
+
+		public static IActiveValue<TSource> ActiveFirstOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, bool>> predicate) => ActiveFirstOrDefault(source, parameter, predicate.Compile(), predicate.GetReferencedProperties());
+
+		public static IActiveValue<TSource> ActiveFirstOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveFirstOrDefault(source, parameter, predicate, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<TSource> ActiveFirstOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveFirstOrDefault<TSource, TParameter>(source, parameter, predicate, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
 		public static IActiveValue<TSource> ActiveLastOrDefault<TSource>(this IActiveList<TSource> source) => ActiveLastOrDefault(source, i => true, null);
 
 		public static IActiveValue<TSource> ActiveLastOrDefault<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveLastOrDefault(source, predicate.Compile(), predicate.GetReferencedProperties());
 
-		public static IActiveValue<TSource> ActiveLastOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveLastOrDefault<TSource>(source, predicate, propertiesToWatch);
+		public static IActiveValue<TSource> ActiveLastOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveLastOrDefault<TSource, object>(source, predicate, propertiesToWatch);
+
+		public static IActiveValue<TSource> ActiveLastOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, bool>> predicate) => ActiveLastOrDefault(source, parameter, predicate.Compile(), predicate.GetReferencedProperties());
+
+		public static IActiveValue<TSource> ActiveLastOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveLastOrDefault(source, parameter, predicate, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<TSource> ActiveLastOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveLastOrDefault<TSource, TParameter>(source, parameter, predicate, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
 		public static IActiveValue<TSource> ActiveSingleOrDefault<TSource>(this IActiveList<TSource> source) => ActiveSingleOrDefault(source, i => true, null);
 
 		public static IActiveValue<TSource> ActiveSingleOrDefault<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveSingleOrDefault(source, predicate.Compile(), predicate.GetReferencedProperties());
 
-		public static IActiveValue<TSource> ActiveSingleOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveSingleOrDefault<TSource>(source, predicate, propertiesToWatch);
+		public static IActiveValue<TSource> ActiveSingleOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveSingleOrDefault<TSource, object>(source, predicate, propertiesToWatch);
+
+		public static IActiveValue<TSource> ActiveSingleOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, bool>> predicate) => ActiveSingleOrDefault(source, parameter, predicate.Compile(), predicate.GetReferencedProperties());
+
+		public static IActiveValue<TSource> ActiveSingleOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveSingleOrDefault(source, parameter, predicate, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<TSource> ActiveSingleOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSingleOrDefault<TSource, TParameter>(source, parameter, predicate, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
 		public static IActiveValue<TSource> ActiveElementAtOrDefault<TSource>(this IActiveList<TSource> source, int index) => ActiveElementAtOrDefault(source, new ActiveValueWrapper<int>(index));
@@ -62,21 +80,39 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<bool> ActiveAll<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveAll(source, predicate.Compile(), predicate.GetReferencedProperties());
 
-		public static IActiveValue<bool> ActiveAll<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveAll<TSource>(source, predicate, propertiesToWatch);
+		public static IActiveValue<bool> ActiveAll<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveAll<TSource, object>(source, predicate, propertiesToWatch);
+
+		public static IActiveValue<bool> ActiveAll<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, bool>> predicate) => ActiveAll(source, parameter, predicate.Compile(), predicate.GetReferencedProperties());
+
+		public static IActiveValue<bool> ActiveAll<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveAll(source, parameter, predicate, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<bool> ActiveAll<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveAll<TSource, TParameter>(source, parameter, predicate, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
 		public static IActiveValue<bool> ActiveAny<TSource>(this IActiveList<TSource> source) => ToActiveValue(source, l => l.Count > 0, new[] { nameof(IActiveList<TSource>.Count) });
 
 		public static IActiveValue<bool> ActiveAny<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveAny(source, predicate.Compile(), predicate.GetReferencedProperties());
 
-		public static IActiveValue<bool> ActiveAny<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveAny<TSource>(source, predicate, propertiesToWatch);
+		public static IActiveValue<bool> ActiveAny<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveAny<TSource, object>(source, predicate, propertiesToWatch);
+
+		public static IActiveValue<bool> ActiveAny<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, bool>> predicate) => ActiveAny(source, parameter, predicate.Compile(), predicate.GetReferencedProperties());
+
+		public static IActiveValue<bool> ActiveAny<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveAny(source, parameter, predicate, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<bool> ActiveAny<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveAny<TSource, TParameter>(source, parameter, predicate, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
 		public static IActiveValue<int> ActiveCount<TSource>(this IActiveList<TSource> source) => ToActiveValue(source, l => l.Count, new[] { nameof(IActiveList<TSource>.Count) });
 
 		public static IActiveValue<int> ActiveCount<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveCount(source, predicate.Compile(), predicate.GetReferencedProperties());
 
-		public static IActiveValue<int> ActiveCount<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveCount<TSource>(source, predicate, propertiesToWatch);
+		public static IActiveValue<int> ActiveCount<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveCount<TSource, object>(source, predicate, propertiesToWatch);
+
+		public static IActiveValue<int> ActiveCount<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, bool>> predicate) => ActiveCount(source, parameter, predicate.Compile(), predicate.GetReferencedProperties());
+
+		public static IActiveValue<int> ActiveCount<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveCount(source, parameter, predicate, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<int> ActiveCount<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveCount<TSource, TParameter>(source, parameter, predicate, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
 		public static IActiveValue<bool> ActiveContains<TSource>(this IActiveList<TSource> source, TSource value) => ActiveContains(source, new ActiveValueWrapper<TSource>(value));
@@ -88,14 +124,26 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<TResult> ActiveMaxOrDefault<TSource, TResult>(this IActiveList<TSource> source, Expression<Func<TSource, TResult>> selector) => ActiveMaxOrDefault(source, selector.Compile(), selector.GetReferencedProperties());
 
-		public static IActiveValue<TResult> ActiveMaxOrDefault<TSource, TResult>(this IActiveList<TSource> source, Func<TSource, TResult> selector, IEnumerable<string> propertiesToWatch) => new ActiveMaxOrDefault<TSource, TResult>(source, selector, propertiesToWatch);
+		public static IActiveValue<TResult> ActiveMaxOrDefault<TSource, TResult>(this IActiveList<TSource> source, Func<TSource, TResult> selector, IEnumerable<string> propertiesToWatch) => new ActiveMaxOrDefault<TSource, object, TResult>(source, selector, propertiesToWatch);
+
+		public static IActiveValue<TResult> ActiveMaxOrDefault<TSource, TParameter, TResult>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, TResult>> selector) => ActiveMaxOrDefault(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<TResult> ActiveMaxOrDefault<TSource, TParameter, TResult>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TResult> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveMaxOrDefault(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<TResult> ActiveMaxOrDefault<TSource, TParameter, TResult>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TResult> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveMaxOrDefault<TSource, TParameter, TResult>(source, parameter, selector, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
 		public static IActiveValue<TSource> ActiveMinOrDefault<TSource>(this IActiveList<TSource> source) => ActiveMinOrDefault(source, i => i, null);
 
 		public static IActiveValue<TResult> ActiveMinOrDefault<TSource, TResult>(this IActiveList<TSource> source, Expression<Func<TSource, TResult>> selector) => ActiveMinOrDefault(source, selector.Compile(), selector.GetReferencedProperties());
 
-		public static IActiveValue<TResult> ActiveMinOrDefault<TSource, TResult>(this IActiveList<TSource> source, Func<TSource, TResult> selector, IEnumerable<string> propertiesToWatch) => new ActiveMinOrDefault<TSource, TResult>(source, selector, propertiesToWatch);
+		public static IActiveValue<TResult> ActiveMinOrDefault<TSource, TResult>(this IActiveList<TSource> source, Func<TSource, TResult> selector, IEnumerable<string> propertiesToWatch) => new ActiveMinOrDefault<TSource, object, TResult>(source, selector, propertiesToWatch);
+
+		public static IActiveValue<TResult> ActiveMinOrDefault<TSource, TParameter, TResult>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, TResult>> selector) => ActiveMinOrDefault(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<TResult> ActiveMinOrDefault<TSource, TParameter, TResult>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TResult> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveMinOrDefault(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<TResult> ActiveMinOrDefault<TSource, TParameter, TResult>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TResult> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveMinOrDefault<TSource, TParameter, TResult>(source, parameter, selector, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 		// SequenceEqual (use Zip + All?)
 		// --FirstOrDefault

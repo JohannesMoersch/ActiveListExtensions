@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveElementAtOrDefault<TSource> : ActiveListValueBase<TSource, TSource>
+	internal class ActiveElementAtOrDefault<TSource> : ActiveListValueBase<TSource, object, TSource>
 	{
 		private readonly IActiveValue<int> _index;
 

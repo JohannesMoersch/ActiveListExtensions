@@ -12,6 +12,9 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 	public class ActiveMinOrDefaultTests
 	{
 		[Fact]
+		public void RandomlyChangeParameter() => ValueTestHelpers.RandomlyChangeParameter((l, p) => l.ActiveMinOrDefault(p, (o, i) => o.Property * i.Property), (l, p) => { try { return l.Min(i => i.Property * p.Property); } catch { return 0; } }, () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger(0, 100) }, () => RandomGenerator.GenerateRandomInteger(-50, 150));
+
+		[Fact]
 		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveMinOrDefault(i => i.Property), l => { try { return l.Min(i => i.Property); } catch { return 0; } }, () => new ActiveMinOrDefaultTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]

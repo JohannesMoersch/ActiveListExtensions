@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveMutateList<TSource, TResult> : ActiveListValueBase<TSource, TResult>
+	internal class ActiveMutateList<TSource, TResult> : ActiveListValueBase<TSource, object, TResult>
 	{
 		private readonly Func<IReadOnlyList<TSource>, TResult> _mutator;
 

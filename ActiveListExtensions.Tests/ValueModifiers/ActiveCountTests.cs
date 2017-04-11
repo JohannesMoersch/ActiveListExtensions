@@ -12,6 +12,9 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 	public class ActiveCountTests
 	{
 		[Fact]
+		public void RandomlyChangeParameter() => ValueTestHelpers.RandomlyChangeParameter((l, p) => l.ActiveCount(p, (o, i) => o.Property > i.Property), (l, p) => l.Count(i => i.Property > p.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger(0, 100) }, () => RandomGenerator.GenerateRandomInteger(-50, 150));
+
+		[Fact]
 		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveCount(), l => l.Count(), () => new ActiveCountTestClass() { Property = RandomGenerator.GenerateRandomInteger() });
 
 		[Fact]

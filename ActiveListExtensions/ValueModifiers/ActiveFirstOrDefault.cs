@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveFirstOrDefault<TSource> : ActiveListValueBase<TSource, TSource>
+	internal class ActiveFirstOrDefault<TSource, TParameter> : ActiveListValueBase<TSource, TParameter, TSource>
 	{
 		private Func<TSource, bool> _predicate;
 
@@ -25,8 +25,18 @@ namespace ActiveListExtensions.ValueModifiers
 			}
 		}
 
-		public ActiveFirstOrDefault(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) 
-			: base(source, propertiesToWatch)
+		public ActiveFirstOrDefault(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch)
+			: this(source, null, predicate, propertiesToWatch, null)
+		{
+		}
+
+		public ActiveFirstOrDefault(IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: this(source, parameter, i => predicate.Invoke(i, parameter.Value), sourcePropertiesToWatch, parameterPropertiesToWatch)
+		{
+		}
+
+		private ActiveFirstOrDefault(IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, bool> predicate, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) 
+			: base(source, parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 			_predicate = predicate;
 

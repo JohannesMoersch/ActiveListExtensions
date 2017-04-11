@@ -7,12 +7,22 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveMinOrDefault<TSource, TValue> : ActiveListCompareBase<TSource, TValue>
+	internal class ActiveMinOrDefault<TSource, TParameter, TValue> : ActiveListCompareBase<TSource, TParameter, TValue>
 	{
 		private readonly Comparer<TValue> _comparer;
 
-		public ActiveMinOrDefault(IActiveList<TSource> source, Func<TSource, TValue> selector, IEnumerable<string> propertiesToWatch = null)
-			: base(source, selector, propertiesToWatch)
+		public ActiveMinOrDefault(IActiveList<TSource> source, Func<TSource, TValue> selector, IEnumerable<string> propertiesToWatch)
+			: this(source, null, selector, propertiesToWatch, null)
+		{
+		}
+
+		public ActiveMinOrDefault(IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TValue> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: this(source, parameter, i => selector.Invoke(i, parameter.Value), sourcePropertiesToWatch, parameterPropertiesToWatch)
+		{
+		}
+
+		private ActiveMinOrDefault(IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TValue> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) 
+			: base(source, parameter, selector, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 			_comparer = Comparer<TValue>.Default;
 

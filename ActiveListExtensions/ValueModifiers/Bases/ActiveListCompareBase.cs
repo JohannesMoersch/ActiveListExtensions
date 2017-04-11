@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers.Bases
 {
-	internal abstract class ActiveListCompareBase<TSource, TValue> : ActiveListValueBase<TSource, TValue>
+	internal abstract class ActiveListCompareBase<TSource, TParameter, TValue> : ActiveListValueBase<TSource, TParameter, TValue>
 	{
 		private readonly Func<TSource, TValue> _selector;
 
 		private int _currentIndex = -1;
 
-		public ActiveListCompareBase(IActiveList<TSource> source, Func<TSource, TValue> selector, IEnumerable<string> propertiesToWatch = null)
-			: base(source, propertiesToWatch)
+		public ActiveListCompareBase(IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TValue> selector, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> parameterPropertiesToWatch = null)
+			: base(source, parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 			_selector = selector;
 		}

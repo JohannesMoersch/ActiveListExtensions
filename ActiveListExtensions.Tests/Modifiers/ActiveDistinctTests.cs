@@ -11,7 +11,6 @@ namespace ActiveListExtensions.Tests.Modifiers
 {
 	public class ActiveDistinctTests
 	{
-
 		[Fact]
 		public void RandomlyChangeParameter() => CollectionTestHelpers.RandomlyChangeParameter((l, p) => l.ActiveDistinct(p, (o, i) => o.Property * i.Property), (l, p) => l.Distinct(new KeyEqualityComparer<IntegerTestClass>(o => o.Property * p.Property, null)), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, true);
 

@@ -8,14 +8,24 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveCount<TSource> : ActiveListValueBase<TSource, int>
+	internal class ActiveCount<TSource, TParameter> : ActiveListValueBase<TSource, TParameter, int>
 	{
 		private readonly Func<TSource, bool> _predicate;
 
 		private readonly BooleanList _values;
 
-		public ActiveCount(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch = null)
-			: base(source, propertiesToWatch)
+		public ActiveCount(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch)
+			: this(source, null, predicate, propertiesToWatch, null)
+		{
+		}
+
+		public ActiveCount(IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, bool> predicate, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			: this(source, parameter, i => predicate.Invoke(i, parameter.Value), sourcePropertiesToWatch, parameterPropertiesToWatch)
+		{
+		}
+
+		private ActiveCount(IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, bool> predicate, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) 
+			: base(source, parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 			_predicate = predicate;
 

@@ -9,6 +9,24 @@ namespace ActiveListExtensions.Tests.Helpers
 {
 	public static class ValueTestHelpers
 	{
+		public static void RandomlyChangeParameter<T, U>(Func<IActiveList<T>, IActiveValue<IntegerTestClass>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, IntegerTestClass, U> linqExpression, Func<T> randomValueGenerator, Func<int> parameterRandomValueGenerator, Func<U, U, bool> comparer = null)
+		{
+			RandomGenerator.ResetRandomGenerator();
+
+			var list = new ObservableList<T>();
+			foreach (var value in Enumerable.Range(0, 100))
+				list.Add(list.Count, randomValueGenerator.Invoke());
+
+			var parameter = new ActiveValue<IntegerTestClass>() { Value = new IntegerTestClass() { Property = 1 } };
+			var sut = activeExpression.Invoke(list.ToActiveList(), parameter);
+
+			foreach (var value in Enumerable.Range(0, 30))
+			{
+				parameter.Value.Property = parameterRandomValueGenerator.Invoke();
+				ValidateResult(sut, linqExpression.Invoke(list, parameter.Value), comparer);
+			}
+		}
+
 		public static void RandomlyInsertItems<T, U>(Func<IActiveList<T>, IActiveValue<U>> activeExpression, Func<IReadOnlyList<T>, U> linqExpression, Func<T> randomValueGenerator, Func<U, U, bool> comparer = null)
 		{
 			RandomGenerator.ResetRandomGenerator();

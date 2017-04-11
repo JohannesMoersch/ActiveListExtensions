@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers.Bases
 {
-	internal abstract class ActiveListPredicateBase<TSource> : ActiveListValueBase<TSource, bool>
+	internal abstract class ActiveListPredicateBase<TSource, TParameter> : ActiveListValueBase<TSource, TParameter, bool>
 	{
 		private Func<TSource, bool> _predicate;
 
 		private int? _valueIndex;
 
-		public ActiveListPredicateBase(IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch = null)
-			: base(source, propertiesToWatch)
+		public ActiveListPredicateBase(IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, bool> predicate, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> parameterPropertiesToWatch = null)
+			: base(source, parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 			_predicate = predicate;
 
