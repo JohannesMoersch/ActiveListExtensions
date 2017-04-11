@@ -87,7 +87,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 
 		private readonly Func<TSource, TKey> _keySelector;
 
-		public ActiveSetBase(IActiveList<TSource> leftSource, IActiveList<TSource> rightSource, Func<TSource, TKey> keySelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+		public ActiveSetBase(IActiveList<TSource> leftSource, IReadOnlyList<TSource> rightSource, Func<TSource, TKey> keySelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
 			: base(leftSource, parameter, sourcePropertiesToWatch, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
 			_keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));

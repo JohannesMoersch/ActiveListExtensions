@@ -130,6 +130,7 @@
     <Compile Include="ValueModifiers\ActiveMinOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveMutateListTests.cs" />
     <Compile Include="ValueModifiers\ActiveMutateValueTests.cs" />
+    <Compile Include="ValueModifiers\ActiveSequenceEqualTests.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefaultTests.cs" />
   </ItemGroup>
   <ItemGroup>
