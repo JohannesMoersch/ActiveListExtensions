@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ActiveListExtensions.Tests.Helpers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -13,10 +14,10 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		[Fact]
 		public void WhenMutatingContainerValueChanged()
 		{
-			var source = new ActiveMutateValueTestOuterClass() { Container = new ActiveMutateValueTestInnerClass() { Property = 100 } };
+			var source = new ActiveMutateValueTestOuterClass() { Container = new IntegerTestClass() { Property = 100 } };
 			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
 
-			source.Container = new ActiveMutateValueTestInnerClass() { Property = 200 };
+			source.Container = new IntegerTestClass() { Property = 200 };
 
 			Assert.Equal(source.Container.Property, sut.Value);
 		}
@@ -24,7 +25,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		[Fact]
 		public void WhenMutatingPropertyValueChanged()
 		{
-			var source = new ActiveMutateValueTestOuterClass() { Container = new ActiveMutateValueTestInnerClass() { Property = 100 } };
+			var source = new ActiveMutateValueTestOuterClass() { Container = new IntegerTestClass() { Property = 100 } };
 			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
 
 			source.Container.Property = 200;
@@ -35,7 +36,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		[Fact]
 		public void WhenMutatingPropertyChangeNotificationIsThrown()
 		{
-			var source = new ActiveMutateValueTestOuterClass() { Container = new ActiveMutateValueTestInnerClass() { Property = 100 } };
+			var source = new ActiveMutateValueTestOuterClass() { Container = new IntegerTestClass() { Property = 100 } };
 			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
 
 			bool called = false;
@@ -48,28 +49,10 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		}
 	}
 
-	public class ActiveMutateValueTestInnerClass : INotifyPropertyChanged
-	{
-		private int _property;
-		public int Property
-		{
-			get { return _property; }
-			set
-			{
-				if (_property == value)
-					return;
-				_property = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Property)));
-			}
-		}
-
-		public event PropertyChangedEventHandler PropertyChanged;
-	}
-
 	public class ActiveMutateValueTestOuterClass : INotifyPropertyChanged
 	{
-		private ActiveMutateValueTestInnerClass _container;
-		public ActiveMutateValueTestInnerClass Container
+		private IntegerTestClass _container;
+		public IntegerTestClass Container
 		{
 			get { return _container; }
 			set

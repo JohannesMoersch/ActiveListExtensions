@@ -73,6 +73,7 @@
     <Compile Include="Utilities\ValueWatcher.cs" />
     <Compile Include="ValueModifiers\ActiveAll.cs" />
     <Compile Include="ValueModifiers\ActiveAny.cs" />
+    <Compile Include="ValueModifiers\ActiveAverageOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveContains.cs" />
     <Compile Include="ValueModifiers\ActiveCount.cs" />
     <Compile Include="ValueModifiers\ActiveElementAtOrDefault.cs" />
@@ -82,6 +83,8 @@
     <Compile Include="ValueModifiers\ActiveMutateValue.cs" />
     <Compile Include="ValueModifiers\ActiveSequenceEqual.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefault.cs" />
+    <Compile Include="ValueModifiers\ActiveSum.cs" />
+    <Compile Include="ValueModifiers\Bases\ActiveAccumulatorBase.cs" />
     <Compile Include="ValueModifiers\ActiveValueListener.cs" />
     <Compile Include="Utilities\CollectionWrapper.cs" />
     <Compile Include="Utilities\ExpressionExtensions.cs" />

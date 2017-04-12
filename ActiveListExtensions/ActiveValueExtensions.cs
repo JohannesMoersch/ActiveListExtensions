@@ -166,7 +166,130 @@ namespace ActiveListExtensions
 
 		private static IActiveValue<TResult> ActiveMinOrDefault<TSource, TParameter, TResult>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TResult> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveMinOrDefault<TSource, TParameter, TResult>(source, parameter, selector, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
-		// SequenceEqual (use Zip + All?)
+
+		public static IActiveValue<int> ActiveSum(this IActiveList<int> source) => ActiveSum(source, i => i, null);
+
+		public static IActiveValue<int> ActiveSum<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, int>> selector) => ActiveSum(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<int> ActiveSum<TSource>(this IActiveList<TSource> source, Func<TSource, int> selector, IEnumerable<string> propertiesToWatch) => new ActiveSum<TSource, object, int>(source, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, propertiesToWatch);
+
+		public static IActiveValue<int> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, int>> selector) => ActiveSum(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<int> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, int> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveSum(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<int> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, int> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSum<TSource, TParameter, int>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+		public static IActiveValue<long> ActiveSum(this IActiveList<long> source) => ActiveSum(source, i => i, null);
+
+		public static IActiveValue<long> ActiveSum<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, long>> selector) => ActiveSum(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<long> ActiveSum<TSource>(this IActiveList<TSource> source, Func<TSource, long> selector, IEnumerable<string> propertiesToWatch) => new ActiveSum<TSource, object, long>(source, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, propertiesToWatch);
+
+		public static IActiveValue<long> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, long>> selector) => ActiveSum(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<long> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, long> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveSum(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<long> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, long> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSum<TSource, TParameter, long>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+		public static IActiveValue<float> ActiveSum(this IActiveList<float> source) => ActiveSum(source, i => i, null);
+
+		public static IActiveValue<float> ActiveSum<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, float>> selector) => ActiveSum(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<float> ActiveSum<TSource>(this IActiveList<TSource> source, Func<TSource, float> selector, IEnumerable<string> propertiesToWatch) => new ActiveSum<TSource, object, float>(source, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, propertiesToWatch);
+
+		public static IActiveValue<float> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, float>> selector) => ActiveSum(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<float> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, float> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveSum(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<float> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, float> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSum<TSource, TParameter, float>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+		public static IActiveValue<double> ActiveSum(this IActiveList<double> source) => ActiveSum(source, i => i, null);
+
+		public static IActiveValue<double> ActiveSum<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, double>> selector) => ActiveSum(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<double> ActiveSum<TSource>(this IActiveList<TSource> source, Func<TSource, double> selector, IEnumerable<string> propertiesToWatch) => new ActiveSum<TSource, object, double>(source, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, propertiesToWatch);
+
+		public static IActiveValue<double> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, double>> selector) => ActiveSum(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<double> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, double> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveSum(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<double> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, double> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSum<TSource, TParameter, double>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+		public static IActiveValue<decimal> ActiveSum(this IActiveList<decimal> source) => ActiveSum(source, i => i, null);
+
+		public static IActiveValue<decimal> ActiveSum<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, decimal>> selector) => ActiveSum(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<decimal> ActiveSum<TSource>(this IActiveList<TSource> source, Func<TSource, decimal> selector, IEnumerable<string> propertiesToWatch) => new ActiveSum<TSource, object, decimal>(source, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, propertiesToWatch);
+
+		public static IActiveValue<decimal> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, decimal>> selector) => ActiveSum(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<decimal> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, decimal> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveSum(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<decimal> ActiveSum<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, decimal> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSum<TSource, TParameter, decimal>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+
+		public static IActiveValue<double> ActiveAverageOrDefault(this IActiveList<int> source) => ActiveAverageOrDefault(source, i => i, null);
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, int>> selector) => ActiveAverageOrDefault(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, int> selector, IEnumerable<string> propertiesToWatch) => new ActiveAverageOrDefault<TSource, object, int, double>(source, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => (double)i1 / i2, propertiesToWatch);
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, int>> selector) => ActiveAverageOrDefault(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, int> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveAverageOrDefault(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<double> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, int> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveAverageOrDefault<TSource, TParameter, int, double>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => (double)i1 / i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+		public static IActiveValue<double> ActiveAverageOrDefault(this IActiveList<long> source) => ActiveAverageOrDefault(source, i => i, null);
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, long>> selector) => ActiveAverageOrDefault(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, long> selector, IEnumerable<string> propertiesToWatch) => new ActiveAverageOrDefault<TSource, object, long, double>(source, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => (double)i1 / i2, propertiesToWatch);
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, long>> selector) => ActiveAverageOrDefault(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, long> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveAverageOrDefault(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<double> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, long> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveAverageOrDefault<TSource, TParameter, long, double>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => (double)i1 / i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+		public static IActiveValue<float> ActiveAverageOrDefault(this IActiveList<float> source) => ActiveAverageOrDefault(source, i => i, null);
+
+		public static IActiveValue<float> ActiveAverageOrDefault<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, float>> selector) => ActiveAverageOrDefault(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<float> ActiveAverageOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, float> selector, IEnumerable<string> propertiesToWatch) => new ActiveAverageOrDefault<TSource, object, float, float>(source, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => i1 / i2, propertiesToWatch);
+
+		public static IActiveValue<float> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, float>> selector) => ActiveAverageOrDefault(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<float> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, float> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveAverageOrDefault(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<float> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, float> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveAverageOrDefault<TSource, TParameter, float, float>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => i1 / i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+		public static IActiveValue<double> ActiveAverageOrDefault(this IActiveList<double> source) => ActiveAverageOrDefault(source, i => i, null);
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, double>> selector) => ActiveAverageOrDefault(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, double> selector, IEnumerable<string> propertiesToWatch) => new ActiveAverageOrDefault<TSource, object, double, double>(source, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => i1 / i2, propertiesToWatch);
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, double>> selector) => ActiveAverageOrDefault(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<double> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, double> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveAverageOrDefault(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<double> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, double> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveAverageOrDefault<TSource, TParameter, double, double>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => i1 / i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+		public static IActiveValue<decimal> ActiveAverageOrDefault(this IActiveList<decimal> source) => ActiveAverageOrDefault(source, i => i, null);
+
+		public static IActiveValue<decimal> ActiveAverageOrDefault<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, decimal>> selector) => ActiveAverageOrDefault(source, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<decimal> ActiveAverageOrDefault<TSource>(this IActiveList<TSource> source, Func<TSource, decimal> selector, IEnumerable<string> propertiesToWatch) => new ActiveAverageOrDefault<TSource, object, decimal, decimal>(source, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => i1 / i2, propertiesToWatch);
+
+		public static IActiveValue<decimal> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, decimal>> selector) => ActiveAverageOrDefault(source, parameter, selector.Compile(), selector.GetReferencedProperties());
+
+		public static IActiveValue<decimal> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, decimal> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveAverageOrDefault(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<decimal> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, decimal> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveAverageOrDefault<TSource, TParameter, decimal, decimal>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => i1 / i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+
+		// --SequenceEqual
 		// --FirstOrDefault
 		// --LastOrDefault
 		// --SingleOrDefault
@@ -176,10 +299,9 @@ namespace ActiveListExtensions
 		// --All
 		// --Count
 		// --Contains
-		// AggregateOrDefault
-		// SumOrDefault
+		// --SumOrDefault
 		// --MinOrDefault
 		// --MaxOrDefault
-		// AverageOrDefault
+		// --AverageOrDefault
 	}
 }
