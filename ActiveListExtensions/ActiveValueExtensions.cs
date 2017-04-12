@@ -37,7 +37,7 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<bool> ActiveSequenceEqual<TSource>(this IActiveList<TSource> source, IReadOnlyList<TSource> otherSource, Func<TSource, TSource, bool> comparer, IEnumerable<string> propertiesToWatch) => new ActiveSequenceEqual<TSource, object>(source, otherSource, comparer, propertiesToWatch);
 
-		public static IActiveValue<bool> ActiveSequenceEqual<TSource, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> otherSource, IActiveValue<TParameter> parameter, Expression<Func<TSource, TSource, TParameter, bool>> comparer) => ActiveSequenceEqual(source, otherSource, null, comparer.Compile(), comparer.GetReferencedProperties());
+		public static IActiveValue<bool> ActiveSequenceEqual<TSource, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> otherSource, IActiveValue<TParameter> parameter, Expression<Func<TSource, TSource, TParameter, bool>> comparer) => ActiveSequenceEqual(source, otherSource, parameter, comparer.Compile(), comparer.GetReferencedProperties());
 
 		public static IActiveValue<bool> ActiveSequenceEqual<TSource, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> otherSource, IActiveValue<TParameter> parameter, Func<TSource, TSource, TParameter, bool> comparer, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveSequenceEqual(source, otherSource, parameter, comparer, Tuple.Create(sourcePropertiesToWatch, Enumerable.Empty<string>(), parameterPropertiesToWatch));
 

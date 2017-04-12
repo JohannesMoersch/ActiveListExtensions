@@ -40,13 +40,13 @@ namespace ActiveListExtensions.ValueModifiers
 		{
 			_equalityComparer = new FunctionEqualityComparer(comparer);
 
-			_otherSourceList = new CollectionWrapper<TSource>(otherSource);
-			_otherSourceList.ItemModified += (s, i, v) => OtherItemModified(i, v);
-			_otherSourceList.ItemAdded += (s, i, v) => OnOtherAdded(i, v);
-			_otherSourceList.ItemRemoved += (s, i, v) => OnOtherRemoved(i, v);
-			_otherSourceList.ItemReplaced += (s, i, o, n) => OnOtherReplaced(i, o, n);
-			_otherSourceList.ItemMoved += (s, o, n, v) => OnOtherMoved(o, n, v);
-			_otherSourceList.ItemsReset += s => OnOtherReset(s);
+			_otherSourceList = new CollectionWrapper<TSource>(otherSource, sourcePropertiesToWatch.ToArray());
+			_otherSourceList.ItemModified += (s, i, v) => ItemModified(i, v);
+			_otherSourceList.ItemAdded += (s, i, v) => OnAdded(i, v);
+			_otherSourceList.ItemRemoved += (s, i, v) => OnRemoved(i, v);
+			_otherSourceList.ItemReplaced += (s, i, o, n) => OnReplaced(i, o, n);
+			_otherSourceList.ItemMoved += (s, o, n, v) => OnMoved(o, n, v);
+			_otherSourceList.ItemsReset += s => OnReset(s);
 
 			Initialize();
 		}
@@ -59,7 +59,9 @@ namespace ActiveListExtensions.ValueModifiers
 				Value = SourceList.SequenceEqual(_otherSourceList, _equalityComparer);
 		}
 
-		private bool Reevaluate(int index) => _equalityComparer.Equals(SourceList[index], _otherSourceList[index]);
+		protected override void OnParameterChanged() => Recalculate();
+
+		private bool Evaluate(int index) => _equalityComparer.Equals(SourceList[index], _otherSourceList[index]);
 
 		protected override void OnAdded(int index, TSource value) => Recalculate();
 
@@ -67,34 +69,22 @@ namespace ActiveListExtensions.ValueModifiers
 
 		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
+			if (Value)
+				Value = Evaluate(oldIndex) && Evaluate(newIndex);
+			else
+				Recalculate();
 		}
 
 		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
+			if (Value)
+				Value = Evaluate(index);
+			else
+				Recalculate();
 		}
 
 		protected override void OnReset(IReadOnlyList<TSource> newItems) => Recalculate();
 
-		protected override void ItemModified(int index, TSource value)
-		{
-		}
-
-		private void OnOtherAdded(int index, TSource value) => Recalculate();
-
-		private void OnOtherRemoved(int index, TSource value) => Recalculate();
-
-		private void OnOtherMoved(int oldIndex, int newIndex, TSource value)
-		{
-		}
-
-		private void OnOtherReplaced(int index, TSource oldValue, TSource newValue)
-		{
-		}
-
-		private void OnOtherReset(IReadOnlyList<TSource> newItems) => Recalculate();
-
-		private void OtherItemModified(int index, TSource value)
-		{
-		}
+		protected override void ItemModified(int index, TSource value) => OnReplaced(index, value, value);
 	}
 }

@@ -84,6 +84,30 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		}
 
 		[Fact]
+		public void MoveToLeaveEqual()
+		{
+			CreateLists(out IActiveValue<bool> sut, out Func<bool> linq, out ObservableList<IntegerTestClass> listOne, out ObservableList<IntegerTestClass> listTwo, new[] { 1, 2, 1 }, new[] { 1, 2, 1 });
+
+			Assert.Equal(sut.Value, linq.Invoke());
+
+			listTwo.Move(0, 2);
+
+			Assert.Equal(sut.Value, linq.Invoke());
+		}
+
+		[Fact]
+		public void MoveToLeaveNotEqual()
+		{
+			CreateLists(out IActiveValue<bool> sut, out Func<bool> linq, out ObservableList<IntegerTestClass> listOne, out ObservableList<IntegerTestClass> listTwo, new[] { 2, 1, 3 }, new[] { 1, 2, 3 });
+
+			Assert.Equal(sut.Value, linq.Invoke());
+
+			listTwo.Move(1, 2);
+
+			Assert.Equal(sut.Value, linq.Invoke());
+		}
+
+		[Fact]
 		public void ReplaceToMakeNotEqual()
 		{
 			CreateLists(out IActiveValue<bool> sut, out Func<bool> linq, out ObservableList<IntegerTestClass> listOne, out ObservableList<IntegerTestClass> listTwo, new[] { 1, 2, 3 }, new[] { 1, 2, 3 });
