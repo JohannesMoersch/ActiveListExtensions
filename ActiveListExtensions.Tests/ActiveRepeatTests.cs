@@ -39,11 +39,11 @@ namespace ActiveListExtensions.Tests
 
 			var sut = ActiveEnumerable.ActiveRepeat(value, count);
 			var watcher = new CollectionSynchronizationWatcher<int>(sut);
-			var validator = new LinqValidator<int, int, int>(() => Enumerable.Repeat(value.Value, count.Value).ToArray(), sut, l => l, false, i => i);
+			var validator = new LinqValidator<int, int, int>(() => { try { return Enumerable.Repeat(value.Value, count.Value).ToArray(); } catch { return new int[0]; } }, sut, l => l, false, i => i);
 
 			foreach (var num in Enumerable.Range(0, 500))
 			{
-				count.Value = RandomGenerator.GenerateRandomInteger(0, 50);
+				count.Value = RandomGenerator.GenerateRandomInteger(-5, 50);
 				validator.Validate();
 			}
 		}

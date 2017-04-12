@@ -43,14 +43,19 @@ namespace ActiveListExtensions
 
 		private void CountChanged()
 		{
-			if (_countWatcher.Value > _resultList.Count)
+			var count = _countWatcher.Value;
+
+			if (count < 0)
+				count = 0;
+
+			if (count > _resultList.Count)
 			{
-				for (int i = _resultList.Count; i < _countWatcher.Value; ++i)
+				for (int i = _resultList.Count; i < count; ++i)
 					_resultList.Add(i, _valueWatcher.Value);
 			}
-			else if (_countWatcher.Value < _resultList.Count)
+			else if (count < _resultList.Count)
 			{
-				for (int i = _resultList.Count - 1; i >= _countWatcher.Value; --i)
+				for (int i = _resultList.Count - 1; i >= count; --i)
 					_resultList.Remove(i);
 			}
 		}

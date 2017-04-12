@@ -16,6 +16,7 @@ namespace ActiveListExtensions
 
 		private ObservableList<int, int> _resultList;
 
+		private int _start;
 		private ValueWatcher<int> _startWatcher;
 
 		private ValueWatcher<int> _countWatcher;
@@ -37,10 +38,57 @@ namespace ActiveListExtensions
 
 		private void StartChanged()
 		{
+			if (_startWatcher.Value > _start)
+			{
+				var max = _startWatcher.Value - _start;
+
+				if (max > _resultList.Count)
+					max = _resultList.Count;
+
+				for (int i = max - 1; i >= 0; --i)
+					_resultList.Remove(i);
+
+				_start = _startWatcher.Value;
+
+				for (int i = _resultList.Count; i < _countWatcher.Value; ++i)
+					_resultList.Add(i, _start + i);
+			}
+			else if (_startWatcher.Value < _start)
+			{
+				var min = _startWatcher.Value - _start;
+
+				if (min < 0)
+					min = 0;
+
+				for (int i = _resultList.Count - 1; i >= min; --i)
+					_resultList.Remove(i);
+
+				_start = _startWatcher.Value;
+
+				var max = _countWatcher.Value - _resultList.Count;
+
+				for (int i = 0; i < max; ++i)
+					_resultList.Add(i, _start + i);
+			}
 		}
 
 		private void CountChanged()
 		{
+			var count = _countWatcher.Value;
+
+			if (count < 0)
+				count = 0;
+
+			if (count > _resultList.Count)
+			{
+				for (int i = _resultList.Count; i < count; ++i)
+					_resultList.Add(i, _startWatcher.Value + i);
+			}
+			else if (count < _resultList.Count)
+			{
+				for (int i = _resultList.Count - 1; i >= count; --i)
+					_resultList.Remove(i);
+			}
 		}
 
 		protected override void OnDisposed()
