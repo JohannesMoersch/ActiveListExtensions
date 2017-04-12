@@ -11,8 +11,8 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions
 {
-    public static class ActiveListExtensions
-    {
+	public static class ActiveListExtensions
+	{
 		public static IActiveList<T> ToActiveList<T>(this IEnumerable<T> source)
 		{
 			if (source == null)
@@ -143,7 +143,7 @@ namespace ActiveListExtensions
 
 		public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Expression<Func<TFirst, TSecond, TResult>> resultSelector) => ActiveZip(source, otherSource, resultSelector.Compile(), resultSelector.GetReferencedProperties());
 
-        public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch) => ActiveZip(source, otherSource, resultSelector, Tuple.Create(sourcePropertiesToWatch, otherSourcePropertiesToWatch));
+		public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch) => ActiveZip(source, otherSource, resultSelector, Tuple.Create(sourcePropertiesToWatch, otherSourcePropertiesToWatch));
 
 		private static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveZip<TFirst, TSecond, object, TResult>(source, otherSource, resultSelector, propertiesToWatch.Item1, propertiesToWatch.Item2);
 

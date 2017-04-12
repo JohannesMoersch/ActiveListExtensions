@@ -287,21 +287,5 @@ namespace ActiveListExtensions
 		public static IActiveValue<decimal> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, decimal> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveAverageOrDefault(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
 
 		private static IActiveValue<decimal> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, decimal> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveAverageOrDefault<TSource, TParameter, decimal, decimal>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => i1 / i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
-
-
-		// --SequenceEqual
-		// --FirstOrDefault
-		// --LastOrDefault
-		// --SingleOrDefault
-		// --ElementAtOrDefault
-		// ElementsAtOrDefault
-		// --Any
-		// --All
-		// --Count
-		// --Contains
-		// --SumOrDefault
-		// --MinOrDefault
-		// --MaxOrDefault
-		// --AverageOrDefault
 	}
 }

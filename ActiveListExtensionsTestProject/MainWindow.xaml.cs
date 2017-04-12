@@ -96,8 +96,6 @@ namespace ActiveListExtensionsTestProject
 			Source.Add(new TestData(2, "Two", "Def"));
 			Source.Add(new TestData(3, "Three", "Ghi"));
 
-			var average = new int[0].Average();
-
 			var activeList = (Source as IList<TestData>).ToActiveList();
 
 			Data = activeList.ActiveWhere(x => x.One % 2 == 0).ActiveSelect(x => $"{x.One} - {x.Two}");
