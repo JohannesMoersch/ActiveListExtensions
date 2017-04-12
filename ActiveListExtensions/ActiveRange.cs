@@ -16,9 +16,9 @@ namespace ActiveListExtensions
 
 		private ObservableList<int, int> _resultList;
 
-		private IActiveValue<int> _start;
+		private ValueWatcher<int> _startWatcher;
 
-		private IActiveValue<int> _count;
+		private ValueWatcher<int> _countWatcher;
 
 		public ActiveRange(IActiveValue<int> start, IActiveValue<int> count)
 		{
@@ -26,11 +26,28 @@ namespace ActiveListExtensions
 			_resultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);
 			_resultList.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
 
-			_start = start;
+			_startWatcher = new ValueWatcher<int>(start, null);
+			_startWatcher.ValueOrValuePropertyChanged += StartChanged;
 
-			_count = count;
+			_countWatcher = new ValueWatcher<int>(count, null);
+			_countWatcher.ValueOrValuePropertyChanged += CountChanged;
+
+			CountChanged();
 		}
 
+		private void StartChanged()
+		{
+		}
+
+		private void CountChanged()
+		{
+		}
+
+		protected override void OnDisposed()
+		{
+			_startWatcher.Dispose();
+			_countWatcher.Dispose();
+		}
 		public override IEnumerator<int> GetEnumerator() => _resultList.GetEnumerator();
 	}
 }

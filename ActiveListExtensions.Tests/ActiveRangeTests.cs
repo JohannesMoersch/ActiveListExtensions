@@ -13,6 +13,8 @@ namespace ActiveListExtensions.Tests
 		[Fact]
 		public void RandomlyChangeStart()
 		{
+			RandomGenerator.ResetRandomGenerator();
+
 			var start = new ActiveValue<int>(0);
 			var count = new ActiveValue<int>(10);
 
@@ -30,6 +32,8 @@ namespace ActiveListExtensions.Tests
 		[Fact]
 		public void RandomlyChangeCount()
 		{
+			RandomGenerator.ResetRandomGenerator();
+
 			var start = new ActiveValue<int>(0);
 			var count = new ActiveValue<int>(10);
 

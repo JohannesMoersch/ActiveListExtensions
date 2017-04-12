@@ -13,12 +13,14 @@ namespace ActiveListExtensions.Tests
 		[Fact]
 		public void RandomlyChangeStart()
 		{
+			RandomGenerator.ResetRandomGenerator();
+
 			var value = new ActiveValue<int>(0);
 			var count = new ActiveValue<int>(10);
 
-			var sut = ActiveEnumerable.ActiveRange(value, count);
+			var sut = ActiveEnumerable.ActiveRepeat(value, count);
 			var watcher = new CollectionSynchronizationWatcher<int>(sut);
-			var validator = new LinqValidator<int, int, int>(() => Enumerable.Range(value.Value, count.Value).ToArray(), sut, l => l, false, i => i);
+			var validator = new LinqValidator<int, int, int>(() => Enumerable.Repeat(value.Value, count.Value).ToArray(), sut, l => l, false, i => i);
 
 			foreach (var num in Enumerable.Range(0, 500))
 			{
@@ -30,12 +32,14 @@ namespace ActiveListExtensions.Tests
 		[Fact]
 		public void RandomlyChangeCount()
 		{
+			RandomGenerator.ResetRandomGenerator();
+
 			var value = new ActiveValue<int>(0);
 			var count = new ActiveValue<int>(10);
 
-			var sut = ActiveEnumerable.ActiveRange(value, count);
+			var sut = ActiveEnumerable.ActiveRepeat(value, count);
 			var watcher = new CollectionSynchronizationWatcher<int>(sut);
-			var validator = new LinqValidator<int, int, int>(() => Enumerable.Range(value.Value, count.Value).ToArray(), sut, l => l, false, i => i);
+			var validator = new LinqValidator<int, int, int>(() => Enumerable.Repeat(value.Value, count.Value).ToArray(), sut, l => l, false, i => i);
 
 			foreach (var num in Enumerable.Range(0, 500))
 			{

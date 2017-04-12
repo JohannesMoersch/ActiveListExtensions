@@ -15,7 +15,7 @@ namespace ActiveListExtensions
 
 		public static IActiveList<int> ActiveRange(IActiveValue<int> start, IActiveValue<int> count) => new ActiveRange(start, count);
 
-		public static IActiveList<TValue> ActiveRepeat<TValue>(TValue value, IActiveValue<int> count) => ActiveRepeat(new ActiveValueWrapper<TValue>(value) as IActiveValue<TValue>, count);
+		public static IActiveList<TValue> ActiveRepeatConstant<TValue>(TValue value, IActiveValue<int> count) => ActiveRepeat(new ActiveValueWrapper<TValue>(value) as IActiveValue<TValue>, count);
 
 		public static IActiveList<TValue> ActiveRepeat<TValue>(IActiveValue<TValue> value, int count) => ActiveRepeat(value, new ActiveValueWrapper<int>(count));
 

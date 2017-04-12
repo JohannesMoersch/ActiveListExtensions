@@ -16,9 +16,9 @@ namespace ActiveListExtensions
 
 		private ObservableList<TValue, TValue> _resultList;
 
-		private IActiveValue<TValue> _value;
+		private ValueWatcher<TValue> _valueWatcher;
 
-		private IActiveValue<int> _count;
+		private ValueWatcher<int> _countWatcher;
 
 		public ActiveRepeat(IActiveValue<TValue> value, IActiveValue<int> count)
 		{
@@ -26,9 +26,39 @@ namespace ActiveListExtensions
 			_resultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);
 			_resultList.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
 
-			_value = value;
+			_valueWatcher = new ValueWatcher<TValue>(value, null);
+			_valueWatcher.ValueOrValuePropertyChanged += ValueChanged;
 
-			_count = count;
+			_countWatcher = new ValueWatcher<int>(count, null);
+			_countWatcher.ValueOrValuePropertyChanged += CountChanged;
+
+			CountChanged();
+		}
+
+		private void ValueChanged()
+		{
+			for (int i = 0; i < _resultList.Count; ++i)
+				_resultList.Replace(i, _valueWatcher.Value);
+		}
+
+		private void CountChanged()
+		{
+			if (_countWatcher.Value > _resultList.Count)
+			{
+				for (int i = _resultList.Count; i < _countWatcher.Value; ++i)
+					_resultList.Add(i, _valueWatcher.Value);
+			}
+			else if (_countWatcher.Value < _resultList.Count)
+			{
+				for (int i = _resultList.Count - 1; i >= _countWatcher.Value; --i)
+					_resultList.Remove(i);
+			}
+		}
+
+		protected override void OnDisposed()
+		{
+			_valueWatcher.Dispose();
+			_countWatcher.Dispose();
 		}
 
 		public override IEnumerator<TValue> GetEnumerator() => _resultList.GetEnumerator();

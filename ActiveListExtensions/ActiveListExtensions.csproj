@@ -50,6 +50,7 @@
     <Compile Include="IActiveGrouping.cs" />
     <Compile Include="IActiveLookup.cs" />
     <Compile Include="IActiveValue.cs" />
+    <Compile Include="IMutableActiveValue.cs" />
     <Compile Include="ListModifiers\ActiveDistinct.cs" />
     <Compile Include="ListModifiers\ActiveExcept.cs" />
     <Compile Include="ListModifiers\ActiveIntersect.cs" />
