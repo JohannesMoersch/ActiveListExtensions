@@ -6,11 +6,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using ActiveListExtensions.Modifiers;
+using ActiveListExtensions.ListModifiers;
 using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions
 {
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class ActiveListExtensions
 	{
 		public static IActiveList<T> ToActiveList<T>(this IEnumerable<T> source)

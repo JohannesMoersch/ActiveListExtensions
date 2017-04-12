@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	public class ActiveValueWrapper<TValue> : IActiveValue<TValue>
+	internal class ActiveValueWrapper<TValue> : IActiveValue<TValue>
 	{
 		public TValue Value { get; }
 

@@ -5,10 +5,10 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ActiveListExtensions.Modifiers.Bases;
+using ActiveListExtensions.ListModifiers.Bases;
 using ActiveListExtensions.Utilities;
 
-namespace ActiveListExtensions.Modifiers
+namespace ActiveListExtensions.ListModifiers
 {
 	internal class ActiveSelect<TSource, TParameter, TResult> : ActiveListBase<TSource, TResult, TParameter, TResult>
 	{

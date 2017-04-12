@@ -5,9 +5,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ActiveListExtensions.Modifiers.Bases;
+using ActiveListExtensions.ListModifiers.Bases;
 
-namespace ActiveListExtensions.Modifiers
+namespace ActiveListExtensions.ListModifiers
 {
 	internal class ActiveTake<TSource> : ActiveListListenerBase<TSource, TSource>
 	{

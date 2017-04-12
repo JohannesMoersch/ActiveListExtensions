@@ -1,11 +1,11 @@
-﻿using ActiveListExtensions.Modifiers.Bases;
+﻿using ActiveListExtensions.ListModifiers.Bases;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ActiveListExtensions.Modifiers
+namespace ActiveListExtensions.ListModifiers
 {
     internal class ActiveZip<TSource, TOtherSource, TParameter, TResult> : ActiveMultiListBase<TSource, TOtherSource, TParameter, TResult>
     {

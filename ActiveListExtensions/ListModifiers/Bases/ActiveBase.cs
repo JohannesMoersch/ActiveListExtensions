@@ -8,9 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ActiveListExtensions.Utilities;
 
-namespace ActiveListExtensions.Modifiers.Bases
+namespace ActiveListExtensions.ListModifiers.Bases
 {
-	internal abstract class ActiveBase<TSource, TResult> : IActiveList<TResult>
+	internal abstract class ActiveBase<TResult> : IActiveList<TResult>
 	{
 		public abstract int Count { get; }
 

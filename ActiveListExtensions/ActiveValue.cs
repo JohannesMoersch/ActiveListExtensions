@@ -7,7 +7,14 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions
 {
-	public class ActiveValue<TValue> : IActiveValue<TValue>
+	public static class ActiveValue
+	{
+		public static IMutableActiveValue<TValue> Create<TValue>() => new ActiveValue<TValue>(default(TValue));
+
+		public static IMutableActiveValue<TValue> Create<TValue>(TValue value) => new ActiveValue<TValue>(value);
+	}
+
+	internal class ActiveValue<TValue> : IMutableActiveValue<TValue>
 	{
 		private TValue _value;
 		public TValue Value

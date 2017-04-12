@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ActiveListExtensions.Utilities;
 
-namespace ActiveListExtensions.Modifiers.Bases
+namespace ActiveListExtensions.ListModifiers.Bases
 {
 	internal abstract class ActiveMultiListBase<TSource, TOtherSources, TParameter, TResult> : ActiveMultiListListenerBase<TSource, TOtherSources, TParameter, TResult>
 	{

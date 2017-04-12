@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ActiveListExtensions.Utilities;
 
-namespace ActiveListExtensions.Modifiers.Bases
+namespace ActiveListExtensions.ListModifiers.Bases
 {
 	internal abstract class ActiveMultiListListenerBase<TSource, TOtherSources, TParameter, TResult> : ActiveListListenerBase<TSource, TParameter, TResult>
 	{
