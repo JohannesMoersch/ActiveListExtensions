@@ -22,6 +22,15 @@ namespace ActiveListExtensions
 			}
 		}
 
+		public ActiveValue()
+		{
+		}
+
+		public ActiveValue(TValue initialValue)
+		{
+			Value = initialValue;
+		}
+
 		public void Dispose() { }
 
 		public event PropertyChangedEventHandler PropertyChanged;

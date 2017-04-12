@@ -80,6 +80,7 @@
     <Compile Include="ValueModifiers\ActiveMinOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveMutateList.cs" />
     <Compile Include="ValueModifiers\ActiveMutateValue.cs" />
+    <Compile Include="ValueModifiers\ActiveSequenceEqual.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveValueListener.cs" />
     <Compile Include="Utilities\CollectionWrapper.cs" />
