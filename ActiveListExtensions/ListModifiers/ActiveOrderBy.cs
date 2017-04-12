@@ -1,4 +1,4 @@
-﻿using ActiveListExtensions.Modifiers.Bases;
+﻿using ActiveListExtensions.ListModifiers.Bases;
 using ActiveListExtensions.Utilities;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ActiveListExtensions.Modifiers
+namespace ActiveListExtensions.ListModifiers
 {
 	internal class ActiveOrderBy<TSource, TKey> : ActiveListBase<TSource, ActiveOrderBy<TSource, TKey>.ItemSet, ListSortDirection, TSource>
 		where TKey : IComparable<TKey>

@@ -2,6 +2,7 @@
 using ActiveListExtensions.ValueModifiers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions
 {
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class ActiveValueExtensions
 	{
 		public static IActiveValue<TValue> ToActiveValue<TSource, TValue>(this TSource source, Expression<Func<TSource, TValue>> valueGetter) => ToActiveValue<TSource, TValue>(source, valueGetter.Compile(), valueGetter.GetReferencedProperties());

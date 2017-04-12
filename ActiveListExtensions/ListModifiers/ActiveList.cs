@@ -5,13 +5,13 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ActiveListExtensions.Modifiers.Bases;
+using ActiveListExtensions.ListModifiers.Bases;
 using ActiveListExtensions.Utilities;
 using System.ComponentModel;
 
-namespace ActiveListExtensions.Modifiers
+namespace ActiveListExtensions.ListModifiers
 {
-	internal class ActiveList<T> : ActiveBase<T, T>
+	internal class ActiveList<T> : ActiveBase<T>
 	{
 		public override int Count => _collection.Count;
 

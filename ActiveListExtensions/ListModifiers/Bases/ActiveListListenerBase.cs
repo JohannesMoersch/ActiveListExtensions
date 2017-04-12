@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ActiveListExtensions.Utilities;
 using System.ComponentModel;
 
-namespace ActiveListExtensions.Modifiers.Bases
+namespace ActiveListExtensions.ListModifiers.Bases
 {
 	internal abstract class ActiveListListenerBase<TSource, TResult> : ActiveListListenerBase<TSource, object, TResult>
 	{
@@ -16,7 +16,7 @@ namespace ActiveListExtensions.Modifiers.Bases
 		}
 	}
 
-	internal abstract class ActiveListListenerBase<TSource, TParameter, TResult> : ActiveBase<TSource, TResult>
+	internal abstract class ActiveListListenerBase<TSource, TParameter, TResult> : ActiveBase<TResult>
 	{
 		private CollectionWrapper<TSource> _sourceList;
 

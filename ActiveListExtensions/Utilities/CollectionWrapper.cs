@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	public class CollectionWrapper<T> : IReadOnlyList<T>, IDisposable
+	internal class CollectionWrapper<T> : IReadOnlyList<T>, IDisposable
 	{
 		public T this[int index]
 		{
