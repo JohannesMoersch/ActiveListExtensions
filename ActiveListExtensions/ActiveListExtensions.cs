@@ -20,7 +20,7 @@ namespace ActiveListExtensions
 				throw new ArgumentNullException(nameof(source));
 			if (source is IActiveList<T> list)
 				return list;
-			var readonlyList = source as IReadOnlyList<T> ?? new ListToReadOnlyWrapper<T>(source as IList<T> ?? source.ToList());
+			var readonlyList = source.ToReadOnlyList();
 			return new ActiveList<T>(new ActiveValueWrapper<IReadOnlyList<T>>(readonlyList));
 		}
 
@@ -28,7 +28,7 @@ namespace ActiveListExtensions
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
-			var readonlyListValue = source as IActiveValue<IReadOnlyList<T>> ?? source.ActiveMutate(l => l as IReadOnlyList<T> ?? new ListToReadOnlyWrapper<T>(l as IList<T> ?? l.ToList()));
+			var readonlyListValue = source as IActiveValue<IReadOnlyList<T>> ?? source.ActiveMutate(l => l.ToReadOnlyList());
 			return new ActiveList<T>(readonlyListValue);
 		}
 
@@ -63,6 +63,11 @@ namespace ActiveListExtensions
 		public static IActiveList<TResult> ActiveSelectMany<TSource, TParameter, TResult>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, IEnumerable<TResult>> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveSelectMany(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
 
 		private static IActiveList<TResult> ActiveSelectMany<TSource, TParameter, TResult>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, IEnumerable<TResult>> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSelectMany<TSource, TParameter, TResult>(source, selector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+
+		public static IActiveList<TSource> ActiveElementsAtOrEmpty<TSource>(this IActiveList<TSource> source, params int[] indexes) => new ActiveElementsOrEmpty<TSource>(source, indexes);
+
+		public static IActiveList<TSource> ActiveElementsAtOrEmpty<TSource>(this IActiveList<TSource> source, IEnumerable<int> indexes) => new ActiveElementsOrEmpty<TSource>(source, indexes.ToReadOnlyList());
 
 
 		public static IActiveList<TSource> ActiveTake<TSource>(this IActiveList<TSource> source, int count) => new ActiveTake<TSource>(source, new ActiveValueWrapper<int>(count));
