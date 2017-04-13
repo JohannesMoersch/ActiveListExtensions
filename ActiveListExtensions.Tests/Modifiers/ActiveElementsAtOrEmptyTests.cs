@@ -27,9 +27,11 @@ namespace ActiveListExtensions.Tests.Modifiers
 
 		private IEnumerable<int> ElementsAtOrEmpty(IReadOnlyList<int> listOne, IReadOnlyList<int> listTwo)
 		{
-			var indexes = new HashSet<int>(listTwo);
-			foreach (var item in listOne.Where((value, index) => indexes.Contains(index)))
-				yield return item;
+			foreach (var index in listTwo)
+			{
+				if (index >= 0 && index < listOne.Count)
+					yield return listOne[index];
+			}
 		}
 	}
 }
