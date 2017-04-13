@@ -12,6 +12,12 @@ namespace ActiveListExtensions.ListModifiers
 		public ActiveElementsOrEmpty(IActiveList<TSource> source, IReadOnlyList<int> indexes)
 			: base(source, null)
 		{
+			if (indexes == null)
+				throw new ArgumentNullException(nameof(indexes));
+
+			AddSourceCollection(0, indexes);
+
+			Initialize();
 		}
 
 		protected override void OnAdded(int index, TSource value)
