@@ -110,6 +110,7 @@
     <Compile Include="Modifiers\ActiveReverseTests.cs" />
     <Compile Include="Modifiers\ActiveSelectTests.cs" />
     <Compile Include="Modifiers\ActiveSelectManyTests.cs" />
+    <Compile Include="Modifiers\ActiveSelectValueTests.cs" />
     <Compile Include="Modifiers\ActiveSkipTests.cs" />
     <Compile Include="Modifiers\ActiveTakeTests.cs" />
     <Compile Include="Modifiers\ActiveUnionTests.cs" />

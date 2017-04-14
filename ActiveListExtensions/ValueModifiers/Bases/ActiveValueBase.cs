@@ -17,7 +17,12 @@ namespace ActiveListExtensions.ValueModifiers.Bases
 			{
 				if (Equals(_value, value))
 					return;
+
+				var oldValue = _value;
 				_value = value;
+
+				ValueChanged?.Invoke(this, new ActiveValueChangedEventArgs<TValue>(oldValue, _value));
+
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
 			}
 		}
@@ -35,5 +40,7 @@ namespace ActiveListExtensions.ValueModifiers.Bases
 		protected abstract void OnDisposed();
 
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		public event ActiveValueChangedEventHandler<TValue> ValueChanged;
 	}
 }

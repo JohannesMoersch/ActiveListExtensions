@@ -18,7 +18,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 		public ActiveListBase(IActiveList<TSource> source, Func<TResultItem, TResult> resultSelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcerPropertiesToWatch = null, IEnumerable<string> parameterPropertiesToWatch = null)
 			: base(source, parameter, sourcerPropertiesToWatch, parameterPropertiesToWatch)
 		{
-			ResultList = new ObservableList<TResultItem, TResult>(resultSelector);
+			ResultList = CreateResultList(resultSelector);
 			ResultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);
 			ResultList.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
 		}
@@ -28,6 +28,8 @@ namespace ActiveListExtensions.ListModifiers.Bases
 			ResultList.Dispose();
 			base.OnDisposed();
 		}
+
+		protected virtual ObservableList<TResultItem, TResult> CreateResultList(Func<TResultItem, TResult> resultSelector) => new ObservableList<TResultItem, TResult>(resultSelector);
 
 		public override IEnumerator<TResult> GetEnumerator() => (ResultList as IActiveList<TResult>).GetEnumerator();
 	}

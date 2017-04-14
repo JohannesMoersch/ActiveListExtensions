@@ -74,8 +74,10 @@
     <Compile Include="ListModifiers\ActiveTake.cs" />
     <Compile Include="ListModifiers\ActiveWhere.cs" />
     <Compile Include="ListModifiers\Bases\ActiveMultiListListenerBase.cs" />
+    <Compile Include="ListModifiers\Bases\ActiveSelectBase.cs" />
     <Compile Include="ListModifiers\Bases\ActiveSetBase.cs" />
     <Compile Include="ListModifiers\Bases\ActiveWhereBase.cs" />
+    <Compile Include="Utilities\ActiveValueList.cs" />
     <Compile Include="Utilities\ActiveValueWrapper.cs" />
     <Compile Include="Utilities\BooleanList.cs" />
     <Compile Include="Utilities\ValueWatcher.cs" />

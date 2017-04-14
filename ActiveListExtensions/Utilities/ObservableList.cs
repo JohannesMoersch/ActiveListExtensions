@@ -9,96 +9,126 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	internal class ObservableList<T> : ObservableList<T, T>
+	internal class ObservableList<T> : ObservableList<T, T, T>
 	{
 		public ObservableList()
 			: base(i => i)
 		{
 		}
+
+		protected override T GetStoreFromSource(T source) => source;
+
+		protected override void DisposeOfStore(T store) { }
 	}
 
-	internal class ObservableList<TSource, TResult> : IActiveList<TResult>
+	internal class ObservableList<TSource, TResult> : ObservableList<TSource, TSource, TResult>
+	{
+		public ObservableList(Func<TSource, TResult> itemSelector)
+			: base(itemSelector)
+		{
+		}
+
+		protected override TSource GetStoreFromSource(TSource source) => source;
+
+		protected override void DisposeOfStore(TSource store) { }
+	}
+
+	internal abstract class ObservableList<TSource, TStore, TResult> : IActiveList<TResult>
 	{
 		private int _skipStart, _skipCount;
 
-		public TSource this[int index]
+		public TStore this[int index]
 		{
 			get
 			{
 				if (index >= _skipStart)
 					index += _skipCount;
-				return _list[index];
+				return List[index];
 			}
 		}
 
 		TResult IReadOnlyList<TResult>.this[int index] => GetResultFromItem(this[index]);
 
-		public int Count => _list.Count - _skipCount;
+		public int Count => List.Count - _skipCount;
 
-		private IList<TSource> _list = new List<TSource>();
+		protected IList<TStore> List { get; }
 
-		private readonly Func<TSource, TResult> _itemSelector;
+		private readonly Func<TStore, TResult> _itemSelector;
 
-		public ObservableList(Func<TSource, TResult> itemSelector)
+		public ObservableList(Func<TStore, TResult> itemSelector)
 		{
+			List = new List<TStore>();
+
 			_itemSelector = itemSelector;
 		}
 
-		public void Dispose()
+		protected abstract TStore GetStoreFromSource(TSource source);
+
+		protected abstract void DisposeOfStore(TStore store);
+
+		public virtual void Dispose()
 		{
 			PropertyChanged = null;
 			CollectionChanged = null;
-			_list.Clear();
+			List.Clear();
 		}
 
-		public void Add(int index, TSource value)
+		public virtual void Add(int index, TSource value)
 		{
-			_list.Insert(index, value);
-			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, GetResultFromItem(value), index));
+			var store = GetStoreFromSource(value);
+			List.Insert(index, store);
+			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, GetResultFromItem(store), index));
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
 		}
 
-		public void Remove(int index)
+		public virtual void Remove(int index)
 		{
-			var value = _list[index];
-			_list.RemoveAt(index);
-			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, GetResultFromItem(value), index));
+			var store = List[index];
+			List.RemoveAt(index);
+			var value = GetResultFromItem(store);
+			DisposeOfStore(store);
+			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, index));
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
 		}
 
-		public void Replace(int index, TSource newValue)
+		public virtual void Replace(int index, TSource newValue)
 		{
-			var oldValue = _list[index];
-			_list[index] = newValue;
-			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, GetResultFromItem(newValue), GetResultFromItem(oldValue), index));
+			var oldStore = List[index];
+			var store = GetStoreFromSource(newValue);
+			List[index] = store;
+			var oldValue = GetResultFromItem(oldStore);
+			DisposeOfStore(oldStore);
+			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, GetResultFromItem(store), oldValue, index));
 		}
 
-		public void Move(int oldIndex, int newIndex)
+		public virtual void Move(int oldIndex, int newIndex)
 		{
 			if (oldIndex == newIndex)
 				return;
-			var value = _list[oldIndex];
-			_list.RemoveAt(oldIndex);
-			_list.Insert(newIndex, value);
-			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetResultFromItem(value), newIndex, oldIndex));
+			var value = List[oldIndex];
+			List.RemoveAt(oldIndex);
+			List.Insert(newIndex, value);
+			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetResultFromItem(value), newIndex, oldIndex));
 		}
 
-		public void Reset(IEnumerable<TSource> values)
+		public virtual void Reset(IEnumerable<TSource> values)
 		{
 			var oldCount = Count;
-			_list.Clear();
+			foreach (var item in List)
+				DisposeOfStore(item);
+			List.Clear();
 			foreach (var value in values)
-				_list.Add(value);
-			CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+				List.Add(GetStoreFromSource(value));
+			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 			if (oldCount != Count)
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
 		}
 
-		public void ReplaceRange(int startIndex, int oldCount, IReadOnlyList<TSource> newValues)
+		public virtual void ReplaceRange(int startIndex, int oldCount, IReadOnlyList<TSource> newValues)
 		{
 			try
 			{
-				var top = _list.Count - 1;
+				var top = List.Count - 1;
 				var bottom = startIndex + oldCount;
 				var diff = newValues.Count - oldCount;
 
@@ -109,11 +139,11 @@ namespace ActiveListExtensions.Utilities
 				if (diff > 0)
 				{
 					for (int i = 0; i < diff; ++i)
-						_list.Add(default(TSource));
+						List.Add(default(TStore));
 					for (int i = top; i >= bottom; --i)
-						_list[i + diff] = _list[i];
+						List[i + diff] = List[i];
 					for (int i = oldCount; i < newValues.Count; ++i)
-						_list[startIndex + i] = newValues[i];
+						List[startIndex + i] = GetStoreFromSource(newValues[i]);
 
 					_skipStart = startIndex + oldCount;
 					_skipCount = newValues.Count - oldCount;
@@ -121,7 +151,8 @@ namespace ActiveListExtensions.Utilities
 					{
 						--_skipCount;
 						++_skipStart;
-						CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, GetResultFromItem(newValues[i]), startIndex + i));
+						var index = startIndex + i;
+						NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, GetResultFromItem(List[index]), index));
 					}
 				}
 				else if (diff < 0)
@@ -132,14 +163,18 @@ namespace ActiveListExtensions.Utilities
 					for (int i = _skipStart; i >= end; --i)
 					{
 						++_skipCount;
-						CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, GetResultFromItem(_list[i]), i));
+						NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, GetResultFromItem(List[i]), i));
 						--_skipStart;
 					}
 
 					for (int i = bottom; i <= top; ++i)
-						_list[i + diff] = _list[i];
+						List[i + diff] = List[i];
 					for (int i = 0; i < -diff; ++i)
-						_list.RemoveAt(_list.Count - 1);
+					{
+						var store = List[List.Count - 1];
+						List.RemoveAt(List.Count - 1);
+						DisposeOfStore(store);
+					}
 				}
 
 				if (diff != 0)
@@ -152,18 +187,20 @@ namespace ActiveListExtensions.Utilities
 			}
 		}
 
-		private TResult GetResultFromItem(TSource item) => _itemSelector.Invoke(item);
+		protected TResult GetResultFromItem(TStore item) => _itemSelector.Invoke(item);
+
+		protected void NotifyOfCollectionChange(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-		private IEnumerable<TSource> EnumerateCollection()
+		private IEnumerable<TStore> EnumerateCollection()
 		{
 			for (int i = 0; i < Count; ++i)
 				yield return this[i];
 		}
 
-		public IEnumerator<TSource> GetEnumerator() => EnumerateCollection().GetEnumerator();
+		public IEnumerator<TStore> GetEnumerator() => EnumerateCollection().GetEnumerator();
 
 		IEnumerator<TResult> IEnumerable<TResult>.GetEnumerator() => EnumerateCollection().Select(i => GetResultFromItem(i)).GetEnumerator();
 
