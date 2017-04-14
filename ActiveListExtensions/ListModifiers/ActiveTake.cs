@@ -9,7 +9,7 @@ using ActiveListExtensions.ListModifiers.Bases;
 
 namespace ActiveListExtensions.ListModifiers
 {
-	internal class ActiveTake<TSource> : ActiveListListenerBase<TSource, TSource>
+	internal class ActiveTake<TSource> : ActiveListListenerBase<TSource, object, TSource>
 	{
 		private int _lastCount;
 		public override int Count

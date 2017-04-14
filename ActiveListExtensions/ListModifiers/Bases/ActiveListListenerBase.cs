@@ -8,14 +8,6 @@ using System.ComponentModel;
 
 namespace ActiveListExtensions.ListModifiers.Bases
 {
-	internal abstract class ActiveListListenerBase<TSource, TResult> : ActiveListListenerBase<TSource, object, TResult>
-	{
-		public ActiveListListenerBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null)
-			: base(source, propertiesToWatch)
-		{
-		}
-	}
-
 	internal abstract class ActiveListListenerBase<TSource, TParameter, TResult> : ActiveBase<TResult>
 	{
 		private CollectionWrapper<TSource> _sourceList;

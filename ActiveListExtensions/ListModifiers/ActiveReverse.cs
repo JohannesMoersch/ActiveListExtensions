@@ -9,7 +9,7 @@ using ActiveListExtensions.ListModifiers.Bases;
 
 namespace ActiveListExtensions.ListModifiers
 {
-	internal class ActiveReverse<TSource> : ActiveListListenerBase<TSource, TSource>
+	internal class ActiveReverse<TSource> : ActiveListListenerBase<TSource, object, TSource>
 	{
 		public override int Count => SourceList.Count;
 
