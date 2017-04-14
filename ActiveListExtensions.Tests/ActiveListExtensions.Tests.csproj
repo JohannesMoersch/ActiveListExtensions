@@ -101,6 +101,7 @@
     <Compile Include="Helpers\ValueTestHelpers.cs" />
     <Compile Include="Modifiers\ActiveConcatTests.cs" />
     <Compile Include="Modifiers\ActiveDistinctTests.cs" />
+    <Compile Include="Modifiers\ActiveElementsAtOrEmptyTests.cs" />
     <Compile Include="Modifiers\ActiveExceptTests.cs" />
     <Compile Include="Modifiers\ActiveGroupByTests.cs" />
     <Compile Include="Modifiers\ActiveIntersectTests.cs" />

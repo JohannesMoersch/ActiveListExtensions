@@ -25,25 +25,25 @@ namespace ActiveListExtensions
 		public static IActiveValue<TResult> ActiveMutate<TSource, TResult>(this IActiveList<TSource> source, Func<IReadOnlyList<TSource>, TResult> mutator) => new ActiveMutateList<TSource, TResult>(source, mutator);
 
 
-		public static IActiveValue<bool> ActiveSequenceEqual<TSource>(this IActiveList<TSource> source, IReadOnlyList<TSource> otherSource)
+		public static IActiveValue<bool> ActiveSequenceEqual<TSource>(this IActiveList<TSource> source, IEnumerable<TSource> otherSource)
 		{
 			var comparer = EqualityComparer<TSource>.Default;
-			return new ActiveSequenceEqual<TSource, object>(source, otherSource, (o1, o2) => comparer.Equals(o1, o2), null);
+			return new ActiveSequenceEqual<TSource, object>(source, otherSource.ToReadOnlyList(), (o1, o2) => comparer.Equals(o1, o2), null);
 		}
 
-		public static IActiveValue<bool> ActiveSequenceEqual<TSource>(this IActiveList<TSource> source, IReadOnlyList<TSource> otherSource, Expression<Func<TSource, TSource, bool>> comparer)
+		public static IActiveValue<bool> ActiveSequenceEqual<TSource>(this IActiveList<TSource> source, IEnumerable<TSource> otherSource, Expression<Func<TSource, TSource, bool>> comparer)
 		{
 			var properties = comparer.GetReferencedProperties();
 			return ActiveSequenceEqual(source, otherSource, comparer.Compile(), properties.Item1.Concat(properties.Item2).Distinct());
 		}
 
-		public static IActiveValue<bool> ActiveSequenceEqual<TSource>(this IActiveList<TSource> source, IReadOnlyList<TSource> otherSource, Func<TSource, TSource, bool> comparer, IEnumerable<string> propertiesToWatch) => new ActiveSequenceEqual<TSource, object>(source, otherSource, comparer, propertiesToWatch);
+		public static IActiveValue<bool> ActiveSequenceEqual<TSource>(this IActiveList<TSource> source, IEnumerable<TSource> otherSource, Func<TSource, TSource, bool> comparer, IEnumerable<string> propertiesToWatch) => new ActiveSequenceEqual<TSource, object>(source, otherSource.ToReadOnlyList(), comparer, propertiesToWatch);
 
-		public static IActiveValue<bool> ActiveSequenceEqual<TSource, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> otherSource, IActiveValue<TParameter> parameter, Expression<Func<TSource, TSource, TParameter, bool>> comparer) => ActiveSequenceEqual(source, otherSource, parameter, comparer.Compile(), comparer.GetReferencedProperties());
+		public static IActiveValue<bool> ActiveSequenceEqual<TSource, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> otherSource, IActiveValue<TParameter> parameter, Expression<Func<TSource, TSource, TParameter, bool>> comparer) => ActiveSequenceEqual(source, otherSource, parameter, comparer.Compile(), comparer.GetReferencedProperties());
 
-		public static IActiveValue<bool> ActiveSequenceEqual<TSource, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> otherSource, IActiveValue<TParameter> parameter, Func<TSource, TSource, TParameter, bool> comparer, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveSequenceEqual(source, otherSource, parameter, comparer, Tuple.Create(sourcePropertiesToWatch, Enumerable.Empty<string>(), parameterPropertiesToWatch));
+		public static IActiveValue<bool> ActiveSequenceEqual<TSource, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> otherSource, IActiveValue<TParameter> parameter, Func<TSource, TSource, TParameter, bool> comparer, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveSequenceEqual(source, otherSource, parameter, comparer, Tuple.Create(sourcePropertiesToWatch, Enumerable.Empty<string>(), parameterPropertiesToWatch));
 
-		private static IActiveValue<bool> ActiveSequenceEqual<TSource, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> otherSource, IActiveValue<TParameter> parameter, Func<TSource, TSource, TParameter, bool> comparer, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSequenceEqual<TSource, TParameter>(source, otherSource, parameter, comparer, propertiesToWatch.Item1.Concat(propertiesToWatch.Item2).Distinct(), propertiesToWatch.Item3);
+		private static IActiveValue<bool> ActiveSequenceEqual<TSource, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> otherSource, IActiveValue<TParameter> parameter, Func<TSource, TSource, TParameter, bool> comparer, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSequenceEqual<TSource, TParameter>(source, otherSource.ToReadOnlyList(), parameter, comparer, propertiesToWatch.Item1.Concat(propertiesToWatch.Item2).Distinct(), propertiesToWatch.Item3);
 
 
 		public static IActiveValue<TResult> ActiveCombine<TValue1, TValue2, TResult>(this IActiveValue<TValue1> value1, TValue2 value2, Expression<Func<TValue1, TValue2, TResult>> resultCombiner) => ActiveCombine(value1, new ActiveValueWrapper<TValue2>(value2), resultCombiner);

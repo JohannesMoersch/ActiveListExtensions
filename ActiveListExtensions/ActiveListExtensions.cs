@@ -20,7 +20,7 @@ namespace ActiveListExtensions
 				throw new ArgumentNullException(nameof(source));
 			if (source is IActiveList<T> list)
 				return list;
-			var readonlyList = source as IReadOnlyList<T> ?? new ListToReadOnlyWrapper<T>(source as IList<T> ?? source.ToList());
+			var readonlyList = source.ToReadOnlyList();
 			return new ActiveList<T>(new ActiveValueWrapper<IReadOnlyList<T>>(readonlyList));
 		}
 
@@ -28,7 +28,7 @@ namespace ActiveListExtensions
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
-			var readonlyListValue = source as IActiveValue<IReadOnlyList<T>> ?? source.ActiveMutate(l => l as IReadOnlyList<T> ?? new ListToReadOnlyWrapper<T>(l as IList<T> ?? l.ToList()));
+			var readonlyListValue = source as IActiveValue<IReadOnlyList<T>> ?? source.ActiveMutate(l => l.ToReadOnlyList());
 			return new ActiveList<T>(readonlyListValue);
 		}
 
@@ -65,6 +65,11 @@ namespace ActiveListExtensions
 		private static IActiveList<TResult> ActiveSelectMany<TSource, TParameter, TResult>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, IEnumerable<TResult>> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSelectMany<TSource, TParameter, TResult>(source, selector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
+		public static IActiveList<TSource> ActiveElementsAtOrEmpty<TSource>(this IActiveList<TSource> source, params int[] indexes) => new ActiveElementsOrEmpty<TSource>(source, indexes);
+
+		public static IActiveList<TSource> ActiveElementsAtOrEmpty<TSource>(this IActiveList<TSource> source, IEnumerable<int> indexes) => new ActiveElementsOrEmpty<TSource>(source, indexes.ToReadOnlyList());
+
+
 		public static IActiveList<TSource> ActiveTake<TSource>(this IActiveList<TSource> source, int count) => new ActiveTake<TSource>(source, new ActiveValueWrapper<int>(count));
 
 		public static IActiveList<TSource> ActiveTake<TSource>(this IActiveList<TSource> source, IActiveValue<int> count) => new ActiveTake<TSource>(source, count);
@@ -94,43 +99,43 @@ namespace ActiveListExtensions
 		private static IActiveList<TSource> ActiveDistinct<TSource, TKey, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveDistinct<TKey, TSource, TParameter>(source, keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
-		public static IActiveList<TSource> ActiveUnion<TSource>(this IActiveList<TSource> source, IReadOnlyList<TSource> union) => new ActiveUnion<TSource, TSource, object>(source, union, o => o, null);
+		public static IActiveList<TSource> ActiveUnion<TSource>(this IActiveList<TSource> source, IEnumerable<TSource> union) => new ActiveUnion<TSource, TSource, object>(source, union.ToReadOnlyList(), o => o, null);
 
-		public static IActiveList<TSource> ActiveUnion<TSource, TKey>(this IActiveList<TSource> source, IReadOnlyList<TSource> union, Expression<Func<TSource, TKey>> keySelector) => ActiveUnion(source, union, keySelector.Compile(), keySelector.GetReferencedProperties());
+		public static IActiveList<TSource> ActiveUnion<TSource, TKey>(this IActiveList<TSource> source, IEnumerable<TSource> union, Expression<Func<TSource, TKey>> keySelector) => ActiveUnion(source, union, keySelector.Compile(), keySelector.GetReferencedProperties());
 
-		public static IActiveList<TSource> ActiveUnion<TSource, TKey>(this IActiveList<TSource> source, IReadOnlyList<TSource> union, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveUnion<TKey, TSource, object>(source, union, keySelector, propertiesToWatch);
+		public static IActiveList<TSource> ActiveUnion<TSource, TKey>(this IActiveList<TSource> source, IEnumerable<TSource> union, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveUnion<TKey, TSource, object>(source, union.ToReadOnlyList(), keySelector, propertiesToWatch);
 
-		public static IActiveList<TSource> ActiveUnion<TSource, TKey, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> union, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, TKey>> keySelector) => ActiveUnion(source, union, parameter, keySelector.Compile(), keySelector.GetReferencedProperties());
+		public static IActiveList<TSource> ActiveUnion<TSource, TKey, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> union, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, TKey>> keySelector) => ActiveUnion(source, union, parameter, keySelector.Compile(), keySelector.GetReferencedProperties());
 
-		public static IActiveList<TSource> ActiveUnion<TSource, TKey, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> union, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveUnion(source, union, parameter, keySelector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+		public static IActiveList<TSource> ActiveUnion<TSource, TKey, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> union, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveUnion(source, union, parameter, keySelector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
 
-		private static IActiveList<TSource> ActiveUnion<TSource, TKey, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> union, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveUnion<TKey, TSource, TParameter>(source, union, keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
-
-
-		public static IActiveList<TSource> ActiveIntersect<TSource>(this IActiveList<TSource> source, IReadOnlyList<TSource> intersect) => new ActiveIntersect<TSource, TSource, object>(source, intersect, o => o, null);
-
-		public static IActiveList<TSource> ActiveIntersect<TSource, TKey>(this IActiveList<TSource> source, IReadOnlyList<TSource> intersect, Expression<Func<TSource, TKey>> keySelector) => ActiveIntersect(source, intersect, keySelector.Compile(), keySelector.GetReferencedProperties());
-
-		public static IActiveList<TSource> ActiveIntersect<TSource, TKey>(this IActiveList<TSource> source, IReadOnlyList<TSource> intersect, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveIntersect<TKey, TSource, object>(source, intersect, keySelector, propertiesToWatch);
-
-		public static IActiveList<TSource> ActiveIntersect<TSource, TKey, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> intersect, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, TKey>> keySelector) => ActiveIntersect(source, intersect, parameter, keySelector.Compile(), keySelector.GetReferencedProperties());
-
-		public static IActiveList<TSource> ActiveIntersect<TSource, TKey, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> intersect, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveIntersect(source, intersect, parameter, keySelector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
-
-		private static IActiveList<TSource> ActiveIntersect<TSource, TKey, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> intersect, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveIntersect<TKey, TSource, TParameter>(source, intersect, keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
+		private static IActiveList<TSource> ActiveUnion<TSource, TKey, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> union, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveUnion<TKey, TSource, TParameter>(source, union.ToReadOnlyList(), keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
-		public static IActiveList<TSource> ActiveExcept<TSource>(this IActiveList<TSource> source, IReadOnlyList<TSource> except) => new ActiveExcept<TSource, TSource, object>(source, except, o => o, null);
+		public static IActiveList<TSource> ActiveIntersect<TSource>(this IActiveList<TSource> source, IEnumerable<TSource> intersect) => new ActiveIntersect<TSource, TSource, object>(source, intersect.ToReadOnlyList(), o => o, null);
 
-		public static IActiveList<TSource> ActiveExcept<TSource, TKey>(this IActiveList<TSource> source, IReadOnlyList<TSource> except, Expression<Func<TSource, TKey>> keySelector) => ActiveExcept(source, except, keySelector.Compile(), keySelector.GetReferencedProperties());
+		public static IActiveList<TSource> ActiveIntersect<TSource, TKey>(this IActiveList<TSource> source, IEnumerable<TSource> intersect, Expression<Func<TSource, TKey>> keySelector) => ActiveIntersect(source, intersect, keySelector.Compile(), keySelector.GetReferencedProperties());
 
-		public static IActiveList<TSource> ActiveExcept<TSource, TKey>(this IActiveList<TSource> source, IReadOnlyList<TSource> except, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveExcept<TKey, TSource, object>(source, except, keySelector, propertiesToWatch);
+		public static IActiveList<TSource> ActiveIntersect<TSource, TKey>(this IActiveList<TSource> source, IEnumerable<TSource> intersect, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveIntersect<TKey, TSource, object>(source, intersect.ToReadOnlyList(), keySelector, propertiesToWatch);
 
-		public static IActiveList<TSource> ActiveExcept<TSource, TKey, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> except, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, TKey>> keySelector) => ActiveExcept(source, except, parameter, keySelector.Compile(), keySelector.GetReferencedProperties());
+		public static IActiveList<TSource> ActiveIntersect<TSource, TKey, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> intersect, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, TKey>> keySelector) => ActiveIntersect(source, intersect, parameter, keySelector.Compile(), keySelector.GetReferencedProperties());
 
-		public static IActiveList<TSource> ActiveExcept<TSource, TKey, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> except, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveExcept(source, except, parameter, keySelector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+		public static IActiveList<TSource> ActiveIntersect<TSource, TKey, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> intersect, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveIntersect(source, intersect, parameter, keySelector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
 
-		private static IActiveList<TSource> ActiveExcept<TSource, TKey, TParameter>(this IActiveList<TSource> source, IReadOnlyList<TSource> except, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveExcept<TKey, TSource, TParameter>(source, except, keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
+		private static IActiveList<TSource> ActiveIntersect<TSource, TKey, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> intersect, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveIntersect<TKey, TSource, TParameter>(source, intersect.ToReadOnlyList(), keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+
+		public static IActiveList<TSource> ActiveExcept<TSource>(this IActiveList<TSource> source, IEnumerable<TSource> except) => new ActiveExcept<TSource, TSource, object>(source, except.ToReadOnlyList(), o => o, null);
+
+		public static IActiveList<TSource> ActiveExcept<TSource, TKey>(this IActiveList<TSource> source, IEnumerable<TSource> except, Expression<Func<TSource, TKey>> keySelector) => ActiveExcept(source, except, keySelector.Compile(), keySelector.GetReferencedProperties());
+
+		public static IActiveList<TSource> ActiveExcept<TSource, TKey>(this IActiveList<TSource> source, IEnumerable<TSource> except, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch) => new ActiveExcept<TKey, TSource, object>(source, except.ToReadOnlyList(), keySelector, propertiesToWatch);
+
+		public static IActiveList<TSource> ActiveExcept<TSource, TKey, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> except, IActiveValue<TParameter> parameter, Expression<Func<TSource, TParameter, TKey>> keySelector) => ActiveExcept(source, except, parameter, keySelector.Compile(), keySelector.GetReferencedProperties());
+
+		public static IActiveList<TSource> ActiveExcept<TSource, TKey, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> except, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveExcept(source, except, parameter, keySelector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveList<TSource> ActiveExcept<TSource, TKey, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> except, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveExcept<TKey, TSource, TParameter>(source, except.ToReadOnlyList(), keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
 		public static IActiveList<TSource> ActiveOrderBy<TSource, TKey>(this IActiveList<TSource> source, Expression<Func<TSource, TKey>> keySelector, ListSortDirection sortDirection = ListSortDirection.Ascending) where TKey : IComparable<TKey> => ActiveOrderBy(source, keySelector.Compile(), keySelector.GetReferencedProperties(), new ActiveValueWrapper<ListSortDirection>(sortDirection));
@@ -146,13 +151,13 @@ namespace ActiveListExtensions
 
 		public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch) => ActiveZip(source, otherSource, resultSelector, Tuple.Create(sourcePropertiesToWatch, otherSourcePropertiesToWatch));
 
-		private static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveZip<TFirst, TSecond, object, TResult>(source, otherSource, resultSelector, propertiesToWatch.Item1, propertiesToWatch.Item2);
+		private static IActiveList<TResult> ActiveZip<TFirst, TSecond, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, Func<TFirst, TSecond, TResult> resultSelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveZip<TFirst, TSecond, object, TResult>(source, otherSource.ToReadOnlyList(), resultSelector, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 		public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TParameter, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, IActiveValue<TParameter> parameter, Expression<Func<TFirst, TSecond, TParameter, TResult>> resultSelector) => ActiveZip(source, otherSource, parameter, resultSelector.Compile(), resultSelector.GetReferencedProperties());
 
 		public static IActiveList<TResult> ActiveZip<TFirst, TSecond, TParameter, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, IActiveValue<TParameter> parameter, Func<TFirst, TSecond, TParameter, TResult> resultSelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> otherSourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveZip(source, otherSource, parameter, resultSelector, Tuple.Create(sourcePropertiesToWatch, otherSourcePropertiesToWatch, parameterPropertiesToWatch));
 
-		private static IActiveList<TResult> ActiveZip<TFirst, TSecond, TParameter, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, IActiveValue<TParameter> parameter, Func<TFirst, TSecond, TParameter, TResult> resultSelector, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveZip<TFirst, TSecond, TParameter, TResult>(source, otherSource, resultSelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2, propertiesToWatch.Item3);
+		private static IActiveList<TResult> ActiveZip<TFirst, TSecond, TParameter, TResult>(this IActiveList<TFirst> source, IEnumerable<TSecond> otherSource, IActiveValue<TParameter> parameter, Func<TFirst, TSecond, TParameter, TResult> resultSelector, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveZip<TFirst, TSecond, TParameter, TResult>(source, otherSource.ToReadOnlyList(), resultSelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2, propertiesToWatch.Item3);
 
 
 		public static IActiveList<IActiveGrouping<TKey, TSource>> ActiveGroupBy<TKey, TSource>(this IActiveList<TSource> source, Expression<Func<TSource, TKey>> keySelector) => ToActiveLookup(source, keySelector.Compile(), keySelector.GetReferencedProperties());
