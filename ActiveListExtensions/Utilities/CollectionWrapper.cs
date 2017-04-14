@@ -54,6 +54,8 @@ namespace ActiveListExtensions.Utilities
 
 			if (_collection is INotifyCollectionChanged)
 				CollectionChangedEventManager.AddHandler(_collection as INotifyCollectionChanged, HandleCollectionChange);
+
+			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		}
 
 		public void Reset() => HandleCollectionChange(_collection, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));

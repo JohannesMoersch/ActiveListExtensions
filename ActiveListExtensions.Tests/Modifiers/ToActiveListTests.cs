@@ -3,6 +3,7 @@ using ActiveListExtensions.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 			RandomGenerator.ResetRandomGenerator();
 
 			var value = new ActiveValue<IEnumerable<int>>();
-			value.Value = RandomGenerator.GenerateRandomIntegerList(100);
+			value.Value = RandomGenerator.GenerateRandomIntegerList(50);
 
 			var sut = value.ToActiveList();
 
@@ -27,6 +28,28 @@ namespace ActiveListExtensions.Tests.Modifiers
 			value.Value = RandomGenerator.GenerateRandomIntegerList(100);
 
 			Assert.True(value.Value.SequenceEqual(sut));
+		}
+
+		[Fact]
+		public void ReplaceListInActiveValueCausesReset()
+		{
+			RandomGenerator.ResetRandomGenerator();
+
+			var value = new ActiveValue<IEnumerable<int>>();
+			value.Value = RandomGenerator.GenerateRandomIntegerList(50);
+
+			var sut = value.ToActiveList();
+
+			bool resetTriggered = false;
+			sut.CollectionChanged += (s, e) =>
+			{
+				if (e.Action == NotifyCollectionChangedAction.Reset)
+					resetTriggered = true;
+			};
+
+			value.Value = RandomGenerator.GenerateRandomIntegerList(100);
+
+			Assert.True(resetTriggered);
 		}
 
 		[Fact]
