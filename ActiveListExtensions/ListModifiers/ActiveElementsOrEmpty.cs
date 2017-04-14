@@ -31,22 +31,20 @@ namespace ActiveListExtensions.ListModifiers
 
 			_indexes = new List<Item>();
 
-			AddSourceCollection(0, indexes);
-
 			Initialize();
+
+			AddSourceCollection(0, indexes);
 		}
 
 		protected override void OnAdded(int index, TSource value)
 		{
 			int currentAdjustment = 0;
-			for (int elementIndex = 0; elementIndex < SourceLists[0].Count; ++elementIndex)
+			for (int elementIndex = 0; elementIndex < _indexes.Count; ++elementIndex)
 			{
 				var item = _indexes[elementIndex];
 				var sourceIndex = SourceLists[0][elementIndex];
 
-				var sourceListCount = SourceList.Count - 1;
-
-				if (sourceIndex == sourceListCount)
+				if (sourceIndex == SourceList.Count - 1)
 				{
 					item = new Item(true, item.Index + currentAdjustment++);
 					_indexes[elementIndex] = item;
@@ -67,20 +65,62 @@ namespace ActiveListExtensions.ListModifiers
 
 		protected override void OnRemoved(int index, TSource value)
 		{
-			throw new NotImplementedException();
+			int currentAdjustment = 0;
+			for (int elementIndex = 0; elementIndex < _indexes.Count; ++elementIndex)
+			{
+				var item = _indexes[elementIndex];
+				var sourceIndex = SourceLists[0][elementIndex];
+
+				if (sourceIndex == SourceList.Count)
+				{
+					item = new Item(false, item.Index + currentAdjustment--);
+					_indexes[elementIndex] = item;
+					ResultList.Remove(item.Index);
+				}
+				else
+				{
+					if (currentAdjustment < 0)
+					{
+						item = new Item(item.InList, item.Index + currentAdjustment);
+						_indexes[elementIndex] = item;
+					}
+					if (item.InList)
+						ResultList.Replace(item.Index, SourceList[sourceIndex]);
+				}
+			}
 		}
 
 		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
-			throw new NotImplementedException();
+			int min, max;
+			if (oldIndex < newIndex)
+			{
+				min = oldIndex;
+				max = newIndex;
+			}
+			else
+			{
+				min = newIndex;
+				max = oldIndex;
+			}
+			for (int elementIndex = 0; elementIndex < _indexes.Count; ++elementIndex)
+			{
+				var sourceIndex = SourceLists[0][elementIndex];
+				if (sourceIndex >= min && sourceIndex <= max)
+					ResultList.Replace(_indexes[elementIndex].Index, SourceList[sourceIndex]);
+			}
 		}
 
 		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)
 		{
-			throw new NotImplementedException();
+			for (int elementIndex = 0; elementIndex < _indexes.Count; ++elementIndex)
+			{
+				if (index == SourceLists[0][elementIndex])
+					ResultList.Replace(_indexes[elementIndex].Index, newValue);
+			}
 		}
 
-		protected override void OnReset(IReadOnlyList<TSource> newItems) => ResultList.Reset(ElementsAtOrEmpty(SourceList, SourceLists[0]));
+		protected override void OnReset(IReadOnlyList<TSource> newItems) => Reset();
 
 		protected override void OnAdded(int collectionIndex, int index, int value)
 		{
@@ -88,7 +128,7 @@ namespace ActiveListExtensions.ListModifiers
 			{
 				var item = GetItem(index, true);
 				_indexes.Insert(index, item);
-				AdjustIndexes(index + 1, 1);
+				RecalculateIndexes(index + 1, _indexes.Count - 1);
 				ResultList.Add(item.Index, SourceList[value]);
 			}
 			else
@@ -97,27 +137,79 @@ namespace ActiveListExtensions.ListModifiers
 
 		protected override void OnRemoved(int collectionIndex, int index, int value)
 		{
-			throw new NotImplementedException();
+			var item = _indexes[index];
+			_indexes.RemoveAt(index);
+			if (item.InList)
+			{
+				RecalculateIndexes(index, _indexes.Count - 1);
+				ResultList.Remove(item.Index);
+			}
 		}
 
 		protected override void OnMoved(int collectionIndex, int oldIndex, int newIndex, int value)
 		{
-			throw new NotImplementedException();
+			var oldItem = _indexes[oldIndex];
+
+			_indexes.RemoveAt(oldIndex);
+			_indexes.Insert(newIndex, oldItem);
+
+			if (oldItem.InList)
+			{
+				if (oldIndex < newIndex)
+					RecalculateIndexes(oldIndex, newIndex);
+				else
+					RecalculateIndexes(newIndex, oldIndex);
+
+				var newItem = _indexes[newIndex];
+
+				ResultList.Move(oldItem.Index, newItem.Index);
+			}
+			else
+				_indexes[newIndex] = GetItem(newIndex, false);
 		}
 
 		protected override void OnReplaced(int collectionIndex, int index, int oldValue, int newValue)
 		{
-			throw new NotImplementedException();
+			var nowInList = newValue >= 0 && newValue < SourceList.Count;
+			var item = _indexes[index];
+			if (item.InList != nowInList)
+			{
+				_indexes[index] = GetItem(index, nowInList);
+				if (nowInList)
+					ResultList.Add(item.Index, SourceList[newValue]);
+				else
+					ResultList.Remove(item.Index);
+				RecalculateIndexes(index + 1, _indexes.Count - 1);
+			}
+			else if (nowInList)
+				ResultList.Replace(item.Index, SourceList[newValue]);
 		}
 
-		protected override void OnReset(int collectionIndex, IReadOnlyList<int> newItems) => ResultList.Reset(ElementsAtOrEmpty(SourceList, SourceLists[0]));
+		protected override void OnReset(int collectionIndex, IReadOnlyList<int> newItems) => Reset();
 
-		private IEnumerable<TSource> ElementsAtOrEmpty(IReadOnlyList<TSource> listOne, IReadOnlyList<int> listTwo)
+		private void Reset()
 		{
-			foreach (var index in listTwo)
+			if (SourceLists.Count == 0)
+				return;
+
+			ResultList.Reset(GetResetValues());
+		}
+
+		private IEnumerable<TSource> GetResetValues()
+		{
+			_indexes.Clear();
+
+			int count = 0;
+			foreach (var index in SourceLists[0])
 			{
-				if (index >= 0 && index < listOne.Count)
-					yield return listOne[index];
+				if (index >= 0 && index < SourceList.Count)
+				{
+					var item = new Item(true, count++);
+					_indexes.Add(item);
+					yield return SourceList[index];
+				}
+				else
+					_indexes.Add(new Item(false, count));
 			}
 		}
 
@@ -129,19 +221,18 @@ namespace ActiveListExtensions.ListModifiers
 			return new Item(inList, item.InList ? item.Index + 1 : item.Index);
 		}
 
-		private void AdjustIndexes(int index, int adjustment)
+		private void RecalculateIndexes(int startIndex, int endIndex)
 		{
-			for (int i = _indexes.Count - 1; i >= index; --i)
+			var nextIndex = GetItem(startIndex, false).Index;
+
+			for (int i = startIndex; i <= endIndex; ++i)
 			{
 				var oldItem = _indexes[i];
-				var newIndex = oldItem.Index + adjustment;
-				if (oldItem.InList && newIndex >= SourceList.Count)
-				{
-					_indexes[i] = new Item(false, newIndex);
-					ResultList.Remove(oldItem.Index);
-				}
+
+				if (oldItem.InList)
+					_indexes[i] = new Item(true, nextIndex++);
 				else
-					_indexes[i] = new Item(oldItem.InList, newIndex);
+					_indexes[i] = new Item(false, nextIndex);
 			}
 		}
 	}
