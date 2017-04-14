@@ -57,6 +57,7 @@
     <Compile Include="ListModifiers\ActiveExcept.cs" />
     <Compile Include="ListModifiers\ActiveIntersect.cs" />
     <Compile Include="ListModifiers\ActiveLookup.cs" />
+    <Compile Include="ListModifiers\ActiveOfType.cs" />
     <Compile Include="ListModifiers\ActiveOrderBy.cs" />
     <Compile Include="ListModifiers\ActiveUnion.cs" />
     <Compile Include="ListModifiers\ActiveZip.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="ListModifiers\ActiveWhere.cs" />
     <Compile Include="ListModifiers\Bases\ActiveMultiListListenerBase.cs" />
     <Compile Include="ListModifiers\Bases\ActiveSetBase.cs" />
+    <Compile Include="ListModifiers\Bases\ActiveWhereBase.cs" />
     <Compile Include="Utilities\ActiveValueWrapper.cs" />
     <Compile Include="Utilities\BooleanList.cs" />
     <Compile Include="Utilities\ValueWatcher.cs" />

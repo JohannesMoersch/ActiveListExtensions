@@ -32,6 +32,10 @@ namespace ActiveListExtensions
 			return new ActiveList<T>(readonlyListValue);
 		}
 
+
+		public static IActiveList<TResult> ActiveOfType<TResult>(this IActiveList<object> source) => new ActiveOfType<TResult>(source);
+
+
 		public static IActiveList<TSource> ActiveWhere<TSource>(this IActiveList<TSource> source, Expression<Func<TSource, bool>> predicate) => ActiveWhere(source, predicate.Compile(), predicate.GetReferencedProperties());
 
 		public static IActiveList<TSource> ActiveWhere<TSource>(this IActiveList<TSource> source, Func<TSource, bool> predicate, IEnumerable<string> propertiesToWatch) => new ActiveWhere<TSource, object>(source, predicate, propertiesToWatch);
