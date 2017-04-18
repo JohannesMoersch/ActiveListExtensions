@@ -115,6 +115,7 @@
     <Compile Include="Modifiers\ActiveTakeTests.cs" />
     <Compile Include="Modifiers\ActiveUnionTests.cs" />
     <Compile Include="Modifiers\ActiveWhereTests.cs" />
+    <Compile Include="Modifiers\ActiveWhereValueTests.cs" />
     <Compile Include="Modifiers\ActiveZipTests.cs" />
     <Compile Include="Modifiers\ToActiveListTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

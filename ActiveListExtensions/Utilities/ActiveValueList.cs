@@ -11,25 +11,26 @@ namespace ActiveListExtensions.Utilities
 	{
 		internal class ValueStore : IDisposable
 		{
-			public IActiveValue<T> Value { get; }
+			private IActiveValue<T> _value;
+			public T Value => _value.Value;
 
 			public int Index { get; set; }
 
 			public ValueStore(IActiveValue<T> value)
 			{
-				Value = value;
-				Value.ValueChanged += ValueChangedHandler;
+				_value = value;
+				_value.ValueChanged += ValueChangedHandler;
 			}
 
 			private void ValueChangedHandler(IActiveValue<T> activeValue, IActiveValueChangedEventArgs<T> eventArgs) => ValueChanged?.Invoke(eventArgs.OldValue, eventArgs.NewValue, Index);
 
-			public void Dispose() => Value.ValueChanged -= ValueChangedHandler;
+			public void Dispose() => _value.ValueChanged -= ValueChangedHandler;
 
 			public event Action<T, T, int> ValueChanged;
 		}
 
 		public ActiveValueList() 
-			: base(i => i.Value.Value)
+			: base(i => i.Value)
 		{
 		}
 
