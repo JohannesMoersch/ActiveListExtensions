@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActiveListExtensions.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActiveListExtensions.Reactive", "ActiveListExtensions.Reactive\ActiveListExtensions.Reactive.csproj", "{51F83DF6-0253-4564-BA29-997E8A99B539}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActiveListExtensions.Data", "ActiveListExtensions.Data\ActiveListExtensions.Data.csproj", "{88BAECBA-11B5-4A86-8EB0-018E62D83E54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{51F83DF6-0253-4564-BA29-997E8A99B539}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51F83DF6-0253-4564-BA29-997E8A99B539}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51F83DF6-0253-4564-BA29-997E8A99B539}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88BAECBA-11B5-4A86-8EB0-018E62D83E54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88BAECBA-11B5-4A86-8EB0-018E62D83E54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88BAECBA-11B5-4A86-8EB0-018E62D83E54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88BAECBA-11B5-4A86-8EB0-018E62D83E54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

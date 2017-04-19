@@ -17,6 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ActiveListExtensions;
 using ActiveListExtensions.Utilities;
+using System.Data;
 
 namespace ActiveListExtensionsTestProject
 {
@@ -84,8 +85,22 @@ namespace ActiveListExtensionsTestProject
 
 		public IActiveValue<int> SelectManyCount { get; }
 
+		public class BlahRow : DataRow
+		{
+			public BlahRow(DataRowBuilder builder) : base(builder)
+			{
+			}
+		}
+
+		public class BlahTable : TypedTableBase<BlahRow>
+		{
+		}
+
 		public MainWindow()
 		{
+			BlahTable aa = new BlahTable();
+			var blah = aa.ToActiveList();
+
 			var a = new[] { 1, 2, 3, 4, 4, 4 };
 			var b = new[] { 1, 3, 4 };
 
