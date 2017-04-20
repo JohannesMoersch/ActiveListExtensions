@@ -98,6 +98,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ActiveListExtensions.Data\ActiveListExtensions.Data.csproj">
+      <Project>{88baecba-11b5-4a86-8eb0-018e62d83e54}</Project>
+      <Name>ActiveListExtensions.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ActiveListExtensions.Reactive\ActiveListExtensions.Reactive.csproj">
+      <Project>{51f83df6-0253-4564-ba29-997e8a99b539}</Project>
+      <Name>ActiveListExtensions.Reactive</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ActiveListExtensions\ActiveListExtensions.csproj">
       <Project>{bd03ebcc-53ea-42c4-9d87-213b266c9457}</Project>
       <Name>ActiveListExtensions</Name>

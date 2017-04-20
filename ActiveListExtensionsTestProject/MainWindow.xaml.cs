@@ -94,17 +94,47 @@ namespace ActiveListExtensionsTestProject
 
 		public class BlahTable : TypedTableBase<BlahRow>
 		{
+			public BlahTable()
+			{
+				Columns.Add(new DataColumn("Blah", typeof(int)));
+			}
+
+			protected override DataRow NewRowFromBuilder(DataRowBuilder builder) => new BlahRow(builder);
 		}
 
 		public MainWindow()
 		{
 			BlahTable aa = new BlahTable();
+
+			BlahTable bb = new BlahTable();
+			bb.Rows.Add(bb.NewRow());
+			bb.Rows.Add(bb.NewRow());
+			bb.Rows.Add(bb.NewRow());
+
 			var blah = aa.ToActiveList();
+
+			var stuff = blah.Select(r => r["Blah"]);
+
+			aa.RowDeleted += (s, e) => { };
+			aa.TableCleared += (s, e) => { };
+			aa.RowChanged += (s, e) => { };
+
+			var row = aa.NewRow();
+			aa.Rows.Add(row);
+			row["Blah"] = 10;
+			row = aa.NewRow();
+			aa.Rows.Add(row);
+			aa.Rows.Add(aa.NewRow());
+			aa.Rows.Remove(row);
+			aa.Rows.Add(row);
+			aa.Merge(bb);
 
 			var a = new[] { 1, 2, 3, 4, 4, 4 };
 			var b = new[] { 1, 3, 4 };
 
 			var c = a.Except(b).ToArray();
+
+			stuff.ToArray();
 
 			Source = new ObservableCollection<TestData>();
 			Source.Add(new TestData(1, "One", "Abc"));

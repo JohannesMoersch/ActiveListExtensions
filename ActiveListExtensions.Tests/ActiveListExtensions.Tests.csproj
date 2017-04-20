@@ -40,6 +40,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reactive.Core.3.1.1\lib\net45\System.Reactive.Core.dll</HintPath>
     </Reference>
@@ -55,6 +57,7 @@
     <Reference Include="System.Reactive.Windows.Threading, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reactive.Windows.Threading.3.1.1\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
     </Reference>
+    <Reference Include="System.XML" />
     <Reference Include="WindowsBase" />
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
@@ -113,6 +116,7 @@
     <Compile Include="Modifiers\ActiveWhereTests.cs" />
     <Compile Include="Modifiers\ActiveWhereValueTests.cs" />
     <Compile Include="Modifiers\ActiveZipTests.cs" />
+    <Compile Include="Modifiers\DataTableToActiveListTests.cs" />
     <Compile Include="Modifiers\ToActiveListTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reactive\ReactiveListTests.cs" />
@@ -141,6 +145,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ActiveListExtensions.Data\ActiveListExtensions.Data.csproj">
+      <Project>{88baecba-11b5-4a86-8eb0-018e62d83e54}</Project>
+      <Name>ActiveListExtensions.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ActiveListExtensions.Reactive\ActiveListExtensions.Reactive.csproj">
       <Project>{51f83df6-0253-4564-ba29-997e8a99b539}</Project>
       <Name>ActiveListExtensions.Reactive</Name>
