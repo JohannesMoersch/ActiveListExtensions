@@ -1,15 +1,18 @@
-﻿using System;
+﻿using ActiveListExtensions.Reactive;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ActiveListExtensions
 {
-    public static class ReactiveExtensions
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public static class ReactiveExtensions
     {
 		public static IObservable<T> ObserveValue<T>(this IActiveValue<T> value)
 		{
@@ -26,9 +29,11 @@ namespace ActiveListExtensions
 			return subject;
 		}
 
-		public static IObservable<T> ObserveAdded<T>(this IActiveList<T> list)
+		public static IObservable<T> ObserveAdded<T>(this IActiveList<T> list) => ObserveAddedWithIndex(list).Select(o => o.Item);
+
+		public static IObservable<ItemAdded<T>> ObserveAddedWithIndex<T>(this IActiveList<T> list)
 		{
-			var subject = new Subject<T>();
+			var subject = new Subject<ItemAdded<T>>();
 
 			var handler = new EventHandler<NotifyCollectionChangedEventArgs>((o, e) =>
 			{
@@ -36,11 +41,11 @@ namespace ActiveListExtensions
 				{
 					case NotifyCollectionChangedAction.Add:
 					case NotifyCollectionChangedAction.Replace:
-						subject.OnNext((T)e.NewItems[0]);
+						subject.OnNext(new ItemAdded<T>((T)e.NewItems[0], e.NewStartingIndex));
 						break;
 					case NotifyCollectionChangedAction.Reset:
-						foreach (var item in list)
-							subject.OnNext(item);
+						for (int i = 0; i < list.Count; ++i)
+							subject.OnNext(new ItemAdded<T>(list[i], i));
 						break;
 				}
 				
@@ -53,9 +58,11 @@ namespace ActiveListExtensions
 			return subject;
 		}
 
-		public static IObservable<T> ObserveRemoved<T>(this IActiveList<T> list)
+		public static IObservable<T> ObserveRemoved<T>(this IActiveList<T> list) => ObserveRemovedWithIndex(list).Select(o => o.Item);
+
+		public static IObservable<ItemRemoved<T>> ObserveRemovedWithIndex<T>(this IActiveList<T> list)
 		{
-			var subject = new Subject<T>();
+			var subject = new Subject<ItemRemoved<T>>();
 
 			var copy = new List<T>(list.Count);
 			foreach (var item in list)
@@ -70,19 +77,19 @@ namespace ActiveListExtensions
 						break;
 					case NotifyCollectionChangedAction.Remove:
 						copy.RemoveAt(e.OldStartingIndex);
-						subject.OnNext((T)e.OldItems[0]);
+						subject.OnNext(new ItemRemoved<T>((T)e.OldItems[0], e.OldStartingIndex));
 						break;
 					case NotifyCollectionChangedAction.Replace:
 						copy[e.NewStartingIndex] = (T)e.NewItems[0];
-						subject.OnNext((T)e.OldItems[0]);
+						subject.OnNext(new ItemRemoved<T>((T)e.OldItems[0], e.OldStartingIndex));
 						break;
 					case NotifyCollectionChangedAction.Move:
 						copy.RemoveAt(e.OldStartingIndex);
 						copy.Insert(e.NewStartingIndex, (T)e.NewItems[0]);
 						break;
 					case NotifyCollectionChangedAction.Reset:
-						foreach (var item in copy)
-							subject.OnNext(item);
+						for (int i = copy.Count - 1; i >= 0; --i)
+							subject.OnNext(new ItemRemoved<T>(copy[i], i));
 						copy.Clear();
 						foreach (var item in list)
 							copy.Add(item);
