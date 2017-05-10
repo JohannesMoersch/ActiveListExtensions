@@ -106,6 +106,7 @@
     <Compile Include="Modifiers\ActiveIntersectTests.cs" />
     <Compile Include="Modifiers\ActiveOfTypeTests.cs" />
     <Compile Include="Modifiers\ActiveOrderByTests.cs" />
+    <Compile Include="Modifiers\ActiveRecastResetNotificationsTests.cs" />
     <Compile Include="Modifiers\ActiveReverseTests.cs" />
     <Compile Include="Modifiers\ActiveSelectTests.cs" />
     <Compile Include="Modifiers\ActiveSelectManyTests.cs" />

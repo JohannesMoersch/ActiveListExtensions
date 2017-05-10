@@ -52,6 +52,7 @@
     <Compile Include="ListModifiers\ActiveLookup.cs" />
     <Compile Include="ListModifiers\ActiveOfType.cs" />
     <Compile Include="ListModifiers\ActiveOrderBy.cs" />
+    <Compile Include="ListModifiers\ActiveRecastResetNotifications.cs" />
     <Compile Include="ListModifiers\ActiveUnion.cs" />
     <Compile Include="ListModifiers\ActiveZip.cs" />
     <Compile Include="ListModifiers\Bases\ActiveBase.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Utilities\ActiveValueListUnwrapper.cs" />
     <Compile Include="Utilities\ActiveValueWrapper.cs" />
     <Compile Include="Utilities\BooleanList.cs" />
+    <Compile Include="Utilities\IntegerMapNode.cs" />
     <Compile Include="Utilities\ValueWatcher.cs" />
     <Compile Include="ValueModifiers\ActiveAll.cs" />
     <Compile Include="ValueModifiers\ActiveAny.cs" />
