@@ -165,7 +165,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 			{
 				var count = RandomGenerator.GenerateRandomInteger(0, 50);
 
-				value.Value = RandomGenerator.GenerateRandomIntegerList(count);
+				value.Value = RandomGenerator.GenerateRandomIntegerList(count, 0, 50);
 
 				Assert.True(value.Value.SequenceEqual(sut));
 			}

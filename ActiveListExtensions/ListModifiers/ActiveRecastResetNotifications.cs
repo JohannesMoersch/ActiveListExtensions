@@ -1,4 +1,5 @@
 ﻿using ActiveListExtensions.ListModifiers.Bases;
+using ActiveListExtensions.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -106,24 +107,96 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void AlignResultList(int startOffset, int endOffset, IDictionary<TElement, int> counts, IDictionary<TElement, IList<int>> indexes)
 		{
+			int mainOffset = 0;
+			var offsets = IntegerMapNode.CreateRoot();
+
 			var first = startOffset;
-			var last = ResultList.Count - endOffset - 1;
-			/*
-			while (first <= last)
+			var lastInResult = ResultList.Count - endOffset - 1;
+			var lastInSource = SourceList.Count - endOffset - 1;
+			
+			while (first <= lastInSource)
 			{
+				if (first > 0 && !SourceList.Take(first - 1).SequenceEqual(ResultList.Take(first - 1)))
+					Console.WriteLine("A");
+				if (lastInSource < SourceList.Count - 1 && !SourceList.Skip(lastInSource + 1).SequenceEqual(ResultList.Skip(lastInResult + 1)))
+					Console.WriteLine("A");
+
+				while (first <= lastInResult && Equals(SourceList[first], ResultList[first]))
+					++first;
+
+				if (first > lastInSource)
+					break;
+
 				var firstElement = SourceList[first];
 
-				if (counts.TryGetValue(firstElement, out var num) && !Equals(ResultList[i], firstElement))
+				if (counts.TryGetValue(firstElement, out var num))
 				{
 					if (num == 1)
 						counts.Remove(firstElement);
 					else
 						counts[firstElement] = num - 1;
 
-					ResultList.Add(i, firstElement);
+					ResultList.Add(first, firstElement);
+					++mainOffset;
+
+					++lastInResult;
+					++first;
+					continue;
 				}
-			}*/
+
+				while (first <= lastInSource && lastInResult > 0 && Equals(SourceList[lastInSource], ResultList[lastInResult]))
+				{
+					--lastInSource;
+					--lastInResult;
+				}
+
+				if (first > lastInSource)
+					break;
+
+				var lastElement = SourceList[lastInSource];
+
+				var firstList = indexes[firstElement];
+				var firstValue = firstList.First();
+				var firstResultIndex = firstValue + offsets.GetOffset(firstValue) + mainOffset;
+
+				int lastResultIndex = Int32.MaxValue;
+				int lastValue = 0;
+				if (indexes.TryGetValue(lastElement, out var lastList))
+				{
+					lastValue = lastList.Last();
+					lastResultIndex = lastValue + offsets.GetOffset(lastValue) + mainOffset;
+				}
+
+				if (firstResultIndex - first > lastInResult - lastResultIndex)
+				{
+					if (firstResultIndex < first || firstResultIndex > lastInResult)
+						Console.WriteLine("A");
+					ResultList.Move(firstResultIndex, first);
+					++first;
+					firstList.RemoveAt(0);
+					offsets.Update(firstValue, 1, IntegerMapNode.IntegerMapOffsetType.LessThanDivider);
+				}
+				else
+				{
+					if (lastResultIndex < first || lastResultIndex > lastInResult)
+						Console.WriteLine("A");
+					ResultList.Move(lastResultIndex, lastInResult);
+					--lastInResult;
+					--lastInSource;
+					lastList.RemoveAt(lastList.Count - 1);
+					offsets.Update(lastValue + 1, -1, IntegerMapNode.IntegerMapOffsetType.GreaterThanOrEqualToDivider);
+				}
+
+				foreach (var value in indexes.SelectMany(kvp => kvp.Value.Select(i => new { Value = kvp.Key, Index = i })))
+				{
+					var offsetIndex = value.Index + offsets.GetOffset(value.Index) + mainOffset;
+					if (offsetIndex >= first && offsetIndex <= lastInResult && !Equals(ResultList[offsetIndex], value.Value))
+						Console.WriteLine("A");
+				}
+			}
 		}
+
+		private Tuple<TElement, TElement>[] Compare(int first, int lastInSource, int lastInResult) => SourceList.Take(first).Concat(SourceList.Skip(lastInSource + 1)).Zip(ResultList.Take(first).Concat(ResultList.Skip(lastInResult + 1)), (i1, i2) => Tuple.Create(i1, i2)).ToArray();
 
 		private IList<int> ClaimList()
 		{
