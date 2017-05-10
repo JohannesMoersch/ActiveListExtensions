@@ -28,7 +28,7 @@ namespace ActiveListExtensions
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
-			var readonlyListValue = source as IActiveValue<IReadOnlyList<T>> ?? source.ActiveMutate(l => l.ToReadOnlyList());
+			var readonlyListValue = source as IActiveValue<IReadOnlyList<T>> ?? source.ActiveMutate(l => l?.ToReadOnlyList() ?? new List<T>(), null);
 			return new ActiveList<T>(readonlyListValue);
 		}
 
@@ -204,5 +204,8 @@ namespace ActiveListExtensions
 		public static IActiveLookup<TKey, TSource> ToActiveLookup<TKey, TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ToActiveLookup(source, parameter, keySelector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
 
 		private static IActiveLookup<TKey, TSource> ToActiveLookup<TKey, TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveLookup<TKey, TSource, TParameter>(source, keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+
+		public static IActiveList<TSource> ActiveRecastResetNotifications<TSource>(this IActiveList<TSource> source) => new ActiveRecastResetNotifications<TSource>(source);
 	}
 }

@@ -14,6 +14,36 @@ namespace ActiveListExtensions.Tests.Modifiers
 	public class ToActiveListTests
 	{
 		[Fact]
+		public void ReplaceListInActiveValueWithNull()
+		{
+			RandomGenerator.ResetRandomGenerator();
+
+			var value = new ActiveValue<IEnumerable<int>>();
+
+			value.Value = RandomGenerator.GenerateRandomIntegerList(50);
+
+			var sut = value.ToActiveList();
+
+			value.Value = null;
+
+			Assert.True(sut.SequenceEqual(new int[0]));
+		}
+
+		[Fact]
+		public void StartListInActiveValueAsNull()
+		{
+			RandomGenerator.ResetRandomGenerator();
+
+			var value = new ActiveValue<IEnumerable<int>>();
+
+			value.Value = null;
+
+			var sut = value.ToActiveList();
+
+			Assert.True(sut.SequenceEqual(new int[0]));
+		}
+
+		[Fact]
 		public void ReplaceListInActiveValue()
 		{
 			RandomGenerator.ResetRandomGenerator();
