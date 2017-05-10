@@ -48,7 +48,6 @@ namespace ActiveListExtensions
 							subject.OnNext(new ItemAdded<T>(list[i], i));
 						break;
 				}
-				
 			});
 
 			CollectionChangedEventManager.AddHandler(list, handler);
@@ -104,5 +103,17 @@ namespace ActiveListExtensions
 
 			return subject;
 		}
+
+		public static IActiveValue<T> ToActiveValue<T>(this IObservable<T> observable)
+		{
+			var activeValue = new ObservableToActiveValue<T>();
+
+			var subscription = observable.Subscribe(new WeakSubscriber<T>(activeValue));
+			activeValue.Disposed += subscription.Dispose;
+
+			return activeValue;
+		}
+
+		public static IActiveList<T> ToActiveList<T>(this IObservable<IEnumerable<T>> observable) => observable.ToActiveValue().ToActiveList();
 	}
 }

@@ -119,6 +119,7 @@
     <Compile Include="Modifiers\DataTableToActiveListTests.cs" />
     <Compile Include="Modifiers\ToActiveListTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reactive\ObservableToActiveValueTests.cs" />
     <Compile Include="Reactive\ReactiveListTests.cs" />
     <Compile Include="Reactive\ReactiveValueTests.cs" />
     <Compile Include="Utilities\BooleanListTests.cs" />
