@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using ActiveListExtensions;
 using ActiveListExtensions.Utilities;
 using System.Data;
+using System.Collections.Specialized;
 
 namespace ActiveListExtensionsTestProject
 {
@@ -102,8 +103,43 @@ namespace ActiveListExtensionsTestProject
 			protected override DataRow NewRowFromBuilder(DataRowBuilder builder) => new BlahRow(builder);
 		}
 
+		public string Text { get; }
+
 		public MainWindow()
 		{
+			var value = ActiveValue.Create<IEnumerable<int>>();
+			value.Value = Enumerable.Range(0, 100000).Select(i => _random.Next(0,1000)).ToArray();
+			var newValue = Enumerable.Range(0, 100000).Select(i => _random.Next(0, 1000)).ToArray();
+
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
+
+			int adds = 0;
+			int removes = 0;
+			int moves = 0;
+
+			sut.CollectionChanged += (s, e) =>
+			{
+				switch (e.Action)
+				{
+					case NotifyCollectionChangedAction.Add:
+						++adds;
+						break;
+					case NotifyCollectionChangedAction.Remove:
+						++removes;
+						break;
+					case NotifyCollectionChangedAction.Move:
+						++moves;
+						break;
+				}
+			};
+
+			var timer = new Stopwatch();
+			timer.Start();
+			value.Value = newValue;
+			timer.Stop();
+
+			Text = $"{timer.Elapsed.TotalMilliseconds.ToString("0.00 ms")} - Adds({adds}), Removes({removes}), Moves({moves})";
+
 			BlahTable aa = new BlahTable();
 
 			BlahTable bb = new BlahTable();

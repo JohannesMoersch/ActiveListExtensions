@@ -206,6 +206,6 @@ namespace ActiveListExtensions
 		private static IActiveLookup<TKey, TSource> ToActiveLookup<TKey, TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveLookup<TKey, TSource, TParameter>(source, keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
-		public static IActiveList<TSource> ActiveRecastResetNotifications<TSource>(this IActiveList<TSource> source) => new ActiveRecastResetNotifications<TSource>(source);
+		public static IActiveList<TSource> ActiveTranslateResetNotifications<TSource>(this IActiveList<TSource> source) => new ActiveTranslateResetNotifications<TSource>(source);
 	}
 }

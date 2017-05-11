@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ListModifiers
 {
-	internal class ActiveRecastResetNotifications<TElement> : ActiveListBase<TElement, TElement, object, TElement>
+	internal class ActiveTranslateResetNotifications<TElement> : ActiveListBase<TElement, TElement, object, TElement>
 	{
 		private IDictionary<TElement, int> _counts = new Dictionary<TElement, int>();
 
@@ -17,7 +17,7 @@ namespace ActiveListExtensions.ListModifiers
 
 		private IList<IList<int>> _listCache = new List<IList<int>>();
 
-		public ActiveRecastResetNotifications(IActiveList<TElement> source)
+		public ActiveTranslateResetNotifications(IActiveList<TElement> source)
 			: base(source, i => i, null)
 		{
 			Initialize();

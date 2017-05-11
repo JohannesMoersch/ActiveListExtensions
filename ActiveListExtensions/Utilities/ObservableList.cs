@@ -51,13 +51,13 @@ namespace ActiveListExtensions.Utilities
 
 		public int Count => List.Count - _skipCount;
 
-		protected IList<TStore> List { get; }
+		protected QuickList<TStore> List { get; }
 
 		private readonly Func<TStore, TResult> _itemSelector;
 
 		public ObservableList(Func<TStore, TResult> itemSelector)
 		{
-			List = new List<TStore>();
+			List = new QuickList<TStore>();
 
 			_itemSelector = itemSelector;
 		}
@@ -76,7 +76,7 @@ namespace ActiveListExtensions.Utilities
 		public virtual void Add(int index, TSource value)
 		{
 			var store = GetStoreFromSource(value);
-			List.Insert(index, store);
+			List.Add(index, store);
 			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, GetResultFromItem(store), index));
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
 		}
@@ -84,7 +84,7 @@ namespace ActiveListExtensions.Utilities
 		public virtual void Remove(int index)
 		{
 			var store = List[index];
-			List.RemoveAt(index);
+			List.Remove(index);
 			var value = GetResultFromItem(store);
 			DisposeOfStore(store);
 			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, index));
@@ -95,7 +95,7 @@ namespace ActiveListExtensions.Utilities
 		{
 			var oldStore = List[index];
 			var store = GetStoreFromSource(newValue);
-			List[index] = store;
+			List.Replace(index, store);
 			var oldValue = GetResultFromItem(oldStore);
 			DisposeOfStore(oldStore);
 			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, GetResultFromItem(store), oldValue, index));
@@ -103,12 +103,8 @@ namespace ActiveListExtensions.Utilities
 
 		public virtual void Move(int oldIndex, int newIndex)
 		{
-			if (oldIndex == newIndex)
-				return;
-			var value = List[oldIndex];
-			List.RemoveAt(oldIndex);
-			List.Insert(newIndex, value);
-			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetResultFromItem(value), newIndex, oldIndex));
+			List.Move(oldIndex, newIndex);
+			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetResultFromItem(List[newIndex]), newIndex, oldIndex));
 		}
 
 		public virtual void Reset(IEnumerable<TSource> values)
@@ -118,7 +114,7 @@ namespace ActiveListExtensions.Utilities
 				DisposeOfStore(item);
 			List.Clear();
 			foreach (var value in values)
-				List.Add(GetStoreFromSource(value));
+				List.Add(List.Count, GetStoreFromSource(value));
 			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 			if (oldCount != Count)
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
@@ -139,11 +135,11 @@ namespace ActiveListExtensions.Utilities
 				if (diff > 0)
 				{
 					for (int i = 0; i < diff; ++i)
-						List.Add(default(TStore));
+						List.Add(List.Count, default(TStore));
 					for (int i = top; i >= bottom; --i)
-						List[i + diff] = List[i];
+						List.Replace(i + diff, List[i]);
 					for (int i = oldCount; i < newValues.Count; ++i)
-						List[startIndex + i] = GetStoreFromSource(newValues[i]);
+						List.Replace(startIndex + i, GetStoreFromSource(newValues[i]));
 
 					_skipStart = startIndex + oldCount;
 					_skipCount = newValues.Count - oldCount;
@@ -168,11 +164,11 @@ namespace ActiveListExtensions.Utilities
 					}
 
 					for (int i = bottom; i <= top; ++i)
-						List[i + diff] = List[i];
+						List.Replace(i + diff, List[i]);
 					for (int i = 0; i < -diff; ++i)
 					{
 						var store = List[List.Count - 1];
-						List.RemoveAt(List.Count - 1);
+						List.Remove(List.Count - 1);
 						DisposeOfStore(store);
 					}
 				}

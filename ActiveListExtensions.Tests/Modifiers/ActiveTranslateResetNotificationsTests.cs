@@ -10,14 +10,14 @@ using Xunit;
 
 namespace ActiveListExtensions.Tests.Modifiers
 {
-	public class ActiveRecastResetNotificationsTests
+	public class ActiveTranslateResetNotificationsTests
 	{
 		[Fact]
 		public void EqualInitially()
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 1, 2, 3 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			Assert.True(value.Value.SequenceEqual(sut));
 		}
@@ -27,7 +27,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 1, 2, 3 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 0, 1, 2, 3 };
 
@@ -39,7 +39,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 1, 2, 4, 5 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 1, 2, 3, 4, 5 };
 
@@ -51,7 +51,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 1, 2, 3 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 1, 2, 3, 4 };
 
@@ -63,7 +63,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 1, 2, 4, 6, 7, 8 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
@@ -75,7 +75,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 1, 1, 2 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 0, 0, 1, 1, 1, 2, 2 };
 
@@ -87,7 +87,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 1, 2, 3 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 2, 3 };
 
@@ -99,7 +99,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 1, 2, 3 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 1, 3 };
 
@@ -111,7 +111,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 1, 2, 3 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 1, 2 };
 
@@ -123,7 +123,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 1, 2, 4, 6, 7, 8 };
 
@@ -135,7 +135,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 0, 0, 1, 1, 1, 2, 2 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 1, 1, 2 };
 
@@ -147,7 +147,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 1, 4, 8, 5, 2, 9, 0, 3, 7, 6 };
 
@@ -161,7 +161,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 
 			var value = new ActiveValue<IEnumerable<int>>(new int[0]);
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			for (int i = 0; i < 500; ++i)
 			{
@@ -180,7 +180,7 @@ namespace ActiveListExtensions.Tests.Modifiers
 
 			var value = new ActiveValue<IEnumerable<object>>(Enumerable.Range(0, 50).Select(i => new object()));
 
-			var sut = value.ToActiveList().ActiveRecastResetNotifications();
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			int addCount = 0;
 			int removeCount = 0;
