@@ -48,7 +48,7 @@ namespace ActiveListExtensions.ListModifiers
 			public GroupData(TKey key) => Items = new Group(key);
 		}
 
-		private readonly IList<ItemData> _sourceData;
+		private readonly QuickList<ItemData> _sourceData;
 
 		private readonly IDictionary<TKey, GroupData> _resultSet;
 
@@ -69,7 +69,7 @@ namespace ActiveListExtensions.ListModifiers
 		private ActiveLookup(IActiveList<TSource> source, Func<TSource, TKey> keySelector, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
 			: base(source, i => i.Items, parameter, sourcePropertiesToWatch, parameterPropertiesToWatch)
 		{
-			_sourceData = new List<ItemData>();
+			_sourceData = new QuickList<ItemData>();
 			_resultSet = new Dictionary<TKey, GroupData>();
 
 			_keySelector = keySelector;
@@ -83,7 +83,7 @@ namespace ActiveListExtensions.ListModifiers
 		{
 			var item = new ItemData(_keySelector.Invoke(value), value);
 			item.SourceIndex = index;
-			_sourceData.Insert(index, item);
+			_sourceData.Add(index, item);
 
 			for (int i = index + 1; i < _sourceData.Count; ++i)
 				_sourceData[i].SourceIndex = i;
@@ -95,7 +95,7 @@ namespace ActiveListExtensions.ListModifiers
 		{
 			var item = _sourceData[index];
 			item.SourceIndex = -1;
-			_sourceData.RemoveAt(index);
+			_sourceData.Remove(index);
 
 			for (int i = index; i < _sourceData.Count; ++i)
 				_sourceData[i].SourceIndex = i;
@@ -125,8 +125,7 @@ namespace ActiveListExtensions.ListModifiers
 		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
 			var item = _sourceData[oldIndex];
-			_sourceData.RemoveAt(oldIndex);
-			_sourceData.Insert(newIndex, item);
+			_sourceData.Move(oldIndex, newIndex);
 
 			var min = oldIndex < newIndex ? oldIndex : newIndex;
 			var max = oldIndex < newIndex ? newIndex : oldIndex;
@@ -164,7 +163,7 @@ namespace ActiveListExtensions.ListModifiers
 			{
 				var item = new ItemData(_keySelector.Invoke(value), value);
 				item.SourceIndex = _sourceData.Count;
-				_sourceData.Add(item);
+				_sourceData.Add(_sourceData.Count, item);
 				AddToGroup(item, false);
 			}
 

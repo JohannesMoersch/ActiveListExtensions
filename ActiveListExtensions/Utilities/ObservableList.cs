@@ -95,7 +95,7 @@ namespace ActiveListExtensions.Utilities
 		{
 			var oldStore = List[index];
 			var store = GetStoreFromSource(newValue);
-			List.Replace(index, store);
+			List[index] = store;
 			var oldValue = GetResultFromItem(oldStore);
 			DisposeOfStore(oldStore);
 			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, GetResultFromItem(store), oldValue, index));
@@ -137,9 +137,9 @@ namespace ActiveListExtensions.Utilities
 					for (int i = 0; i < diff; ++i)
 						List.Add(List.Count, default(TStore));
 					for (int i = top; i >= bottom; --i)
-						List.Replace(i + diff, List[i]);
+						List[i + diff] =  List[i];
 					for (int i = oldCount; i < newValues.Count; ++i)
-						List.Replace(startIndex + i, GetStoreFromSource(newValues[i]));
+						List[startIndex + i] = GetStoreFromSource(newValues[i]);
 
 					_skipStart = startIndex + oldCount;
 					_skipCount = newValues.Count - oldCount;
@@ -164,7 +164,7 @@ namespace ActiveListExtensions.Utilities
 					}
 
 					for (int i = bottom; i <= top; ++i)
-						List.Replace(i + diff, List[i]);
+						List[i + diff] = List[i];
 					for (int i = 0; i < -diff; ++i)
 					{
 						var store = List[List.Count - 1];

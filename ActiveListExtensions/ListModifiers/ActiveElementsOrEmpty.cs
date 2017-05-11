@@ -1,4 +1,5 @@
 ﻿using ActiveListExtensions.ListModifiers.Bases;
+using ActiveListExtensions.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace ActiveListExtensions.ListModifiers
 			}
 		}
 
-		private IList<Item> _indexes;
+		private QuickList<Item> _indexes;
 
 		public ActiveElementsOrEmpty(IActiveList<TSource> source, IReadOnlyList<int> indexes)
 			: base(source, null)
@@ -29,7 +30,7 @@ namespace ActiveListExtensions.ListModifiers
 			if (indexes == null)
 				throw new ArgumentNullException(nameof(indexes));
 
-			_indexes = new List<Item>();
+			_indexes = new QuickList<Item>();
 
 			Initialize();
 
@@ -127,18 +128,18 @@ namespace ActiveListExtensions.ListModifiers
 			if (value >= 0 && value < SourceList.Count)
 			{
 				var item = GetItem(index, true);
-				_indexes.Insert(index, item);
+				_indexes.Add(index, item);
 				RecalculateIndexes(index + 1, _indexes.Count - 1);
 				ResultList.Add(item.Index, SourceList[value]);
 			}
 			else
-				_indexes.Insert(index, GetItem(index, false));
+				_indexes.Add(index, GetItem(index, false));
 		}
 
 		protected override void OnRemoved(int collectionIndex, int index, int value)
 		{
 			var item = _indexes[index];
-			_indexes.RemoveAt(index);
+			_indexes.Remove(index);
 			if (item.InList)
 			{
 				RecalculateIndexes(index, _indexes.Count - 1);
@@ -150,8 +151,7 @@ namespace ActiveListExtensions.ListModifiers
 		{
 			var oldItem = _indexes[oldIndex];
 
-			_indexes.RemoveAt(oldIndex);
-			_indexes.Insert(newIndex, oldItem);
+			_indexes.Move(oldIndex, newIndex);
 
 			if (oldItem.InList)
 			{
@@ -205,11 +205,11 @@ namespace ActiveListExtensions.ListModifiers
 				if (index >= 0 && index < SourceList.Count)
 				{
 					var item = new Item(true, count++);
-					_indexes.Add(item);
+					_indexes.Add(_indexes.Count, item);
 					yield return SourceList[index];
 				}
 				else
-					_indexes.Add(new Item(false, count));
+					_indexes.Add(_indexes.Count, new Item(false, count));
 			}
 		}
 

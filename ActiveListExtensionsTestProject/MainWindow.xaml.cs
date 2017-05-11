@@ -108,10 +108,12 @@ namespace ActiveListExtensionsTestProject
 		public MainWindow()
 		{
 			var value = ActiveValue.Create<IEnumerable<int>>();
-			value.Value = Enumerable.Range(0, 100000).Select(i => _random.Next(0,1000)).ToArray();
+			value.Value = Enumerable.Range(0, 100000).Select(i => _random.Next(0, 1000)).ToArray();
 			var newValue = Enumerable.Range(0, 100000).Select(i => _random.Next(0, 1000)).ToArray();
 
 			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
+
+			var sum = sut.ActiveSum();
 
 			int adds = 0;
 			int removes = 0;
@@ -138,7 +140,7 @@ namespace ActiveListExtensionsTestProject
 			value.Value = newValue;
 			timer.Stop();
 
-			Text = $"{timer.Elapsed.TotalMilliseconds.ToString("0.00 ms")} - Adds({adds}), Removes({removes}), Moves({moves})";
+			Text = $"{timer.Elapsed.TotalMilliseconds.ToString("0.00 ms")} - Adds({adds}), Removes({removes}), Moves({moves}) - {sum.Value}";
 
 			BlahTable aa = new BlahTable();
 

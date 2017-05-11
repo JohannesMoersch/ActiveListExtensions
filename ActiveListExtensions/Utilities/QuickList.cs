@@ -19,6 +19,7 @@ namespace ActiveListExtensions.Utilities
 					throw new ArgumentOutOfRangeException(nameof(index));
 				return _items[index];
 			}
+			set => Replace(index, value);
 		}
 
 		private int _count;
@@ -52,7 +53,7 @@ namespace ActiveListExtensions.Utilities
 			++_version;
 		}
 
-		public void Replace(int index, T value)
+		private void Replace(int index, T value)
 		{
 			_items[index] = value;
 

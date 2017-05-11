@@ -23,9 +23,9 @@ namespace ActiveListExtensions.Data
 
 		public DataTableWrapper(DataTable table)
 		{
-			_collection = new List<TDataRow>();
-
 			_dataView = table.AsDataView();
+
+			_collection = new List<TDataRow>(_dataView.Count + 8);
 
 			foreach (var item in _dataView)
 				_collection.Add((item as DataRowView).Row as TDataRow);

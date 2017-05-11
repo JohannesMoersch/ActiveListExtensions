@@ -84,7 +84,7 @@ namespace ActiveListExtensions.Tests.Reactive
 			object lastRemoved = null;
 			object expected = null;
 			sut = list.ObserveRemoved().Subscribe(i => lastRemoved = i);
-			GC.Collect(2, GCCollectionMode.Forced, true);
+			
 			foreach (var value in Enumerable.Range(0, 1000))
 			{
 				switch (list.Count > 0 ? RandomGenerator.GenerateRandomInteger(0, 4) : 0)

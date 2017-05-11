@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ActiveListExtensions.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 {
 	internal class ActiveWhereBase<TSource, TParameter, TResult> : ActiveListBase<TSource, TSource, TParameter, TResult>
 	{
-		private IList<int> _indexList;
+		private QuickList<int> _indexList;
 
 		private Func<TSource, bool> _predicate;
 
@@ -17,7 +18,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 		{
 			_predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
 
-			_indexList = new List<int>();
+			_indexList = new QuickList<int>();
 		}
 
 		private int FindTargetIndex(int index)
@@ -36,7 +37,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 			if (updateOnly)
 				_indexList[index] = targetIndex;
 			else
-				_indexList.Insert(index, targetIndex);
+				_indexList.Add(index, targetIndex);
 			for (int i = index + 1; i < _indexList.Count; ++i)
 			{
 				if (_indexList[i] >= 0)
@@ -50,7 +51,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 			if (updateOnly)
 				_indexList[index] = -1;
 			else
-				_indexList.RemoveAt(index);
+				_indexList.Remove(index);
 			for (int i = index; i < _indexList.Count; ++i)
 			{
 				if (_indexList[i] >= 0)
@@ -63,7 +64,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 			if (_predicate.Invoke(value))
 				ResultList.Add(AddIndex(index, false), value);
 			else
-				_indexList.Insert(index, -1);
+				_indexList.Add(index, -1);
 		}
 
 		protected override void OnRemoved(int index, TSource value)
@@ -75,7 +76,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 				ResultList.Remove(targetIndex);
 			}
 			else
-				_indexList.RemoveAt(index);
+				_indexList.Remove(index);
 		}
 
 		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
@@ -90,8 +91,8 @@ namespace ActiveListExtensions.ListModifiers.Bases
 			}
 			else
 			{
-				_indexList.RemoveAt(oldIndex);
-				_indexList.Insert(newIndex, -1);
+				_indexList.Move(oldIndex, newIndex);
+				_indexList[newIndex] = -1;
 			}
 		}
 
@@ -139,10 +140,10 @@ namespace ActiveListExtensions.ListModifiers.Bases
 				if (_predicate.Invoke(item))
 				{
 					yield return item;
-					_indexList.Add(index++);
+					_indexList.Add(_indexList.Count, index++);
 				}
 				else
-					_indexList.Add(-1);
+					_indexList.Add(_indexList.Count, -1);
 			}
 		}
 	}

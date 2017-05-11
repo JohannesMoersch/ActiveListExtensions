@@ -63,7 +63,7 @@ namespace ActiveListExtensions
 		{
 			var subject = new Subject<ItemRemoved<T>>();
 
-			var copy = new List<T>(list.Count);
+			var copy = new List<T>(list.Count + 8);
 			foreach (var item in list)
 				copy.Add(item);
 

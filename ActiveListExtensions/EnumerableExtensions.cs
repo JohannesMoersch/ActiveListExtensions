@@ -15,9 +15,10 @@ namespace ActiveListExtensions
 				return readOnlyList;
 			if (source is ICollection<T> collection)
 			{
-				var list = new List<T>(collection.Count);
+				var list = new T[collection.Count];
+				int index = 0;
 				foreach (var item in source)
-					list.Add(item);
+					list[index++] = item;
 				return new ListToReadOnlyWrapper<T>(list);
 			}
 			return source.ToList();

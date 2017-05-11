@@ -30,7 +30,7 @@ namespace ActiveListExtensions.ListModifiers
 			}
 		}
 
-		private readonly List<ItemSet> _sourceList;
+		private readonly QuickList<ItemSet> _sourceList;
 
 		private readonly Func<TSource, TKey> _keySelector;
 
@@ -39,7 +39,7 @@ namespace ActiveListExtensions.ListModifiers
 		{
 			_keySelector = keySelector;
 
-			_sourceList = new List<ItemSet>();
+			_sourceList = new QuickList<ItemSet>();
 
 			Initialize();
 		}
@@ -88,7 +88,7 @@ namespace ActiveListExtensions.ListModifiers
 				SourceIndex = index,
 				TargetIndex = targetIndex
 			};
-			_sourceList.Insert(index, itemSet);
+			_sourceList.Add(index, itemSet);
 			ResultList.Add(targetIndex, itemSet);
 
 			UpdateSourceIndexes(index + 1);
@@ -98,7 +98,7 @@ namespace ActiveListExtensions.ListModifiers
 		protected override void OnRemoved(int index, TSource value)
 		{
 			var itemSet = _sourceList[index];
-			_sourceList.RemoveAt(itemSet.SourceIndex);
+			_sourceList.Remove(itemSet.SourceIndex);
 			ResultList.Remove(itemSet.TargetIndex);
 
 			UpdateSourceIndexes(itemSet.SourceIndex);
@@ -145,8 +145,7 @@ namespace ActiveListExtensions.ListModifiers
 			if (newTargetIndex > itemSet.TargetIndex)
 				--newTargetIndex;
 
-			_sourceList.RemoveAt(oldIndex);
-			_sourceList.Insert(newIndex, itemSet);
+			_sourceList.Move(oldIndex, newIndex);
 
 			if (oldIndex < newIndex)
 				UpdateSourceIndexes(oldIndex, newIndex);
@@ -169,7 +168,7 @@ namespace ActiveListExtensions.ListModifiers
 		{
 			_sourceList.Clear();
 			for (int i = 0; i < newItems.Count; ++i)
-				_sourceList.Add(new ItemSet(_keySelector.Invoke(newItems[i]), newItems[i]) { SourceIndex = i });
+				_sourceList.Add(i, new ItemSet(_keySelector.Invoke(newItems[i]), newItems[i]) { SourceIndex = i });
 
 			IEnumerable<ItemSet> sortedItems;
 			if (ParameterValue == ListSortDirection.Ascending)
