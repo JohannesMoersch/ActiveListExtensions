@@ -11,11 +11,13 @@ namespace ActiveListExtensions.Tests.Utilities
 {
 	public class PropertyWatcherListTests
 	{
+		private PropertyWatcherList<PropertyWatcherTestClass> sut;
+
 		[Fact]
 		public void AddItemsThenThrowChangeNotifications()
 		{
 			int eventsReceived = 0;
-			var sut = new PropertyWatcherList<PropertyWatcherTestClass>(new[] { "Test", "Things" });
+			sut = new PropertyWatcherList<PropertyWatcherTestClass>(new[] { "Test", "Things" });
 			sut.ValueChanged += (s, e) => ++eventsReceived;
 
 			var item1 = new PropertyWatcherTestClass();
@@ -36,7 +38,7 @@ namespace ActiveListExtensions.Tests.Utilities
 		public void InsertItemsThenThrowChangeNotifications()
 		{
 			int eventsReceived = 0;
-			var sut = new PropertyWatcherList<PropertyWatcherTestClass>(new[] { "Test", "Things" });
+			sut = new PropertyWatcherList<PropertyWatcherTestClass>(new[] { "Test", "Things" });
 			sut.ValueChanged += (s, e) => ++eventsReceived;
 
 			var item1 = new PropertyWatcherTestClass();
@@ -57,7 +59,7 @@ namespace ActiveListExtensions.Tests.Utilities
 		public void AddAndThenRemoveItemsThenThrowChangeNotifications()
 		{
 			int eventsReceived = 0;
-			var sut = new PropertyWatcherList<PropertyWatcherTestClass>(new[] { "Test", "Things" });
+			sut = new PropertyWatcherList<PropertyWatcherTestClass>(new[] { "Test", "Things" });
 			sut.ValueChanged += (s, e) => ++eventsReceived;
 
 			var item1 = new PropertyWatcherTestClass();
@@ -81,7 +83,7 @@ namespace ActiveListExtensions.Tests.Utilities
 		public void AddItemsThenThrowIgnoredChangeNotifications()
 		{
 			int eventsReceived = 0;
-			var sut = new PropertyWatcherList<PropertyWatcherTestClass>(new[] { "Test", "Things" });
+			sut = new PropertyWatcherList<PropertyWatcherTestClass>(new[] { "Test", "Things" });
 			sut.ValueChanged += (s, e) => ++eventsReceived;
 
 			var item1 = new PropertyWatcherTestClass();
@@ -102,7 +104,7 @@ namespace ActiveListExtensions.Tests.Utilities
 		public void AddAndThenResetWithNewItemsThenThrowChangeNotifications()
 		{
 			int eventsReceived = 0;
-			var sut = new PropertyWatcherList<PropertyWatcherTestClass>(new[] { "Test", "Things" });
+			sut = new PropertyWatcherList<PropertyWatcherTestClass>(new[] { "Test", "Things" });
 			sut.ValueChanged += (s, e) => ++eventsReceived;
 
 			var item1 = new PropertyWatcherTestClass();

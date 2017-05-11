@@ -11,6 +11,8 @@ namespace ActiveListExtensions.Tests.Reactive
 {
 	public class ReactiveListTests
 	{
+		private IDisposable sut;
+
 		[Fact]
 		public void ObserveAddedOnRandomOperations()
 		{
@@ -22,7 +24,7 @@ namespace ActiveListExtensions.Tests.Reactive
 
 			object lastAdded = null;
 			object expected = null;
-			var sut = list.ObserveAdded().Subscribe(i => lastAdded = i);
+			sut = list.ObserveAdded().Subscribe(i => lastAdded = i);
 
 			foreach (var value in Enumerable.Range(0, 1000))
 			{
@@ -59,7 +61,7 @@ namespace ActiveListExtensions.Tests.Reactive
 				list.Add(list.Count, new object());
 
 			var lastAdded = new List<object>();
-			var sut = list.ObserveAdded().Subscribe(i => lastAdded.Add(i));
+			sut = list.ObserveAdded().Subscribe(i => lastAdded.Add(i));
 
 			for (int i = 0; i < 50; ++i)
 				list.Remove(i);
@@ -81,8 +83,8 @@ namespace ActiveListExtensions.Tests.Reactive
 
 			object lastRemoved = null;
 			object expected = null;
-			var sut = list.ObserveRemoved().Subscribe(i => lastRemoved = i);
-
+			sut = list.ObserveRemoved().Subscribe(i => lastRemoved = i);
+			GC.Collect(2, GCCollectionMode.Forced, true);
 			foreach (var value in Enumerable.Range(0, 1000))
 			{
 				switch (list.Count > 0 ? RandomGenerator.GenerateRandomInteger(0, 4) : 0)
@@ -120,7 +122,7 @@ namespace ActiveListExtensions.Tests.Reactive
 				list.Add(list.Count, new object());
 
 			var lastRemoved = new List<object>();
-			var sut = list.ObserveRemoved().Subscribe(i => lastRemoved.Add(i));
+			sut = list.ObserveRemoved().Subscribe(i => lastRemoved.Add(i));
 
 			foreach (var value in Enumerable.Range(0, 50))
 				list.Add(list.Count, new object());
