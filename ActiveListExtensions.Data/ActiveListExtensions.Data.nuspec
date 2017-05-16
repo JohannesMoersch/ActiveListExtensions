@@ -20,7 +20,7 @@
         <frameworkAssembly assemblyName="WindowsBase" targetFramework="net40" />
     </frameworkAssemblies>
     <dependencies>
-        <dependency id="ActiveListExtensions" version="1.0.4" />
+        <dependency id="ActiveListExtensions" version="1.0.6" />
     </dependencies>
   </metadata>
 </package>
