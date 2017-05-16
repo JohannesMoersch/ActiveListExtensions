@@ -19,7 +19,7 @@ namespace ActiveListExtensions.ListModifiers
 
 			public int TargetIndex { get; set; }
 
-			public TKey Key { get; }
+			public TKey Key { get; set; }
 
 			public TSource Value { get; }
 
@@ -185,6 +185,28 @@ namespace ActiveListExtensions.ListModifiers
 			ResultList.Reset(sortedItems);
 		}
 
-		protected override void ItemModified(int index, TSource value) => OnReplaced(index, value, value);
+		protected override void ItemModified(int index, TSource value)
+		{
+			var oldItemSet = _sourceList[index];
+			var oldTargetIndex = oldItemSet.TargetIndex;
+
+			var newKey = _keySelector.Invoke(value);
+
+			var newTargetIndex = FindByKey(newKey, index);
+			if (newTargetIndex > oldTargetIndex)
+				--newTargetIndex;
+
+			oldItemSet.Key = newKey;
+
+			if (oldTargetIndex != newTargetIndex)
+			{
+				ResultList.Move(oldTargetIndex, newTargetIndex);
+
+				if (oldTargetIndex < newTargetIndex)
+					UpdateTargetIndexes(oldTargetIndex, newTargetIndex);
+				else
+					UpdateTargetIndexes(newTargetIndex, oldTargetIndex);
+			}
+		}
 	}
 }

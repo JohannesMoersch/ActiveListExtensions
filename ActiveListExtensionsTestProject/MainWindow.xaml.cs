@@ -107,72 +107,15 @@ namespace ActiveListExtensionsTestProject
 
 		public MainWindow()
 		{
-			var value = ActiveValue.Create<IEnumerable<int>>();
-			value.Value = Enumerable.Range(0, 100000).Select(i => _random.Next(0, 1000)).ToArray();
-			var newValue = Enumerable.Range(0, 100000).Select(i => _random.Next(0, 1000)).ToArray();
-
-			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
-
-			var sum = sut.ActiveSum();
-
-			int adds = 0;
-			int removes = 0;
-			int moves = 0;
-
-			sut.CollectionChanged += (s, e) =>
-			{
-				switch (e.Action)
-				{
-					case NotifyCollectionChangedAction.Add:
-						++adds;
-						break;
-					case NotifyCollectionChangedAction.Remove:
-						++removes;
-						break;
-					case NotifyCollectionChangedAction.Move:
-						++moves;
-						break;
-				}
-			};
-
-			var timer = new Stopwatch();
-			timer.Start();
-			value.Value = newValue;
-			timer.Stop();
-
-			Text = $"{timer.Elapsed.TotalMilliseconds.ToString("0.00 ms")} - Adds({adds}), Removes({removes}), Moves({moves}) - {sum.Value}";
-
-			BlahTable aa = new BlahTable();
-
-			BlahTable bb = new BlahTable();
-			bb.Rows.Add(bb.NewRow());
-			bb.Rows.Add(bb.NewRow());
-			bb.Rows.Add(bb.NewRow());
-
-			var blah = aa.ToActiveList();
-
-			var stuff = blah.Select(r => r["Blah"]);
-
-			aa.RowDeleted += (s, e) => { };
-			aa.TableCleared += (s, e) => { };
-			aa.RowChanged += (s, e) => { };
-
-			var row = aa.NewRow();
-			aa.Rows.Add(row);
-			row["Blah"] = 10;
-			row = aa.NewRow();
-			aa.Rows.Add(row);
-			aa.Rows.Add(aa.NewRow());
-			aa.Rows.Remove(row);
-			aa.Rows.Add(row);
-			aa.Merge(bb);
-
 			var a = new[] { 1, 2, 3, 4, 4, 4 };
 			var b = new[] { 1, 3, 4 };
 
-			var c = a.Except(b).ToArray();
-
-			stuff.ToArray();
+			var source = ActiveValue.Create<int[]>();
+			source.Value = new int[0];
+			var list = source.ToActiveList().ActiveTranslateResetNotifications();
+			var any = list.ActiveAny();
+			GC.Collect(2, GCCollectionMode.Forced, true);
+			source.Value = new[] { 1, 2, 3 };
 
 			Source = new ObservableCollection<TestData>();
 			Source.Add(new TestData(1, "One", "Abc"));

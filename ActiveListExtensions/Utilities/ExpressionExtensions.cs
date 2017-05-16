@@ -20,6 +20,8 @@ namespace ActiveListExtensions.Utilities
 
 			private ParameterExpression GetParentParameter(Expression expression)
 			{
+				if (expression == null)
+					return null;
 				while (expression.NodeType != ExpressionType.Parameter)
 				{
 					if ((expression.NodeType == ExpressionType.TypeAs || expression.NodeType == ExpressionType.Convert || expression.NodeType == ExpressionType.ConvertChecked) && expression is UnaryExpression unary)
