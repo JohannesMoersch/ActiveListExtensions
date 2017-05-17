@@ -105,5 +105,22 @@ namespace ActiveListExtensions.Tests.Modifiers
 
 			Assert.True(value.Value.SequenceEqual(sut));
 		}
+
+		[Fact]
+		public void AddingToListThrowsCountChangeNotification()
+		{
+			RandomGenerator.ResetRandomGenerator();
+
+			var collection = new ObservableCollection<int>();
+
+			var sut = collection.ToActiveList();
+
+			bool countChanged = false;
+			sut.PropertyChanged += (s, e) => countChanged = e.PropertyName == nameof(IActiveList<int>.Count);
+
+			collection.Add(0);
+
+			Assert.True(countChanged);
+		}
 	}
 }

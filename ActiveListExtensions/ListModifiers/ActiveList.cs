@@ -26,6 +26,7 @@ namespace ActiveListExtensions.ListModifiers
 			_source = source;
 
 			_collection = new CollectionWrapper<T>(_source.Value);
+			_collection.CountChanged += (s) => NotifyOfPropertyChange(new PropertyChangedEventArgs(nameof(Count)));
 			_collection.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);
 
 			PropertyChangedEventManager.AddHandler(source, SourceChanged, nameof(IActiveValue<IReadOnlyList<T>>.Value));

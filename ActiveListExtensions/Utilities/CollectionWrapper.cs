@@ -21,6 +21,7 @@ namespace ActiveListExtensions.Utilities
 			}
 		}
 
+		private int _oldCount;
 		public int Count => _collection?.Count ?? 0;
 
 		public int CollectionIndex { get; set; }
@@ -118,9 +119,11 @@ namespace ActiveListExtensions.Utilities
 			{
 				case NotifyCollectionChangedAction.Add:
 					ItemAdded?.Invoke(this, args.NewStartingIndex, (T)args.NewItems[0]);
+					OnCountChanged();
 					break;
 				case NotifyCollectionChangedAction.Remove:
 					ItemRemoved?.Invoke(this, args.OldStartingIndex, (T)args.OldItems[0]);
+					OnCountChanged();
 					break;
 				case NotifyCollectionChangedAction.Move:
 					ItemMoved?.Invoke(this, args.OldStartingIndex, args.NewStartingIndex, (T)args.NewItems[0]);
@@ -130,9 +133,18 @@ namespace ActiveListExtensions.Utilities
 					break;
 				case NotifyCollectionChangedAction.Reset:
 					ItemsReset?.Invoke(this);
+					OnCountChanged();
 					break;
 			}
 			CollectionChanged?.Invoke(this, args);
+		}
+
+		private void OnCountChanged()
+		{
+			if (_oldCount == Count)
+				return;
+			_oldCount = Count;
+			CountChanged?.Invoke(this);
 		}
 
 		public IEnumerator<T> GetEnumerator() => _collection?.GetEnumerator() ?? Enumerable.Empty<T>().GetEnumerator();
@@ -152,5 +164,7 @@ namespace ActiveListExtensions.Utilities
 		public event Action<CollectionWrapper<T>> ItemsReset;
 
 		public event Action<CollectionWrapper<T>, NotifyCollectionChangedEventArgs> CollectionChanged;
+
+		public event Action<CollectionWrapper<T>> CountChanged;
 	}
 }

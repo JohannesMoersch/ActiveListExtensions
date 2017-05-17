@@ -110,12 +110,11 @@ namespace ActiveListExtensionsTestProject
 			var a = new[] { 1, 2, 3, 4, 4, 4 };
 			var b = new[] { 1, 3, 4 };
 
-			var source = ActiveValue.Create<int[]>();
-			source.Value = new int[0];
-			var list = source.ToActiveList().ActiveTranslateResetNotifications();
-			var any = list.ActiveAny();
+			var source = new ObservableCollection<int>();
 			GC.Collect(2, GCCollectionMode.Forced, true);
-			source.Value = new[] { 1, 2, 3 };
+			var any = source.ToActiveList().ActiveAny();
+			GC.Collect(2, GCCollectionMode.Forced, true);
+			source.Add(0);
 
 			Source = new ObservableCollection<TestData>();
 			Source.Add(new TestData(1, "One", "Abc"));
