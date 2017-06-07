@@ -39,6 +39,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -117,7 +118,7 @@
     <Compile Include="Modifiers\ActiveWhereTests.cs" />
     <Compile Include="Modifiers\ActiveWhereValueTests.cs" />
     <Compile Include="Modifiers\ActiveZipTests.cs" />
-    <Compile Include="Modifiers\DataTableToActiveListTests.cs" />
+    <Compile Include="Data\DataTableToActiveListTests.cs" />
     <Compile Include="Modifiers\ToActiveListTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reactive\ObservableToActiveValueTests.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="ValueModifiers\ActiveSequenceEqualTests.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveSumTests.cs" />
+    <Compile Include="Wpf\DependencyPropertyWatcherTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -154,6 +156,10 @@
     <ProjectReference Include="..\ActiveListExtensions.Reactive\ActiveListExtensions.Reactive.csproj">
       <Project>{51f83df6-0253-4564-ba29-997e8a99b539}</Project>
       <Name>ActiveListExtensions.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ActiveListExtensions.Wpf\ActiveListExtensions.Wpf.csproj">
+      <Project>{e22118ac-bdfa-45a1-abb6-43355a838d00}</Project>
+      <Name>ActiveListExtensions.Wpf</Name>
     </ProjectReference>
     <ProjectReference Include="..\ActiveListExtensions\ActiveListExtensions.csproj">
       <Project>{bd03ebcc-53ea-42c4-9d87-213b266c9457}</Project>

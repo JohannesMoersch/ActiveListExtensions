@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace ActiveListExtensions.Tests.Modifiers
+namespace ActiveListExtensions.Tests.Data
 {
 	public class DataTableToActiveListTests
 	{

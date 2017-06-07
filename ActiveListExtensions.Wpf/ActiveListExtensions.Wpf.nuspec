@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>ActiveListExtensions.Wpf</id>
+    <title>Active List Wpf Extensions</title>
+    <version>$version$</version>
+    <authors>Johannes Moersch</authors>
+    <owners>Johannes Moersch</owners>
+    <licenseUrl>https://github.com/JohannesMoersch/ActiveListExtensions/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/JohannesMoersch/ActiveListExtensions</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Provides active list extensions for working with WPF.</description>
+    <copyright>Copyright ©  2017</copyright>
+    <tags>Reactive Linq List Collection WPF</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="PresentationFramework" targetFramework="net40" />
+      <frameworkAssembly assemblyName="System" targetFramework="net40" />
+      <frameworkAssembly assemblyName="WindowsBase" targetFramework="net40" />
+    </frameworkAssemblies>
+    <dependencies>
+        <dependency id="ActiveListExtensions" version="1.0.9" />
+    </dependencies>
+  </metadata>
+</package>
