@@ -11,7 +11,7 @@ using System.ComponentModel;
 
 namespace ActiveListExtensions.ListModifiers
 {
-	internal class ActiveList<T> : ActiveBase<T>
+	internal class ActiveListWrapper<T> : ActiveBase<T>
 	{
 		public override int Count => _collection.Count;
 
@@ -21,7 +21,7 @@ namespace ActiveListExtensions.ListModifiers
 
 		private CollectionWrapper<T> _collection;
 
-		public ActiveList(IActiveValue<IReadOnlyList<T>> source)
+		public ActiveListWrapper(IActiveValue<IReadOnlyList<T>> source)
 		{
 			_source = source;
 

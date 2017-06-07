@@ -21,7 +21,7 @@ namespace ActiveListExtensions
 			if (source is IActiveList<T> list)
 				return list;
 			var readonlyList = source.ToReadOnlyList();
-			return new ActiveList<T>(new ActiveValueWrapper<IReadOnlyList<T>>(readonlyList));
+			return new ActiveListWrapper<T>(new ActiveValueWrapper<IReadOnlyList<T>>(readonlyList));
 		}
 
 		public static IActiveList<T> ToActiveList<T>(this IActiveValue<IEnumerable<T>> source)
@@ -29,7 +29,7 @@ namespace ActiveListExtensions
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
 			var readonlyListValue = source as IActiveValue<IReadOnlyList<T>> ?? source.ActiveMutate(l => l?.ToReadOnlyList() ?? new T[0], null);
-			return new ActiveList<T>(readonlyListValue);
+			return new ActiveListWrapper<T>(readonlyListValue);
 		}
 
 

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	internal class ObservableList<T> : ObservableList<T, T, T>
+	internal class ObservableList<T> : ObservableList<T, T, T>, IMutableActiveList<T>
 	{
 		public ObservableList()
 			: base(i => i)

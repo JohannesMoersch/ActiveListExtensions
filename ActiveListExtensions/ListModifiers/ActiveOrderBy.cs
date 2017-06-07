@@ -154,8 +154,7 @@ namespace ActiveListExtensions.ListModifiers
 			
 			if (itemSet.TargetIndex != newTargetIndex)
 			{
-				ResultList.Remove(itemSet.TargetIndex);
-				ResultList.Add(newTargetIndex, itemSet);
+				ResultList.Move(itemSet.TargetIndex, newTargetIndex);
 
 				if (itemSet.TargetIndex < newTargetIndex)
 					UpdateTargetIndexes(itemSet.TargetIndex, newTargetIndex);
