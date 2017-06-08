@@ -15,6 +15,8 @@ namespace ActiveListExtensions.ValueModifiers
 			: base(source)
 		{
 			_mutator = mutator;
+
+			Initialize();
 		}
 
 		protected override void OnAdded(int index, TSource value) => Value = _mutator.Invoke(SourceList);
