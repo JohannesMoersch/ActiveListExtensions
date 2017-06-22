@@ -8,12 +8,23 @@ using System.Text;
 using System.Threading.Tasks;
 using ActiveListExtensions.ListModifiers;
 using ActiveListExtensions.Utilities;
+using System.Collections;
 
 namespace ActiveListExtensions
 {
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class ActiveListExtensions
 	{
+		public static IActiveList<object> ToActiveList(this IEnumerable source)
+		{
+			if (source == null)
+				throw new ArgumentNullException(nameof(source));
+			if (source is IActiveList<object> list)
+				return list;
+			var readonlyList = source.ToReadOnlyList();
+			return new ActiveListWrapper<object>(new ActiveValueWrapper<IReadOnlyList<object>>(readonlyList));
+		}
+
 		public static IActiveList<T> ToActiveList<T>(this IEnumerable<T> source)
 		{
 			if (source == null)
@@ -22,6 +33,14 @@ namespace ActiveListExtensions
 				return list;
 			var readonlyList = source.ToReadOnlyList();
 			return new ActiveListWrapper<T>(new ActiveValueWrapper<IReadOnlyList<T>>(readonlyList));
+		}
+
+		public static IActiveList<object> ToActiveList(this IActiveValue<IEnumerable> source)
+		{
+			if (source == null)
+				throw new ArgumentNullException(nameof(source));
+			var readonlyListValue = source as IActiveValue<IReadOnlyList<object>> ?? source.ActiveMutate(l => l?.ToReadOnlyList() ?? new object[0], null);
+			return new ActiveListWrapper<object>(readonlyListValue);
 		}
 
 		public static IActiveList<T> ToActiveList<T>(this IActiveValue<IEnumerable<T>> source)

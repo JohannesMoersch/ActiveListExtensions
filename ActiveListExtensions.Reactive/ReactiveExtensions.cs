@@ -1,5 +1,6 @@
 ﻿using ActiveListExtensions.Reactive;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -135,6 +136,8 @@ namespace ActiveListExtensions
 
 			return activeValue;
 		}
+
+		public static IActiveList<object> ToActiveList(this IObservable<IEnumerable> observable) => observable.ToActiveValue().ToActiveList();
 
 		public static IActiveList<T> ToActiveList<T>(this IObservable<IEnumerable<T>> observable) => observable.ToActiveValue().ToActiveList();
 	}

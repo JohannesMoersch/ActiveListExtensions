@@ -1,6 +1,7 @@
 ﻿using ActiveListExtensions.Tests.Helpers;
 using ActiveListExtensions.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -121,6 +122,32 @@ namespace ActiveListExtensions.Tests.Modifiers
 			collection.Add(0);
 
 			Assert.True(countChanged);
+		}
+
+		[Fact]
+		public void NonGenericEnumerableValuesMatchActiveListValues()
+		{
+			var values = Enumerable.Range(0, 100).Select(_ => new object()).ToArray();
+
+			var enumerable = new TestEnumerable(values);
+
+			var sut = enumerable.ToActiveList();
+
+			Assert.True(sut.SequenceEqual(values));
+		}
+	}
+
+	public class TestEnumerable : IEnumerable
+	{
+		private readonly IEnumerable<object> _values;
+
+		public TestEnumerable(IEnumerable<object> values)
+			=> _values = values;
+
+		public IEnumerator GetEnumerator()
+		{
+			foreach (var value in _values)
+				yield return value;
 		}
 	}
 }
