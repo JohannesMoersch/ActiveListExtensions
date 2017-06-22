@@ -29,6 +29,28 @@ namespace ActiveListExtensions
 			return subject;
 		}
 
+		public static IObservable<IReadOnlyList<T>> ObserveAll<T>(this IActiveList<T> list)
+		{
+			var subject = new Subject<IReadOnlyList<T>>();
+
+			var handler = new EventHandler<NotifyCollectionChangedEventArgs>((o, e) =>
+			{
+				var count = list.Count;
+
+				var array = new T[count];
+				for (int i = 0; i < count; ++i)
+					array[i] = list[i];
+
+				subject.OnNext(array);
+			});
+
+			CollectionChangedEventManager.AddHandler(list, handler);
+
+			subject.Subscribe(_ => { }, () => CollectionChangedEventManager.RemoveHandler(list, handler));
+
+			return subject;
+		}
+
 		public static IObservable<T> ObserveAdded<T>(this IActiveList<T> list) => ObserveAddedWithIndex(list).Select(o => o.Item);
 
 		public static IObservable<ItemAdded<T>> ObserveAddedWithIndex<T>(this IActiveList<T> list)

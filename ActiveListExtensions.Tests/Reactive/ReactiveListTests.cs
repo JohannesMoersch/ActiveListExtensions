@@ -14,6 +14,39 @@ namespace ActiveListExtensions.Tests.Reactive
 		private IDisposable sut;
 
 		[Fact]
+		public void ObserveAllOnRandomOperations()
+		{
+			RandomGenerator.ResetRandomGenerator();
+
+			var list = new ObservableList<object>();
+			foreach (var value in Enumerable.Range(0, 100))
+				list.Add(list.Count, new object());
+
+			IEnumerable<object> lastList = null;
+			sut = list.ObserveAll().Subscribe(l => lastList = l);
+
+			foreach (var value in Enumerable.Range(0, 1000))
+			{
+				switch (list.Count > 0 ? RandomGenerator.GenerateRandomInteger(0, 4) : 0)
+				{
+					case 0:
+						list.Add(RandomGenerator.GenerateRandomInteger(0, list.Count), new object());
+						break;
+					case 1:
+						list.Remove(RandomGenerator.GenerateRandomInteger(0, list.Count));
+						break;
+					case 2:
+						list.Replace(RandomGenerator.GenerateRandomInteger(0, list.Count), new object());
+						break;
+					case 3:
+						list.Move(RandomGenerator.GenerateRandomInteger(0, list.Count), RandomGenerator.GenerateRandomInteger(0, list.Count));
+						break;
+				}
+				Assert.True(list.SequenceEqual(lastList));
+			}
+		}
+
+		[Fact]
 		public void ObserveAddedOnRandomOperations()
 		{
 			RandomGenerator.ResetRandomGenerator();

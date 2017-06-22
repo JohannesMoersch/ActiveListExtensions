@@ -17,6 +17,8 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<TValue> ToActiveValue<TSource, TValue>(this TSource source, Func<TSource, TValue> valueGetter, IEnumerable<string> propertiesToWatch) => new ActiveValueListener<TSource, TValue>(source, valueGetter, propertiesToWatch);
 
+		public static IActiveValue<IReadOnlyList<TSource>> ToActiveValue<TSource>(this IActiveList<TSource> source) => new ActiveMutateList<TSource, IReadOnlyList<TSource>>(source, o => o);
+
 
 		public static IActiveValue<TResult> ActiveMutate<TValue, TResult>(this IActiveValue<TValue> source, Expression<Func<TValue, TResult>> mutator) => ActiveMutate(source, mutator.Compile(), mutator.GetReferencedProperties());
 
@@ -45,10 +47,6 @@ namespace ActiveListExtensions
 
 		private static IActiveValue<bool> ActiveSequenceEqual<TSource, TParameter>(this IActiveList<TSource> source, IEnumerable<TSource> otherSource, IActiveValue<TParameter> parameter, Func<TSource, TSource, TParameter, bool> comparer, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveSequenceEqual<TSource, TParameter>(source, otherSource.ToReadOnlyList(), parameter, comparer, propertiesToWatch.Item1.Concat(propertiesToWatch.Item2).Distinct(), propertiesToWatch.Item3);
 
-
-		public static IActiveValue<TResult> ActiveCombine<TValue1, TValue2, TResult>(this IActiveValue<TValue1> value1, TValue2 value2, Expression<Func<TValue1, TValue2, TResult>> resultCombiner) => ActiveCombine(value1, new ActiveValueWrapper<TValue2>(value2), resultCombiner);
-
-		public static IActiveValue<TResult> ActiveCombine<TValue1, TValue2, TResult>(this IActiveValue<TValue1> value1, TValue2 value2, Func<TValue1, TValue2, TResult> resultCombiner, IEnumerable<string> value1PropertiesToWatch, IEnumerable<string> value2PropertiesToWatch) => ActiveCombine(value1, new ActiveValueWrapper<TValue2>(value2), resultCombiner, value1PropertiesToWatch, value2PropertiesToWatch);
 
 		public static IActiveValue<TResult> ActiveCombine<TValue1, TValue2, TResult>(this IActiveValue<TValue1> value1, IActiveValue<TValue2> value2, Expression<Func<TValue1, TValue2, TResult>> resultCombiner) => ActiveCombine(value1, value2, resultCombiner.Compile(), resultCombiner.GetReferencedProperties());
 

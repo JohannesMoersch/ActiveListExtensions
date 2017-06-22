@@ -15,9 +15,6 @@ namespace ActiveListExtensions.Reactive
 			get => _value;
 			set
 			{
-				if (Equals(_value, value))
-					return;
-
 				var oldValue = _value;
 				_value = value;
 
