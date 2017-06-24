@@ -34,9 +34,6 @@ namespace ActiveListExtensions.Utilities
 
 		public CollectionWrapper(IReadOnlyList<T> collection, string[] propertiesToWatch = null)
 		{
-			if (collection == null)
-				throw new ArgumentNullException(nameof(collection));
-
 			if ((propertiesToWatch?.Length ?? 0) > 0)
 				_propertiesToWatch = propertiesToWatch;
 

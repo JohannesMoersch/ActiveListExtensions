@@ -44,6 +44,8 @@
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IActiveGrouping.cs" />
     <Compile Include="IActiveLookup.cs" />
+    <Compile Include="IActiveSet.cs" />
+    <Compile Include="IActiveSetList.cs" />
     <Compile Include="IActiveValue.cs" />
     <Compile Include="IMutableActiveList.cs" />
     <Compile Include="IMutableActiveValue.cs" />
@@ -93,6 +95,7 @@
     <Compile Include="ValueModifiers\ActiveMutateList.cs" />
     <Compile Include="ValueModifiers\ActiveMutateValue.cs" />
     <Compile Include="ValueModifiers\ActiveSequenceEqual.cs" />
+    <Compile Include="ValueModifiers\ActiveSetContains.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefault.cs" />
     <Compile Include="ValueModifiers\ActiveSum.cs" />
     <Compile Include="ValueModifiers\Bases\ActiveAccumulatorBase.cs" />

@@ -8,7 +8,7 @@ using ActiveListExtensions.Utilities;
 
 namespace ActiveListExtensions.ListModifiers.Bases
 {
-	internal abstract class ActiveSetBase<TKey, TSource, TParameter> : ActiveMultiListListenerBase<TSource, TSource, TParameter, TSource>
+	internal abstract class ActiveSetBase<TKey, TSource, TParameter> : ActiveMultiListListenerBase<TSource, TSource, TParameter, TSource>, IActiveSetList<TSource>
 	{
 		protected enum SetAction
 		{
@@ -81,9 +81,9 @@ namespace ActiveListExtensions.ListModifiers.Bases
 
 		private readonly IDictionary<TKey, SourceSet> _rightCount;
 
-		private readonly List<SourcePair> _leftKeys;
+		private readonly QuickList<SourcePair> _leftKeys;
 
-		private readonly List<SourcePair> _rightKeys;
+		private readonly QuickList<SourcePair> _rightKeys;
 
 		private readonly Func<TSource, TKey> _keySelector;
 
@@ -92,8 +92,8 @@ namespace ActiveListExtensions.ListModifiers.Bases
 		{
 			_keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
 
-			_leftKeys = new List<SourcePair>();
-			_rightKeys = new List<SourcePair>();
+			_leftKeys = new QuickList<SourcePair>();
+			_rightKeys = new QuickList<SourcePair>();
 
 			_cumulativeList = new List<ResultSet>();
 			_leftCount = new Dictionary<TKey, SourceSet>();
@@ -133,6 +133,24 @@ namespace ActiveListExtensions.ListModifiers.Bases
 		{
 			_resultList.Dispose();
 			base.OnDisposed();
+		}
+
+		public bool Contains(TSource value)
+		{
+			var key = _keySelector.Invoke(value);
+
+			var existsInLeft = _leftCount.ContainsKey(key);
+			var existsInRight = _rightCount?.ContainsKey(key) ?? false;
+
+			if (existsInLeft)
+			{
+				if ((OnAddedToLeft(existsInRight) == SetAction.Add || OnAddedToLeft(false) == SetAction.Add) && (!existsInRight || OnAddedToRight(true) != SetAction.Remove))
+					return true;
+			}
+			else if (existsInRight && OnAddedToRight(false) == SetAction.Add)
+				return true;
+
+			return false;
 		}
 
 		protected abstract SetAction OnAddedToLeft(bool existsInRight);
@@ -270,28 +288,28 @@ namespace ActiveListExtensions.ListModifiers.Bases
 		protected override void OnAdded(int index, TSource value)
 		{
 			var key = _keySelector.Invoke(value);
-			_leftKeys.Insert(index, new SourcePair(key, value));
+			_leftKeys.Add(index, new SourcePair(key, value));
 			Add(key, value, _leftCount, _rightCount, OnAddedToLeft);
 		}
 
 		protected override void OnAdded(int collectionIndex, int index, TSource value)
 		{
 			var key = _keySelector.Invoke(value);
-			_rightKeys.Insert(index, new SourcePair(key, value));
+			_rightKeys.Add(index, new SourcePair(key, value));
 			Add(key, value, _rightCount, _leftCount, OnAddedToRight);
 		}
 
 		protected override void OnRemoved(int index, TSource value)
 		{
 			var sourcePair = _leftKeys[index];
-			_leftKeys.RemoveAt(index);
+			_leftKeys.Remove(index);
 			Remove(sourcePair.Key, sourcePair.Value, _leftCount, _rightCount, OnRemovedFromLeft);
 		}
 
 		protected override void OnRemoved(int collectionIndex, int index, TSource value)
 		{
 			var sourcePair = _rightKeys[index];
-			_rightKeys.RemoveAt(index);
+			_rightKeys.Remove(index);
 			Remove(sourcePair.Key, sourcePair.Value, _rightCount, _leftCount, OnRemovedFromRight);
 		}
 
@@ -315,9 +333,11 @@ namespace ActiveListExtensions.ListModifiers.Bases
 			Add(key, newValue, _rightCount, _leftCount, OnAddedToRight);
 		}
 
-		protected override void OnMoved(int oldIndex, int newIndex, TSource value) { }
+		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
+			=> _leftKeys.Move(oldIndex, newIndex);
 
-		protected override void OnMoved(int collectionIndex, int oldIndex, int newIndex, TSource value) { }
+		protected override void OnMoved(int collectionIndex, int oldIndex, int newIndex, TSource value)
+			=> _rightKeys.Move(oldIndex, newIndex);
 
 		protected override void OnReset(IReadOnlyList<TSource> newItems)
 		{
@@ -327,7 +347,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 			foreach (var value in newItems)
 			{
 				var key = _keySelector.Invoke(value);
-				_leftKeys.Add(new SourcePair(key, value));
+				_leftKeys.Add(_leftKeys.Count, new SourcePair(key, value));
 				Add(key, value, _leftCount, _rightCount, OnAddedToLeft);
 			}
 		}
@@ -340,7 +360,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 			foreach (var value in newItems)
 			{
 				var key = _keySelector.Invoke(value);
-				_rightKeys.Add(new SourcePair(key, value));
+				_rightKeys.Add(_rightKeys.Count, new SourcePair(key, value));
 				Add(key, value, _rightCount, _leftCount, OnAddedToRight);
 			}
 		}

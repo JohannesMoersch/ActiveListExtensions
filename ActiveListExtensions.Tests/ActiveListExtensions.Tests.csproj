@@ -141,6 +141,7 @@
     <Compile Include="ValueModifiers\ActiveMutateListTests.cs" />
     <Compile Include="ValueModifiers\ActiveMutateValueTests.cs" />
     <Compile Include="ValueModifiers\ActiveSequenceEqualTests.cs" />
+    <Compile Include="ValueModifiers\ActiveSetContainsTests.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveSumTests.cs" />
     <Compile Include="Wpf\DependencyPropertyWatcherTests.cs" />

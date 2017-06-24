@@ -183,22 +183,25 @@ namespace ActiveListExtensions.ListModifiers
 				group = new GroupData(item.Key);
 
 				_resultSet.Add(item.Key, group);
-
-				if (addToResultList)
-				{
-					group.TargetIndex = Count;
-					ResultList.Add(group.TargetIndex, group);
-
-					for (int i = group.TargetIndex + 1; i < ResultList.Count; ++i)
-						ResultList[i].TargetIndex = i;
-				}
 			}
+			else
+				addToResultList = false;
 
 			item.TargetIndex = FindTargetIndex(group.Items, item.SourceIndex);
 			group.Items.Add(item.TargetIndex, item);
 
 			for (int i = item.TargetIndex + 1; i < group.Items.Count; ++i)
 				group.Items[i].TargetIndex = i;
+
+			if (addToResultList)
+			{
+				group.TargetIndex = Count;
+
+				for (int i = group.TargetIndex; i < ResultList.Count; ++i)
+					ResultList[i].TargetIndex = i + 1;
+
+				ResultList.Add(group.TargetIndex, group);
+			}
 		}
 
 		private void RemoveFromGroup(ItemData item)
@@ -214,14 +217,16 @@ namespace ActiveListExtensions.ListModifiers
 
 				if (group.Items.Count == 0)
 				{
-					ResultList.Remove(group.TargetIndex);
+					_resultSet.Remove(item.Key);
 
-					for (int i = group.TargetIndex; i < ResultList.Count; ++i)
-						ResultList[i].TargetIndex = i;
+					var removeIndex = group.TargetIndex;
+
+					for (int i = group.TargetIndex + 1; i < ResultList.Count; ++i)
+						ResultList[i].TargetIndex = i - 1;
 
 					group.TargetIndex = -1;
 
-					_resultSet.Remove(item.Key);
+					ResultList.Remove(removeIndex);
 				}
 			}
 		}

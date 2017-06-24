@@ -287,5 +287,14 @@ namespace ActiveListExtensions
 		public static IActiveValue<decimal> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, decimal> selector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ActiveAverageOrDefault(source, parameter, selector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
 
 		private static IActiveValue<decimal> ActiveAverageOrDefault<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, decimal> selector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveAverageOrDefault<TSource, TParameter, decimal, decimal>(source, parameter, selector, (i1, i2) => i1 + i2, (i1, i2) => i1 - i2, (i1, i2) => i1 / i2, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+
+		public static IActiveValue<bool> ActiveSetContains<TSource>(this IActiveSetList<TSource> source, TSource value) => ActiveSetContains(source, new ActiveValueWrapper<TSource>(value));
+
+		public static IActiveValue<bool> ActiveSetContains<TSource>(this IActiveSetList<TSource> source, IActiveValue<TSource> value) => new ActiveSetContains<TSource, TSource>(source, source, value);
+
+		public static IActiveValue<bool> ActiveSetContains<TKey, TSource>(this IActiveLookup<TKey, TSource> source, TKey value) => ActiveSetContains(source, new ActiveValueWrapper<TKey>(value));
+
+		public static IActiveValue<bool> ActiveSetContains<TKey, TSource>(this IActiveLookup<TKey, TSource> source, IActiveValue<TKey> value) => new ActiveSetContains<TKey, IActiveGrouping<TKey, TSource>>(source, source, value);
 	}
 }
