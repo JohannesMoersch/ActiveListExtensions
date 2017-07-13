@@ -52,9 +52,23 @@ namespace ActiveListExtensions.ListModifiers
 
 		private readonly IDictionary<TKey, GroupData> _resultSet;
 
+		private readonly IDictionary<TKey, GroupData> _emptyGroups;
+
 		private readonly Func<TSource, TKey> _keySelector;
 
-		public IEnumerable<TSource> this[TKey key] => _resultSet[key].Items;
+		public IActiveList<TSource> this[TKey key]
+		{
+			get
+			{
+				if (!_resultSet.TryGetValue(key, out var group) && !_emptyGroups.TryGetValue(key, out group))
+				{
+					group = new GroupData(key);
+					_emptyGroups.Add(key, group);
+				}
+
+				return group.Items;
+			}
+		}
 
 		public ActiveLookup(IActiveList<TSource> source, Func<TSource, TKey> keySelector, IEnumerable<string> propertiesToWatch)
 			: this(source, keySelector, null, propertiesToWatch, null)
@@ -71,6 +85,7 @@ namespace ActiveListExtensions.ListModifiers
 		{
 			_sourceData = new QuickList<ItemData>();
 			_resultSet = new Dictionary<TKey, GroupData>();
+			_emptyGroups = new Dictionary<TKey, GroupData>();
 
 			_keySelector = keySelector;
 
@@ -178,9 +193,12 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void AddToGroup(ItemData item, bool addToResultList = true)
 		{
-			if (!_resultSet.TryGetValue(item.Key, out GroupData group))
+			if (!_resultSet.TryGetValue(item.Key, out var group))
 			{
-				group = new GroupData(item.Key);
+				if (!_emptyGroups.TryGetValue(item.Key, out group))
+					group = new GroupData(item.Key);
+				else
+					_emptyGroups.Remove(item.Key);
 
 				_resultSet.Add(item.Key, group);
 			}
@@ -217,6 +235,7 @@ namespace ActiveListExtensions.ListModifiers
 
 				if (group.Items.Count == 0)
 				{
+					_emptyGroups.Add(item.Key, _resultSet[item.Key]);
 					_resultSet.Remove(item.Key);
 
 					var removeIndex = group.TargetIndex;

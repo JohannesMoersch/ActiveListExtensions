@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ActiveListExtensions.ListModifiers;
 using ActiveListExtensions.Utilities;
 using System.Collections;
+using ActiveListExtensions.ValueModifiers;
 
 namespace ActiveListExtensions
 {
@@ -223,6 +224,11 @@ namespace ActiveListExtensions
 		public static IActiveLookup<TKey, TSource> ToActiveLookup<TKey, TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch) => ToActiveLookup(source, parameter, keySelector, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
 
 		private static IActiveLookup<TKey, TSource> ToActiveLookup<TKey, TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Func<TSource, TParameter, TKey> keySelector, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch) => new ActiveLookup<TKey, TSource, TParameter>(source, keySelector, parameter, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+
+		public static IActiveList<TSource> ActiveSelectByKey<TKey, TSource>(this IActiveLookup<TKey, TSource> source, TKey key) => ActiveSelectByKey(source, new ActiveValueWrapper<TKey>(key));
+
+		public static IActiveList<TSource> ActiveSelectByKey<TKey, TSource>(this IActiveLookup<TKey, TSource> source, IActiveValue<TKey> key) => new ActiveGetOrDefault<TKey, TSource>(source, key).ToActiveList();
 
 
 		public static IActiveList<TSource> ActiveTranslateResetNotifications<TSource>(this IActiveList<TSource> source) => new ActiveTranslateResetNotifications<TSource>(source);

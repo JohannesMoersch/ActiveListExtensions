@@ -105,8 +105,10 @@
     <Compile Include="Modifiers\ActiveExceptTests.cs" />
     <Compile Include="Modifiers\ActiveGroupByTests.cs" />
     <Compile Include="Modifiers\ActiveIntersectTests.cs" />
+    <Compile Include="Modifiers\ActiveLookupTests.cs" />
     <Compile Include="Modifiers\ActiveOfTypeTests.cs" />
     <Compile Include="Modifiers\ActiveOrderByTests.cs" />
+    <Compile Include="Modifiers\ActiveSelectByKeyTests.cs" />
     <Compile Include="Modifiers\ActiveTranslateResetNotificationsTests.cs" />
     <Compile Include="Modifiers\ActiveReverseTests.cs" />
     <Compile Include="Modifiers\ActiveSelectTests.cs" />

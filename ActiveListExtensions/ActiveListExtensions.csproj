@@ -52,6 +52,7 @@
     <Compile Include="ListModifiers\ActiveDistinct.cs" />
     <Compile Include="ListModifiers\ActiveElementsOrEmpty.cs" />
     <Compile Include="ListModifiers\ActiveExcept.cs" />
+    <Compile Include="ValueModifiers\ActiveGetOrDefault.cs" />
     <Compile Include="ListModifiers\ActiveIntersect.cs" />
     <Compile Include="ListModifiers\ActiveListWrapper.cs" />
     <Compile Include="ListModifiers\ActiveLookup.cs" />

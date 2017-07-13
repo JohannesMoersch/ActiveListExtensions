@@ -8,6 +8,6 @@ namespace ActiveListExtensions
 {
 	public interface IActiveLookup<TKey, out TSource> : IActiveList<IActiveGrouping<TKey, TSource>>, IActiveSet<TKey>
 	{
-		IEnumerable<TSource> this[TKey key] { get; }
+		IActiveList<TSource> this[TKey key] { get; }
 	}
 }
