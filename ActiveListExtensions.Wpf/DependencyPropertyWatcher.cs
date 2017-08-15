@@ -31,10 +31,7 @@ namespace ActiveListExtensions.Wpf
 			BindingOperations.SetBinding(this, ValueProperty, binding);
 		}
 
-		public void Dispose()
-		{
-			throw new NotImplementedException();
-		}
+		public void Dispose() => BindingOperations.ClearBinding(this, ValueProperty);
 
 		private void OnValueChanged(T oldValue, T newValue)
 		{
