@@ -38,5 +38,15 @@ namespace ActiveListExtensions.Tests.Reactive
 
 			Assert.True(notificationReceived);
 		}
+
+		[Fact]
+		public void DefaultValueOnEmptyObservable()
+		{
+			var subject = new Subject<int>();
+
+			var value = subject.ToActiveValue(10);
+
+			Assert.Equal(value.Value, 10);
+		}
 	}
 }
