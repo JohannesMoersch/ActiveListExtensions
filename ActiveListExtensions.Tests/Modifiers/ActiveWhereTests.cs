@@ -31,5 +31,21 @@ namespace ActiveListExtensions.Tests.Modifiers
 
 		[Fact]
 		public void RandomlyChangePropertyValues() => CollectionTestHelpers.RandomlyChangePropertyValues(l => l.ActiveWhere(o => o.Property % 2 == 0), l => l.Where(o => o.Property % 2 == 0), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
+
+		[Fact]
+		public void WhereActiveValue()
+		{
+			var value = ActiveValue.Create(false);
+			var sut = new object[] { null }
+				.ToActiveList()
+				.ActiveWhere(_ => value)
+				.ActiveAny();
+
+			Assert.False(sut.Value);
+
+			value.Value = true;
+
+			Assert.True(sut.Value);
+		}
 	}
 }

@@ -24,6 +24,9 @@ namespace ActiveListExtensions.Reactive
 			}
 		}
 
+		public ObservableToActiveValue(T defaultValue = default(T))
+			=> _value = defaultValue;
+
 		private bool _isDisposed;
 
 		public void Dispose()
