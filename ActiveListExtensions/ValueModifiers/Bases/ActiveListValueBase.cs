@@ -44,7 +44,7 @@ namespace ActiveListExtensions.ValueModifiers.Bases
 		protected override void OnDisposed()
 		{
 			_sourceList.Dispose();
-			_parameterWatcher.Dispose();
+			_parameterWatcher?.Dispose();
 		}
 
 		protected virtual void OnParameterChanged() => OnReset(SourceList);
