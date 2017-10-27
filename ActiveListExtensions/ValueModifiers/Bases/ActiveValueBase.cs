@@ -15,6 +15,9 @@ namespace ActiveListExtensions.ValueModifiers.Bases
 			get => _value;
 			protected set
 			{
+				if (Equals(_value, value))
+					return;
+
 				var oldValue = _value;
 				_value = value;
 

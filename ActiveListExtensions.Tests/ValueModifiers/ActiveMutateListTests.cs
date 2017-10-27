@@ -14,7 +14,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		[Fact]
 		public void MutatedListIsCorrectWithoutAnyAppliedChanges()
 		{
-			var source = ActiveList.Create<int>(new[] { 1, 2, 3 });
+			var source = ActiveList.Create(new[] { 1, 2, 3 });
 
 			var sut = source.ActiveMutate(list => list.Select(i => i * 2));
 
@@ -22,18 +22,18 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		}
 
 		[Fact]
-		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ToActiveValue(i => i.Select(o => o.Property)), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, (l1, l2) => l1.SequenceEqual(l2));
+		public void RandomlyInsertItems() => ValueTestHelpers.RandomlyInsertItems(l => l.ActiveMutate(i => i.Select(o => o.Property).ToArray()), l => l.Select(o => o.Property).ToArray(), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, (l1, l2) => l1.SequenceEqual(l2));
 
 		[Fact]
-		public void RandomlyRemoveItems() => ValueTestHelpers.RandomlyRemoveItems(l => l.ToActiveValue(i => i.Select(o => o.Property)), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, (l1, l2) => l1.SequenceEqual(l2));
+		public void RandomlyRemoveItems() => ValueTestHelpers.RandomlyRemoveItems(l => l.ActiveMutate(i => i.Select(o => o.Property).ToArray()), l => l.Select(o => o.Property).ToArray(), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, (l1, l2) => l1.SequenceEqual(l2));
 
 		[Fact]
-		public void RandomlyReplaceItems() => ValueTestHelpers.RandomlyReplaceItems(l => l.ToActiveValue(i => i.Select(o => o.Property)), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, (l1, l2) => l1.SequenceEqual(l2));
+		public void RandomlyReplaceItems() => ValueTestHelpers.RandomlyReplaceItems(l => l.ActiveMutate(i => i.Select(o => o.Property).ToArray()), l => l.Select(o => o.Property).ToArray(), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, (l1, l2) => l1.SequenceEqual(l2));
 
 		[Fact]
-		public void RandomlyMoveItems() => ValueTestHelpers.RandomlyMoveItems(l => l.ToActiveValue(i => i.Select(o => o.Property)), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, (l1, l2) => l1.SequenceEqual(l2));
+		public void RandomlyMoveItems() => ValueTestHelpers.RandomlyMoveItems(l => l.ActiveMutate(i => i.Select(o => o.Property).ToArray()), l => l.Select(o => o.Property).ToArray(), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, (l1, l2) => l1.SequenceEqual(l2));
 
 		[Fact]
-		public void ResetWithRandomItems() => ValueTestHelpers.ResetWithRandomItems(l => l.ToActiveValue(i => i.Select(o => o.Property)), l => l.Select(o => o.Property), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, (l1, l2) => l1.SequenceEqual(l2));
+		public void ResetWithRandomItems() => ValueTestHelpers.ResetWithRandomItems(l => l.ActiveMutate(i => i.Select(o => o.Property).ToArray()), l => l.Select(o => o.Property).ToArray(), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, (l1, l2) => l1.SequenceEqual(l2));
 	}
 }

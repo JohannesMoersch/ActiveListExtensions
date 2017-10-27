@@ -34,5 +34,25 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 
 		[Fact]
 		public void RandomlyChangePropertyValues() => ValueTestHelpers.RandomlyChangePropertyValues(l => l.ActiveAll(i => i.Property > 5), l => l.All(i => i.Property > 5), () => new IntegerTestClass() { Property = RandomGenerator.GenerateRandomInteger() }, o => o.Property = RandomGenerator.GenerateRandomInteger());
+
+		[Fact]
+		public void OnlyThrowChangeNotificationWhenValueChanges()
+		{
+			var list = ActiveList.Create<int>();
+
+			int changeCount = 0;
+
+			var sut = list.ActiveAll(i => i % 2 == 0);
+
+			sut.ValueChanged += (s, e) => ++changeCount;
+
+			list.Add(0, 2);
+			list.Add(0, 4);
+			list.Add(0, 1);
+
+			list.Clear();
+
+			Assert.Equal(2, changeCount);
+		}
 	}
 }
