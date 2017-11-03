@@ -18,14 +18,12 @@ namespace ActiveListExtensions
 		public static IActiveValue<TValue> ToActiveValue<TSource, TValue>(this TSource source, Func<TSource, TValue> valueGetter, IEnumerable<string> propertiesToWatch) => new ActiveValueListener<TSource, TValue>(source, valueGetter, propertiesToWatch);
 
 
-		public static IActiveValue<TResult> ActiveMutate<TValue, TResult>(this IActiveValue<TValue> source, Expression<Func<TValue, TResult>> mutator) => ActiveMutate(source, mutator.Compile(), mutator.GetReferencedProperties());
+		public static IActiveValue<TResult> ActiveSelect<TValue, TResult>(this IActiveValue<TValue> source, Expression<Func<TValue, TResult>> mutator) => ActiveSelect(source, mutator.Compile(), mutator.GetReferencedProperties());
 
-		public static IActiveValue<TResult> ActiveMutate<TValue, TResult>(this IActiveValue<TValue> source, Func<TValue, TResult> mutator, IEnumerable<string> propertiesToWatch) => new ActiveMutateValue<TValue, TResult>(source, mutator, propertiesToWatch);
+		public static IActiveValue<TResult> ActiveSelect<TValue, TResult>(this IActiveValue<TValue> source, Func<TValue, TResult> mutator, IEnumerable<string> propertiesToWatch) => new ActiveSelectValue<TValue, TResult>(source, mutator, propertiesToWatch);
 
 
-		public static IActiveValue<IReadOnlyList<TSource>> ActiveMutate<TSource>(this IActiveList<TSource> source) => new ActiveMutateList<TSource, IReadOnlyList<TSource>>(source, o => o);
-
-		public static IActiveValue<TResult> ActiveMutate<TSource, TResult>(this IActiveList<TSource> source, Func<IReadOnlyList<TSource>, TResult> mutator) => new ActiveMutateList<TSource, TResult>(source, mutator);
+		public static IActiveValue<IReadOnlyList<TSource>> AsActiveValue<TSource>(this IActiveList<TSource> source) => new ActiveListAsActiveValue<TSource>(source);
 
 
 		public static IActiveValue<bool> ActiveSequenceEqual<TSource>(this IActiveList<TSource> source, IEnumerable<TSource> otherSource)

@@ -15,7 +15,7 @@ namespace ActiveListExtensions.Tests.Wpf
 		{
 			var source = new TestDependencyObject();
 
-			var value = source.ToActiveValue<int>(TestDependencyObject.TestPropertyProperty).ActiveMutate(o => o);
+			var value = source.ToActiveValue<int>(TestDependencyObject.TestPropertyProperty).ActiveSelect(o => o);
 
 			Assert.Equal(0, value.Value);
 

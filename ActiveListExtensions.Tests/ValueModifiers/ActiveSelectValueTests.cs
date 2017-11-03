@@ -9,13 +9,13 @@ using Xunit;
 
 namespace ActiveListExtensions.Tests.ValueModifiers
 {
-	public class ActiveMutateValueTests
+	public class ActiveSelectValueTests
 	{
 		[Fact]
 		public void WhenMutatingContainerValueChanged()
 		{
-			var source = new ActiveMutateValueTestOuterClass() { Container = new IntegerTestClass() { Property = 100 } };
-			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
+			var source = new ActiveSelectValueTestOuterClass() { Container = new IntegerTestClass() { Property = 100 } };
+			var sut = source.ToActiveValue(c => c.Container).ActiveSelect(c => c.Property);
 
 			source.Container = new IntegerTestClass() { Property = 200 };
 
@@ -25,8 +25,8 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		[Fact]
 		public void WhenMutatingPropertyValueChanged()
 		{
-			var source = new ActiveMutateValueTestOuterClass() { Container = new IntegerTestClass() { Property = 100 } };
-			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
+			var source = new ActiveSelectValueTestOuterClass() { Container = new IntegerTestClass() { Property = 100 } };
+			var sut = source.ToActiveValue(c => c.Container).ActiveSelect(c => c.Property);
 
 			source.Container.Property = 200;
 
@@ -36,8 +36,8 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		[Fact]
 		public void WhenMutatingPropertyChangeNotificationIsThrown()
 		{
-			var source = new ActiveMutateValueTestOuterClass() { Container = new IntegerTestClass() { Property = 100 } };
-			var sut = source.ToActiveValue(c => c.Container).ActiveMutate(c => c.Property);
+			var source = new ActiveSelectValueTestOuterClass() { Container = new IntegerTestClass() { Property = 100 } };
+			var sut = source.ToActiveValue(c => c.Container).ActiveSelect(c => c.Property);
 
 			bool called = false;
 
@@ -49,7 +49,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		}
 	}
 
-	public class ActiveMutateValueTestOuterClass : INotifyPropertyChanged
+	public class ActiveSelectValueTestOuterClass : INotifyPropertyChanged
 	{
 		private IntegerTestClass _container;
 		public IntegerTestClass Container

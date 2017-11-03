@@ -17,12 +17,13 @@ namespace ActiveListExtensions.ValueModifiers.Bases
 
 		protected TParameter ParameterValue => _parameterWatcher != null ? _parameterWatcher.Value : default(TParameter);
 
-		public ActiveListValueBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null)
-			: this(source, null, propertiesToWatch)
+		public ActiveListValueBase(IActiveList<TSource> source, IEnumerable<string> propertiesToWatch = null, bool allowsThrowChangeNotifications = false)
+			: this(source, null, propertiesToWatch, null, allowsThrowChangeNotifications)
 		{
 		}
 
-		public ActiveListValueBase(IActiveList<TSource> source, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> parameterPropertiesToWatch = null)
+		public ActiveListValueBase(IActiveList<TSource> source, IActiveValue<TParameter> parameter, IEnumerable<string> sourcePropertiesToWatch = null, IEnumerable<string> parameterPropertiesToWatch = null, bool allowsThrowChangeNotifications = false)
+			: base(allowsThrowChangeNotifications)
 		{
 			_sourceList = new CollectionWrapper<TSource>(source, sourcePropertiesToWatch?.ToArray());
 			_sourceList.ItemModified += (s, i, v) => ItemModified(i, v);

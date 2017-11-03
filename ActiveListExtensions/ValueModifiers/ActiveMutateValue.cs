@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.ValueModifiers
 {
-	internal class ActiveMutateValue<TValue, TResult> : ActiveValueBase<TResult>
+	internal class ActiveSelectValue<TValue, TResult> : ActiveValueBase<TResult>
 	{
 		private Func<TValue, TResult> _mutator;
 
 		private ValueWatcher<TValue> _valueWatcher;
 
-		public ActiveMutateValue(IActiveValue<TValue> value, Func<TValue, TResult> mutator, IEnumerable<string> propertiesToWatch)
+		public ActiveSelectValue(IActiveValue<TValue> value, Func<TValue, TResult> mutator, IEnumerable<string> propertiesToWatch)
 		{
 			_mutator = mutator;
 
