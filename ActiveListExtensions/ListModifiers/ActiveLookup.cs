@@ -41,6 +41,8 @@ namespace ActiveListExtensions.ListModifiers
 
 		internal class GroupData
 		{
+			public int SourceIndex => Items.Count > 0 ? Items[0].SourceIndex : -1;
+
 			public int TargetIndex { get; set; }
 
 			public Group Items { get; }
@@ -109,8 +111,9 @@ namespace ActiveListExtensions.ListModifiers
 		protected override void OnRemoved(int index, TSource value)
 		{
 			var item = _sourceData[index];
-			item.SourceIndex = -1;
 			_sourceData.Remove(index);
+
+			item.SourceIndex = -1;
 
 			for (int i = index; i < _sourceData.Count; ++i)
 				_sourceData[i].SourceIndex = i;
@@ -166,6 +169,9 @@ namespace ActiveListExtensions.ListModifiers
 
 				for (int i = min; i <= max; ++i)
 					group.Items[i].TargetIndex = i;
+
+				if (oldTargetIndex == 0 || item.TargetIndex == 0)
+					UpdateGroupIndex(group);
 			}
 		}
 
@@ -213,19 +219,23 @@ namespace ActiveListExtensions.ListModifiers
 
 			if (addToResultList)
 			{
-				group.TargetIndex = Count;
+				group.TargetIndex = FindTargetIndexForGroup(group.SourceIndex, -1);
 
 				for (int i = group.TargetIndex; i < ResultList.Count; ++i)
 					ResultList[i].TargetIndex = i + 1;
 
 				ResultList.Add(group.TargetIndex, group);
 			}
+			else if (item.TargetIndex == 0)
+				UpdateGroupIndex(group);
 		}
 
 		private void RemoveFromGroup(ItemData item)
 		{
 			if (_resultSet.TryGetValue(item.Key, out GroupData group))
 			{
+				var oldTargetIndex = item.TargetIndex;
+
 				group.Items.Remove(item.TargetIndex);
 
 				for (int i = item.TargetIndex; i < group.Items.Count; ++i)
@@ -247,6 +257,30 @@ namespace ActiveListExtensions.ListModifiers
 
 					ResultList.Remove(removeIndex);
 				}
+				else if (oldTargetIndex == 0)
+					UpdateGroupIndex(group);
+			}
+		}
+
+		private void UpdateGroupIndex(GroupData group)
+		{
+			var oldTargetIndex = group.TargetIndex;
+			group.TargetIndex = FindTargetIndexForGroup(group.SourceIndex, group.TargetIndex);
+
+			if (group.TargetIndex != oldTargetIndex)
+			{
+				if (group.TargetIndex > oldTargetIndex)
+				{
+					for (int i = oldTargetIndex + 1; i <= group.TargetIndex; ++i)
+						ResultList[i].TargetIndex = i - 1;
+				}
+				else
+				{
+					for (int i = group.TargetIndex; i < oldTargetIndex; ++i)
+						ResultList[i].TargetIndex = i + 1;
+				}
+
+				ResultList.Move(oldTargetIndex, group.TargetIndex);
 			}
 		}
 
@@ -258,6 +292,23 @@ namespace ActiveListExtensions.ListModifiers
 			{
 				var mid = bottom + (top - bottom) / 2;
 				var midItem = group[mid];
+				var comparison = sourceIndex.CompareTo(midItem.SourceIndex);
+				if (comparison > 0)
+					bottom = mid + 1;
+				else
+					top = mid - 1;
+			}
+			return bottom;
+		}
+
+		private int FindTargetIndexForGroup(int sourceIndex, int currentIndex)
+		{
+			var bottom = 0;
+			var top = currentIndex >= 0 ? ResultList.Count - 2 : ResultList.Count - 1;
+			while (bottom <= top)
+			{
+				var mid = bottom + (top - bottom) / 2;
+				var midItem = ResultList[currentIndex >= 0 && mid >= currentIndex ? mid + 1 : mid];
 				var comparison = sourceIndex.CompareTo(midItem.SourceIndex);
 				if (comparison > 0)
 					bottom = mid + 1;
