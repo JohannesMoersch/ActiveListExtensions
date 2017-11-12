@@ -134,6 +134,7 @@
     <Compile Include="Reactive\ObservableToActiveValueTests.cs" />
     <Compile Include="Reactive\ReactiveListTests.cs" />
     <Compile Include="Reactive\ReactiveValueTests.cs" />
+    <Compile Include="Utilities\ActiveListJoinerTests.cs" />
     <Compile Include="Utilities\BooleanListTests.cs" />
     <Compile Include="Utilities\ObservableListTests.cs" />
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />

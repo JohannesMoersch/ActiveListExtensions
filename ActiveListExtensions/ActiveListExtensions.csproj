@@ -54,6 +54,8 @@
     <Compile Include="ListModifiers\ActiveExcept.cs" />
     <Compile Include="ListModifiers\ActiveJoin.cs" />
     <Compile Include="MutableActiveListExtensions.cs" />
+    <Compile Include="Utilities\ActiveListJoinBehaviour.cs" />
+    <Compile Include="Utilities\ActiveListJoiner.cs" />
     <Compile Include="ValueModifiers\ActiveGetOrDefault.cs" />
     <Compile Include="ListModifiers\ActiveIntersect.cs" />
     <Compile Include="ListModifiers\ActiveListWrapper.cs" />
