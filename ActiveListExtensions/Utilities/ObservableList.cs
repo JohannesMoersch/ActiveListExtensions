@@ -186,6 +186,40 @@ namespace ActiveListExtensions.Utilities
 			}
 		}
 
+		public virtual void MoveRange(int oldIndex, int newIndex, int count)
+		{
+			if (count == 0)
+				return;
+
+			if (newIndex + count > Count)
+				throw new ArgumentOutOfRangeException(nameof(newIndex));
+
+			try
+			{
+				var diff = newIndex - oldIndex;
+
+				for (int i = 0; i < count; ++i)
+					List.Add(List.Count, default(TStore));
+				
+				if (diff > 0)
+				{
+					for (int i = 0; i < diff; ++i)
+						List[oldIndex + i] = List[oldIndex + count + i];
+				}
+				else
+				{
+
+				}
+
+				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, GetResultFromItem(List[i]), i));
+			}
+			finally
+			{
+				_skipStart = 0;
+				_skipCount = 0;
+			}
+		}
+
 		protected TResult GetResultFromItem(TStore item) => _itemSelector.Invoke(item);
 
 		protected void NotifyOfCollectionChange(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);

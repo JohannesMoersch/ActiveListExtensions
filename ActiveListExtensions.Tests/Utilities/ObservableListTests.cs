@@ -121,5 +121,27 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			Assert.Equal(sut.Count, count);
 		}
+
+		[Fact]
+		public void RandomlyMoveRangesOfItems()
+		{
+			RandomGenerator.ResetRandomGenerator();
+
+			var sut = new ObservableList<int>();
+			foreach (var value in Enumerable.Range(0, 100))
+				sut.Add(sut.Count, value);
+
+			var watcher = new CollectionSynchronizationWatcher<int>(sut);
+
+			foreach (var value in Enumerable.Range(0, 50))
+			{
+				var start = RandomGenerator.GenerateRandomInteger(0, sut.Count);
+				var count = RandomGenerator.GenerateRandomInteger(0, sut.Count + 1);
+				var target = RandomGenerator.GenerateRandomInteger(0, sut.Count - count + 1);
+				sut.MoveRange(start, target, count);
+			}
+
+			Assert.Equal(sut.Count, 100);
+		}
 	}
 }
