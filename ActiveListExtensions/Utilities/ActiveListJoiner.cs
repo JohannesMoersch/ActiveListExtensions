@@ -100,6 +100,14 @@ namespace ActiveListExtensions.Utilities
 			Remove(index);
 		}
 
+		private void ReplaceLeftValue(int index, TLeft value)
+		{
+			if (!SupportsLeft)
+				return;
+
+			Replace(index, GetLeftResult(value));
+		}
+
 		private void AddRightValue(int index, TRight value)
 		{
 			if (!SupportsRight)
@@ -118,6 +126,14 @@ namespace ActiveListExtensions.Utilities
 			_rightItemCount = _rightCollectionWrappper.Count;
 
 			Remove(index);
+		}
+
+		private void ReplaceRightValue(int index, TRight value)
+		{
+			if (!SupportsRight)
+				return;
+
+			Replace(index, GetRightResult(value));
 		}
 
 		private void AddLeftIntersectionValue(int index, TLeft value)
@@ -146,6 +162,14 @@ namespace ActiveListExtensions.Utilities
 				ReplaceRange(index * _rightItemCount, _rightItemCount, replaceWith);
 			else
 				ReplaceRange(0, 0, replaceWith);
+		}
+
+		private void ReplaceLeftIntersectionValue(int index, TLeft value)
+		{
+			if (!SupportsInner)
+				return;
+
+			ReplaceRange(index * _rightItemCount, _rightItemCount, _rightCollectionWrappper.Select(r => GetResult(value, r)).ToArray());
 		}
 
 		private void AddRightIntersectionValue(int index, TRight value)
@@ -197,6 +221,19 @@ namespace ActiveListExtensions.Utilities
 			}
 		}
 
+		private void ReplaceRightIntersectionValue(int index, TRight value)
+		{
+			if (!SupportsInner)
+				return;
+
+			for (int i = 0; i < _leftItemCount; ++i)
+			{
+				var currentIndex = i * _rightItemCount + index;
+
+				Replace(currentIndex, GetResult(_leftCollectionWrappper[i], value));
+			}
+		}
+
 		private TResult GetLeftResult(TLeft left)
 			=> _resultSelector.Invoke(left, default(TRight));
 
@@ -224,6 +261,10 @@ namespace ActiveListExtensions.Utilities
 
 		private void OnLeftReplaced(int index, TLeft oldValue, TLeft newValue)
 		{
+			if (_rightItemCount > 0)
+				ReplaceLeftIntersectionValue(index, newValue);
+			else
+				ReplaceLeftValue(index, newValue);
 		}
 
 		private void OnLeftMoved(int oldIndex, int newIndex, TLeft value)
@@ -252,6 +293,10 @@ namespace ActiveListExtensions.Utilities
 
 		private void OnRightReplaced(int index, TRight oldValue, TRight newValue)
 		{
+			if (_leftItemCount > 0)
+				ReplaceRightIntersectionValue(index, newValue);
+			else
+				ReplaceRightValue(index, newValue);
 		}
 
 		private void OnRightMoved(int oldIndex, int newIndex, TRight value)
