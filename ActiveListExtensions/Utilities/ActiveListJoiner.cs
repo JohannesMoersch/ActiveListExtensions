@@ -90,6 +90,16 @@ namespace ActiveListExtensions.Utilities
 			Add(index, GetLeftResult(value));
 		}
 
+		private void RemoveLeftValue(int index)
+		{
+			if (!SupportsLeft)
+				return;
+
+			_leftItemCount = _leftCollectionWrappper.Count;
+
+			Remove(index);
+		}
+
 		private void AddRightValue(int index, TRight value)
 		{
 			if (!SupportsRight)
@@ -100,11 +110,21 @@ namespace ActiveListExtensions.Utilities
 			Add(index, GetRightResult(value));
 		}
 
+		private void RemoveRightValue(int index)
+		{
+			if (!SupportsRight)
+				return;
+
+			_rightItemCount = _rightCollectionWrappper.Count;
+
+			Remove(index);
+		}
+
 		private void AddLeftIntersectionValue(int index, TLeft value)
 		{
 			var leftItemCount = _leftItemCount;
 
-			var replaceCount = leftItemCount == 0 && SupportsRight ? _rightCollectionWrappper.Count : 0;
+			var replaceCount = leftItemCount == 0 && SupportsRight ? _rightItemCount : 0;
 
 			_leftItemCount = _leftCollectionWrappper.Count;
 
@@ -113,7 +133,19 @@ namespace ActiveListExtensions.Utilities
 
 			var replaceWith = SupportsInner ? _rightCollectionWrappper.Select(r => GetResult(value, r)).ToArray() : new TResult[0];
 
-			ReplaceRange(index * _rightCollectionWrappper.Count, replaceCount, replaceWith);
+			ReplaceRange(index * _rightItemCount, replaceCount, replaceWith);
+		}
+
+		private void RemoveLeftIntersectionValue(int index)
+		{
+			_leftItemCount = _leftCollectionWrappper.Count;
+
+			var replaceWith = SupportsRight && _leftItemCount == 0 ? _rightCollectionWrappper.Select(r => GetRightResult(r)).ToArray() : new TResult[0];
+
+			if (SupportsInner)
+				ReplaceRange(index * _rightItemCount, _rightItemCount, replaceWith);
+			else
+				ReplaceRange(0, 0, replaceWith);
 		}
 
 		private void AddRightIntersectionValue(int index, TRight value)
@@ -127,7 +159,7 @@ namespace ActiveListExtensions.Utilities
 				if (!SupportsInner)
 					return;
 
-				for (int i = _leftCollectionWrappper.Count - 1; i >= 0; --i)
+				for (int i = _leftItemCount - 1; i >= 0; --i)
 				{
 					var newIndex = i * rightItemCount + index;
 
@@ -139,6 +171,29 @@ namespace ActiveListExtensions.Utilities
 				var replaceWith = SupportsInner ? _leftCollectionWrappper.Select(l => GetResult(l, value)).ToArray() : new TResult[0];
 
 				ReplaceRange(0, SupportsLeft ? _leftItemCount : 0, replaceWith);
+			}
+		}
+
+		private void RemoveRightIntersectionValue(int index)
+		{
+			var rightItemCount = _rightItemCount;
+
+			_rightItemCount = _rightCollectionWrappper.Count;
+
+			if (rightItemCount == 1)
+			{
+				var replaceWith = SupportsLeft ? _leftCollectionWrappper.Select(l => GetLeftResult(l)).ToArray() : new TResult[0];
+
+				ReplaceRange(0, SupportsInner ? _leftItemCount : 0, replaceWith);
+			}
+			else if (SupportsInner)
+			{
+				for (int i = _leftItemCount - 1; i >= 0; --i)
+				{
+					var oldIndex = i * rightItemCount + index;
+
+					Remove(oldIndex);
+				}
 			}
 		}
 
@@ -161,6 +216,10 @@ namespace ActiveListExtensions.Utilities
 
 		private void OnLeftRemoved(int index, TLeft value)
 		{
+			if (_rightItemCount > 0)
+				RemoveLeftIntersectionValue(index);
+			else
+				RemoveLeftValue(index);
 		}
 
 		private void OnLeftReplaced(int index, TLeft oldValue, TLeft newValue)
@@ -185,6 +244,10 @@ namespace ActiveListExtensions.Utilities
 
 		private void OnRightRemoved(int index, TRight value)
 		{
+			if (_leftItemCount > 0)
+				RemoveRightIntersectionValue(index);
+			else
+				RemoveRightValue(index);
 		}
 
 		private void OnRightReplaced(int index, TRight oldValue, TRight newValue)

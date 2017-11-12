@@ -122,6 +122,9 @@ namespace ActiveListExtensions.Utilities
 
 		public virtual void ReplaceRange(int startIndex, int oldCount, IReadOnlyList<TSource> newValues)
 		{
+			if (oldCount == 0 && newValues.Count == 0)
+				return;
+
 			try
 			{
 				var top = List.Count - 1;
