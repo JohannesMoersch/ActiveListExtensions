@@ -215,11 +215,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasLeftSetRight()
-				=> TestHasLeftSetRight(ActiveListJoinBehaviour.Inner, new int[0], new[] { 21, 22, 23, 201, 202, 203 });
+				=> TestHasLeftSetRight(ActiveListJoinBehaviour.Inner, new int[0], new[] { 21, 201, 22, 202, 23, 203 });
 
 			[Fact]
 			public void HasRightSetLeft()
-				=> TestHasRightSetLeft(ActiveListJoinBehaviour.Inner, new int[0], new[] { 13, 16, 19, 103, 106, 109 });
+				=> TestHasRightSetLeft(ActiveListJoinBehaviour.Inner, new int[0], new[] { 13, 103, 16, 106, 19, 109 });
 
 			[Fact]
 			public void HasRightSetRight()
@@ -227,11 +227,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasBothSetLeft()
-				=> TestHasBothSetLeft(ActiveListJoinBehaviour.Inner, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 13, 16, 19, 103, 106, 109 });
+				=> TestHasBothSetLeft(ActiveListJoinBehaviour.Inner, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 13, 103, 16, 106, 19, 109 });
 
 			[Fact]
 			public void HasBothSetRight()
-				=> TestHasBothSetRight(ActiveListJoinBehaviour.Inner, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 21, 22, 23, 201, 202, 203 });
+				=> TestHasBothSetRight(ActiveListJoinBehaviour.Inner, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 21, 201, 22, 202, 23, 203 });
 
 			[Fact]
 			public void HasLeftClearLeft()
@@ -243,11 +243,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasBothClearLeft()
-				=> TestHasBothClearLeft(ActiveListJoinBehaviour.Inner, new[] { 11, 12, 13, 101, 102, 103 }, new int[0]);
+				=> TestHasBothClearLeft(ActiveListJoinBehaviour.Inner, new[] { 11, 101, 12, 102, 13, 103 }, new int[0]);
 
 			[Fact]
 			public void HasBothClearRight()
-				=> TestHasBothClearRight(ActiveListJoinBehaviour.Inner, new[] { 11, 12, 13, 101, 102, 103 }, new int[0]);
+				=> TestHasBothClearRight(ActiveListJoinBehaviour.Inner, new[] { 11, 101, 12, 102, 13, 103 }, new int[0]);
 		}
 
 		public class LeftJoin
@@ -266,11 +266,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasLeftSetRight()
-				=> TestHasLeftSetRight(ActiveListJoinBehaviour.Left, new[] { 1, 2, 3 }, new[] { 21, 22, 23, 201, 202, 203 });
+				=> TestHasLeftSetRight(ActiveListJoinBehaviour.Left, new[] { 1, 2, 3 }, new[] { 21, 201, 22, 202, 23, 203 });
 
 			[Fact]
 			public void HasRightSetLeft()
-				=> TestHasRightSetLeft(ActiveListJoinBehaviour.Left, new int[0], new[] { 13, 16, 19, 103, 106, 109 });
+				=> TestHasRightSetLeft(ActiveListJoinBehaviour.Left, new int[0], new[] { 13, 103, 16, 106, 19, 109 });
 
 			[Fact]
 			public void HasRightSetRight()
@@ -278,11 +278,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasBothSetLeft()
-				=> TestHasBothSetLeft(ActiveListJoinBehaviour.Left, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 13, 16, 19, 103, 106, 109 });
+				=> TestHasBothSetLeft(ActiveListJoinBehaviour.Left, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 13, 103, 16, 106, 19, 109 });
 
 			[Fact]
 			public void HasBothSetRight()
-				=> TestHasBothSetRight(ActiveListJoinBehaviour.Left, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 21, 22, 23, 201, 202, 203 });
+				=> TestHasBothSetRight(ActiveListJoinBehaviour.Left, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 21, 201, 22, 202, 23, 203 });
 
 			[Fact]
 			public void HasLeftClearLeft()
@@ -294,11 +294,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasBothClearLeft()
-				=> TestHasBothClearLeft(ActiveListJoinBehaviour.Left, new[] { 11, 12, 13, 101, 102, 103 }, new int[0]);
+				=> TestHasBothClearLeft(ActiveListJoinBehaviour.Left, new[] { 11, 101, 12, 102, 13, 103 }, new int[0]);
 
 			[Fact]
 			public void HasBothClearRight()
-				=> TestHasBothClearRight(ActiveListJoinBehaviour.Left, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 1, 2, 3 });
+				=> TestHasBothClearRight(ActiveListJoinBehaviour.Left, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 1, 2, 3 });
 		}
 
 		public class LeftExcludingJoin
@@ -368,11 +368,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasLeftSetRight()
-				=> TestHasLeftSetRight(ActiveListJoinBehaviour.Right, new int[0], new[] { 21, 22, 23, 201, 202, 203 });
+				=> TestHasLeftSetRight(ActiveListJoinBehaviour.Right, new int[0], new[] { 21, 201, 22, 202, 23, 203 });
 
 			[Fact]
 			public void HasRightSetLeft()
-				=> TestHasRightSetLeft(ActiveListJoinBehaviour.Right, new[] { 10, 100 }, new[] { 13, 16, 19, 103, 106, 109 });
+				=> TestHasRightSetLeft(ActiveListJoinBehaviour.Right, new[] { 10, 100 }, new[] { 13, 103, 16, 106, 19, 109 });
 
 			[Fact]
 			public void HasRightSetRight()
@@ -380,11 +380,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasBothSetLeft()
-				=> TestHasBothSetLeft(ActiveListJoinBehaviour.Right, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 13, 16, 19, 103, 106, 109 });
+				=> TestHasBothSetLeft(ActiveListJoinBehaviour.Right, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 13, 103, 16, 106, 19, 109 });
 
 			[Fact]
 			public void HasBothSetRight()
-				=> TestHasBothSetRight(ActiveListJoinBehaviour.Right, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 21, 22, 23, 201, 202, 203 });
+				=> TestHasBothSetRight(ActiveListJoinBehaviour.Right, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 21, 201, 22, 202, 23, 203 });
 
 			[Fact]
 			public void HasLeftClearLeft()
@@ -396,11 +396,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasBothClearLeft()
-				=> TestHasBothClearLeft(ActiveListJoinBehaviour.Right, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 10, 100 });
+				=> TestHasBothClearLeft(ActiveListJoinBehaviour.Right, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 10, 100 });
 
 			[Fact]
 			public void HasBothClearRight()
-				=> TestHasBothClearRight(ActiveListJoinBehaviour.Right, new[] { 11, 12, 13, 101, 102, 103 }, new int[0]);
+				=> TestHasBothClearRight(ActiveListJoinBehaviour.Right, new[] { 11, 101, 12, 102, 13, 103 }, new int[0]);
 		}
 
 		public class RightExcludingJoin
@@ -470,11 +470,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasLeftSetRight()
-				=> TestHasLeftSetRight(ActiveListJoinBehaviour.Outer, new[] { 1, 2, 3 }, new[] { 21, 22, 23, 201, 202, 203 });
+				=> TestHasLeftSetRight(ActiveListJoinBehaviour.Outer, new[] { 1, 2, 3 }, new[] { 21, 201, 22, 202, 23, 203 });
 
 			[Fact]
 			public void HasRightSetLeft()
-				=> TestHasRightSetLeft(ActiveListJoinBehaviour.Outer, new[] { 10, 100 }, new[] { 13, 16, 19, 103, 106, 109 });
+				=> TestHasRightSetLeft(ActiveListJoinBehaviour.Outer, new[] { 10, 100 }, new[] { 13, 103, 16, 106, 19, 109 });
 
 			[Fact]
 			public void HasRightSetRight()
@@ -482,11 +482,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasBothSetLeft()
-				=> TestHasBothSetLeft(ActiveListJoinBehaviour.Outer, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 13, 16, 19, 103, 106, 109 });
+				=> TestHasBothSetLeft(ActiveListJoinBehaviour.Outer, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 13, 103, 16, 106, 19, 109 });
 
 			[Fact]
 			public void HasBothSetRight()
-				=> TestHasBothSetRight(ActiveListJoinBehaviour.Outer, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 21, 22, 23, 201, 202, 203 });
+				=> TestHasBothSetRight(ActiveListJoinBehaviour.Outer, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 21, 201, 22, 202, 23, 203 });
 
 			[Fact]
 			public void HasLeftClearLeft()
@@ -498,11 +498,11 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			[Fact]
 			public void HasBothClearLeft()
-				=> TestHasBothClearLeft(ActiveListJoinBehaviour.Outer, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 10, 100 });
+				=> TestHasBothClearLeft(ActiveListJoinBehaviour.Outer, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 10, 100 });
 
 			[Fact]
 			public void HasBothClearRight()
-				=> TestHasBothClearRight(ActiveListJoinBehaviour.Outer, new[] { 11, 12, 13, 101, 102, 103 }, new[] { 1, 2, 3 });
+				=> TestHasBothClearRight(ActiveListJoinBehaviour.Outer, new[] { 11, 101, 12, 102, 13, 103 }, new[] { 1, 2, 3 });
 		}
 
 		public class OuterExcludingJoin

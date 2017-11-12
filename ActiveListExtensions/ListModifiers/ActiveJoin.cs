@@ -14,8 +14,6 @@ namespace ActiveListExtensions.ListModifiers
 
 		private List<CollectionWrapper<IActiveGrouping<TKey, TRight>>> _rightGroups = new List<CollectionWrapper<IActiveGrouping<TKey, TRight>>>();
 
-		private string[] _otherSourcePropertiesToWatch;
-
 		public ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveList<TLeft> source, IReadOnlyList<TRight> join, Func<TLeft, TKey> leftKeySelector, Func<TRight, TKey> rightKeySelector, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftKeySelectorPropertiesToWatch, IEnumerable<string> rightKeySelectorPropertiesToWatch, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 			: this(
 				joinBehaviour,
