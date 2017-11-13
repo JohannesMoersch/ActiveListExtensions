@@ -116,7 +116,14 @@ namespace ActiveListExtensions.ListModifiers
 			if (!_joiners.TryGetValue(value.Key, out var joiner))
 				_joiners.Add(value.Key, CreateJoiner(index, value, null, null));
 			else
+			{
+				_leftJoiners.Add(joiner.LeftSourceIndex.Value, joiner);
+
+				for (int i = joiner.LeftSourceIndex.Value + 1; i < _leftJoiners.Count; ++i)
+					_leftJoiners[i].LeftSourceIndex = i;
+
 				joiner.Joiner.SetLeft(value);
+			}
 		}
 
 		private void OnLeftRemoved(int index, IActiveGrouping<TKey, TLeft> value)
@@ -140,7 +147,14 @@ namespace ActiveListExtensions.ListModifiers
 			if (!_joiners.TryGetValue(value.Key, out var joiner))
 				_joiners.Add(value.Key, CreateJoiner(null, null, index, value));
 			else
+			{
+				_rightJoiners.Add(joiner.RightSourceIndex.Value, joiner);
+
+				for (int i = joiner.RightSourceIndex.Value + 1; i < _rightJoiners.Count; ++i)
+					_rightJoiners[i].RightSourceIndex = i;
+
 				joiner.Joiner.SetRight(value);
+			}
 		}
 
 		private void OnRightRemoved(int index, IActiveGrouping<TKey, TRight> value)
@@ -210,6 +224,7 @@ namespace ActiveListExtensions.ListModifiers
 			{
 				var newValues = values.ToArray();
 
+				var oldCount = data.Count;
 				if (data.Count != newValues.Length)
 				{
 					data.Count = newValues.Length;
@@ -217,17 +232,27 @@ namespace ActiveListExtensions.ListModifiers
 					UpdateIndices(data.TargetIndex, data.Offset);
 				}
 
-				_resultList.ReplaceRange(data.Offset, data.Count, newValues);
+				_resultList.ReplaceRange(data.Offset, oldCount, newValues);
 			};
 
 			data.LeftSourceIndex = leftSourceIndex;
 			data.RightSourceIndex = rightSourceIndex;
 
 			if (data.LeftSourceIndex.HasValue)
+			{
 				_leftJoiners.Add(data.LeftSourceIndex.Value, data);
 
+				for (int i = data.LeftSourceIndex.Value + 1; i < _leftJoiners.Count; ++i)
+					_leftJoiners[i].LeftSourceIndex = i;
+			}
+
 			if (data.RightSourceIndex.HasValue)
+			{
 				_rightJoiners.Add(data.RightSourceIndex.Value, data);
+
+				for (int i = data.RightSourceIndex.Value + 1; i < _rightJoiners.Count; ++i)
+					_rightJoiners[i].RightSourceIndex = i;
+			}
 
 			UpdateIndices(0, 0);
 
@@ -250,6 +275,8 @@ namespace ActiveListExtensions.ListModifiers
 
 			for (int i = startIndex; i < _rightJoiners.Count; ++i)
 			{
+				if (_rightJoiners[i].LeftSourceIndex.HasValue)
+					continue;
 				_rightJoiners[i].Offset = offset;
 				offset += _rightJoiners[i].Count;
 			}
