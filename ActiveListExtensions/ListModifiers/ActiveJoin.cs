@@ -10,11 +10,33 @@ namespace ActiveListExtensions.ListModifiers
 {
 	internal class ActiveJoin<TLeft, TRight, TResult, TKey, TParameter> : ActiveBase<TResult>
 	{
+		private class JoinerData
+		{
+			public int SourceIndex { get; set; }
+
+			public int TargetIndex { get; set; }
+
+			public ActiveListJoiner<TLeft, TRight, TResult, TParameter> Joiner { get; }
+
+			public JoinerData(ActiveListJoiner<TLeft, TRight, TResult, TParameter> joiner)
+				=> Joiner = joiner;
+		}
+
 		private readonly CollectionWrapper<IActiveGrouping<TKey, TLeft>> _leftGroups;
 
 		private readonly CollectionWrapper<IActiveGrouping<TKey, TRight>> _rightGroups;
 
-		private readonly IDictionary<TKey, ActiveListJoiner<TLeft, TRight, TResult, TParameter>> _joiners;
+		private readonly IDictionary<TKey, JoinerData> _joiners;
+
+		private readonly ActiveListJoinBehaviour _joinBehaviour;
+
+		private readonly IActiveValue<TParameter> _parameter;
+
+		private readonly Func<TLeft, TRight, TParameter, TResult> _resultSelector;
+
+		private readonly IEnumerable<string> _leftResultSelectorPropertiesToWatch;
+		private readonly IEnumerable<string> _rightResultSelectorPropertiesToWatch;
+		private readonly IEnumerable<string> _resultSelectorParameterPropertiesToWatch;
 
 		public ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveList<TLeft> source, IReadOnlyList<TRight> join, Func<TLeft, TKey> leftKeySelector, Func<TRight, TKey> rightKeySelector, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftKeySelectorPropertiesToWatch, IEnumerable<string> rightKeySelectorPropertiesToWatch, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 			: this(
@@ -27,8 +49,6 @@ namespace ActiveListExtensions.ListModifiers
 				rightResultSelectorPropertiesToWatch,
 				null)
 		{
-			;
-			;
 		}
 
 		public ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveList<TLeft> source, IReadOnlyList<TRight> join, IActiveValue<TParameter> parameter, Func<TLeft, TParameter, TKey> leftKeySelector, Func<TRight, TParameter, TKey> rightKeySelector, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftKeySelectorPropertiesToWatch, IEnumerable<string> rightKeySelectorPropertiesToWatch, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> leftKeySelectorParameterPropertiesToWatch, IEnumerable<string> rightKeySelectorParameterPropertiesToWatch, IEnumerable<string> resultSelectorParameterPropertiesToWatch)
@@ -46,7 +66,15 @@ namespace ActiveListExtensions.ListModifiers
 
 		private ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveLookup<TKey, TLeft> left, IActiveLookup<TKey, TRight> right, IActiveValue<TParameter> parameter, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> resultSelectorParameterPropertiesToWatch)
 		{
-			_joiners = new Dictionary<TKey, ActiveListJoiner<TLeft, TRight, TResult, TParameter>>();
+			_joinBehaviour = joinBehaviour;
+			_parameter = parameter;
+			_resultSelector = resultSelector;
+
+			_leftResultSelectorPropertiesToWatch = leftResultSelectorPropertiesToWatch;
+			_rightResultSelectorPropertiesToWatch = rightResultSelectorPropertiesToWatch;
+			_resultSelectorParameterPropertiesToWatch = resultSelectorParameterPropertiesToWatch;
+
+			_joiners = new Dictionary<TKey, JoinerData>();
 
 			_leftGroups = new CollectionWrapper<IActiveGrouping<TKey, TLeft>>(left);
 			_leftGroups.ItemModified += (s, i, v) => OnLeftReplaced(i, v, v);
@@ -67,6 +95,10 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void OnLeftAdded(int index, IActiveGrouping<TKey, TLeft> value)
 		{
+			if (!_joiners.TryGetValue(value.Key, out var joiner))
+				_joiners.Add(value.Key, CreateJoiner(value, null));
+			else
+				joiner.Joiner.SetLeft(value);
 		}
 
 		private void OnLeftRemoved(int index, IActiveGrouping<TKey, TLeft> value)
@@ -105,12 +137,14 @@ namespace ActiveListExtensions.ListModifiers
 		{
 		}
 
+		private JoinerData CreateJoiner(IReadOnlyList<TLeft> left, IReadOnlyList<TRight> right)
+		{
+			var joiner = new JoinerData(new ActiveListJoiner<TLeft, TRight, TResult, TParameter>(_joinBehaviour, _parameter, _resultSelector, _leftResultSelectorPropertiesToWatch, _rightResultSelectorPropertiesToWatch, _resultSelectorParameterPropertiesToWatch));
 
+			joiner.Joiner.SetBoth(left, right);
 
-
-
-
-
+			return joiner;
+		}
 
 		public override TResult this[int index] => throw new NotImplementedException();
 

@@ -92,6 +92,7 @@
   <ItemGroup>
     <Compile Include="ActiveRangeTests.cs" />
     <Compile Include="ActiveRepeatTests.cs" />
+    <Compile Include="Helpers\ActiveListJoinerToReadOnlyList.cs" />
     <Compile Include="Helpers\CollectionSynchronizationWatcher.cs" />
     <Compile Include="Helpers\CollectionTestHelpers.cs" />
     <Compile Include="Helpers\IntegerTestClass.cs" />

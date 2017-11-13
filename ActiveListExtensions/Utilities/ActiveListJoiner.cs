@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	internal class ActiveListJoiner<TLeft, TRight, TResult, TParameter> : ObservableList<TResult>
+	internal class ActiveListJoiner<TLeft, TRight, TResult, TParameter> : IDisposable
 	{
 		private int _leftItemCount = 0;
 		private readonly CollectionWrapper<TLeft> _leftCollectionWrappper;
@@ -26,7 +26,9 @@ namespace ActiveListExtensions.Utilities
 		private bool SupportsLeft => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.LeftExcluding);
 		private bool SupportsRight => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.RightExcluding);
 
-		public ActiveListJoiner(ActiveListJoinBehaviour joinBehaviour, IReadOnlyList<TLeft> left, IReadOnlyList<TRight> right, IActiveValue<TParameter> parameter, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+		private bool _suppressResets = false;
+
+		public ActiveListJoiner(ActiveListJoinBehaviour joinBehaviour, IActiveValue<TParameter> parameter, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
 		{
 			_joinBehaviour = joinBehaviour;
 
@@ -38,7 +40,7 @@ namespace ActiveListExtensions.Utilities
 				_parameterWatcher.ValueOrValuePropertyChanged += () => OnParameterChanged();
 			}
 
-			_leftCollectionWrappper = new CollectionWrapper<TLeft>(left, leftResultSelectorPropertiesToWatch?.ToArray());
+			_leftCollectionWrappper = new CollectionWrapper<TLeft>(null, leftResultSelectorPropertiesToWatch?.ToArray());
 			_leftCollectionWrappper.ItemModified += (s, i, v) => OnLeftReplaced(i, v, v);
 			_leftCollectionWrappper.ItemAdded += (s, i, v) => OnLeftAdded(i, v);
 			_leftCollectionWrappper.ItemRemoved += (s, i, v) => OnLeftRemoved(i, v);
@@ -46,28 +48,24 @@ namespace ActiveListExtensions.Utilities
 			_leftCollectionWrappper.ItemMoved += (s, o, n, v) => OnLeftMoved(o, n, v);
 			_leftCollectionWrappper.ItemsReset += s => OnLeftReset(s);
 
-			_rightCollectionWrappper = new CollectionWrapper<TRight>(right, rightResultSelectorPropertiesToWatch?.ToArray());
+			_rightCollectionWrappper = new CollectionWrapper<TRight>(null, rightResultSelectorPropertiesToWatch?.ToArray());
 			_rightCollectionWrappper.ItemModified += (s, i, v) => OnRightReplaced(i, v, v);
 			_rightCollectionWrappper.ItemAdded += (s, i, v) => OnRightAdded(i, v);
 			_rightCollectionWrappper.ItemRemoved += (s, i, v) => OnRightRemoved(i, v);
 			_rightCollectionWrappper.ItemReplaced += (s, i, o, n) => OnRightReplaced(i, o, n);
 			_rightCollectionWrappper.ItemMoved += (s, o, n, v) => OnRightMoved(o, n, v);
 			_rightCollectionWrappper.ItemsReset += s => OnRightReset(s);
-
-			Reset();
 		}
 
-		public override void Dispose()
+		public void Dispose()
 		{
 			_leftCollectionWrappper.Dispose();
 			_rightCollectionWrappper.Dispose();
 
 			_parameterWatcher?.Dispose();
-
-			base.Dispose();
 		}
 
-		private void OnParameterChanged() 
+		private void OnParameterChanged()
 			=> Reset();
 
 		public void SetLeft(IReadOnlyList<TLeft> left)
@@ -76,8 +74,28 @@ namespace ActiveListExtensions.Utilities
 		public void SetRight(IReadOnlyList<TRight> right)
 			=> _rightCollectionWrappper.ReplaceCollection(right);
 
+		public void SetBoth(IReadOnlyList<TLeft> left, IReadOnlyList<TRight> right)
+		{
+			_suppressResets = true;
+
+			try
+			{
+				_leftCollectionWrappper.ReplaceCollection(left);
+				_rightCollectionWrappper.ReplaceCollection(right);
+			}
+			finally
+			{
+				_suppressResets = false;
+			}
+
+			Reset();
+		}
+
 		private void Reset()
 		{
+			if (_suppressResets)
+				return;
+
 			_leftItemCount = _leftCollectionWrappper.Count;
 			_rightItemCount = _rightCollectionWrappper.Count;
 
@@ -386,5 +404,34 @@ namespace ActiveListExtensions.Utilities
 
 			Reset();
 		}
+
+		private void Add(int index, TResult result)
+			=> AddRequested?.Invoke(index, result);
+
+		private void Remove(int index)
+			=> RemoveRequested?.Invoke(index);
+
+		private void Replace(int index, TResult result)
+			=> ReplaceRequested?.Invoke(index, result);
+
+		private void ReplaceRange(int index, int oldCount, IReadOnlyList<TResult> results)
+			=> ReplaceRangeRequested?.Invoke(index, oldCount, results);
+
+		private void Move(int oldIndex, int newIndex)
+			=> MoveRequested?.Invoke(oldIndex, newIndex);
+
+		private void MoveRange(int oldIndex, int newIndex, int count)
+			=> MoveRangeRequested?.Invoke(oldIndex, newIndex, count);
+
+		private void Reset(IEnumerable<TResult> results)
+			=> ResetRequested?.Invoke(results);
+
+		public event Action<int, TResult> AddRequested;
+		public event Action<int> RemoveRequested;
+		public event Action<int, TResult> ReplaceRequested;
+		public event Action<int, int, IReadOnlyList<TResult>> ReplaceRangeRequested;
+		public event Action<int, int> MoveRequested;
+		public event Action<int, int, int> MoveRangeRequested;
+		public event Action<IEnumerable<TResult>> ResetRequested;
 	}
 }
