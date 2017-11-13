@@ -44,7 +44,7 @@ namespace ActiveListExtensions.Utilities
 			_rightCollectionWrappper.ItemMoved += (s, o, n, v) => OnRightMoved(o, n, v);
 			_rightCollectionWrappper.ItemsReset += s => OnRightReset(s);
 
-			Initialize();
+			Reset();
 		}
 
 		public override void Dispose()
@@ -61,7 +61,7 @@ namespace ActiveListExtensions.Utilities
 		public void SetRight(IReadOnlyList<TRight> right)
 			=> _rightCollectionWrappper.ReplaceCollection(right);
 
-		private void Initialize()
+		private void Reset()
 		{
 			_leftItemCount = _leftCollectionWrappper.Count;
 			_rightItemCount = _rightCollectionWrappper.Count;
@@ -71,13 +71,24 @@ namespace ActiveListExtensions.Utilities
 				if (_rightItemCount > 0)
 				{
 					if (SupportsInner)
+					{
 						Reset(_leftCollectionWrappper.SelectMany(l => _rightCollectionWrappper.Select(r => _resultSelector.Invoke(l, r))));
+						return;
+					}
 				}
 				else if (SupportsLeft)
+				{
 					Reset(_leftCollectionWrappper.Select(l => _resultSelector.Invoke(l, default(TRight))));
+					return;
+				}
 			}
 			else if (_rightItemCount > 0 && SupportsRight)
+			{
 				Reset(_rightCollectionWrappper.Select(r => _resultSelector.Invoke(default(TLeft), r)));
+				return;
+			}
+
+			Reset(new TResult[0]);
 		}
 
 		private void AddLeftValue(int index, TLeft value)
@@ -314,8 +325,7 @@ namespace ActiveListExtensions.Utilities
 		}
 
 		private void OnLeftReset(IReadOnlyList<TLeft> newItems)
-		{
-		}
+			=> Reset();
 
 		private void OnRightAdded(int index, TRight value)
 		{
@@ -350,7 +360,6 @@ namespace ActiveListExtensions.Utilities
 		}
 
 		private void OnRightReset(IReadOnlyList<TRight> newItems)
-		{
-		}
+			=> Reset();
 	}
 }
