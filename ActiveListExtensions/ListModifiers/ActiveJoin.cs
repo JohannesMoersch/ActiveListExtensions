@@ -142,10 +142,31 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void OnLeftReplaced(int index, KeyValuePair<TKey, TLeft> oldValue, KeyValuePair<TKey, TLeft> newValue)
 		{
+			OnLeftRemoved(index, oldValue);
+			OnLeftAdded(index, newValue);
 		}
 
 		private void OnLeftMoved(int oldIndex, int newIndex, KeyValuePair<TKey, TLeft> value)
 		{
+			var startIndex = _leftJoiners[oldIndex].Offset;
+			int endIndex;
+			if (oldIndex < newIndex)
+				endIndex = (_leftJoiners[newIndex].Offset + _leftJoiners[newIndex].Count) - _leftJoiners[oldIndex].Count;
+			else
+				endIndex = _leftJoiners[newIndex].Offset;
+			var count = _leftJoiners[oldIndex].Count;
+
+			var min = oldIndex < newIndex ? oldIndex : newIndex;
+			var max = oldIndex > newIndex ? oldIndex : newIndex;
+
+			_leftJoiners.Move(oldIndex, newIndex);
+
+			for (int i = min; i <= max; ++i)
+				_leftJoiners[i].TargetIndex = i;
+
+			UpdateIndices(min);
+
+			_resultList.MoveRange(startIndex, endIndex, count);
 		}
 
 		private void OnLeftReset(IReadOnlyList<KeyValuePair<TKey, TLeft>> newItems)
