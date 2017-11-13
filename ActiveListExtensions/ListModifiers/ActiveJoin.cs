@@ -122,7 +122,7 @@ namespace ActiveListExtensions.ListModifiers
 				for (int i = joiner.LeftSourceIndex.Value + 1; i < _leftJoiners.Count; ++i)
 					_leftJoiners[i].LeftSourceIndex = i;
 
-				joiner.Joiner.SetLeft(value);
+				//joiner.Joiner.SetLeft(value);
 			}
 		}
 
@@ -256,7 +256,7 @@ namespace ActiveListExtensions.ListModifiers
 
 			UpdateIndices(0, 0);
 
-			joiner.SetBoth(left, right);
+			//joiner.SetBoth(left, right);
 
 			return data;
 		}
