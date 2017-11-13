@@ -63,6 +63,14 @@ namespace ActiveListExtensions.Utilities
 			_rightCollectionWrappper.Dispose();
 
 			_parameterWatcher?.Dispose();
+
+			AddRequested = null;
+			RemoveRequested = null;
+			ReplaceRequested = null;
+			ReplaceRangeRequested = null;
+			MoveRequested = null;
+			MoveRangeRequested = null;
+			ResetRequested = null;
 		}
 
 		private void OnParameterChanged()
