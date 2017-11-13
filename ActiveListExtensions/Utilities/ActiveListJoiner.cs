@@ -9,7 +9,7 @@ namespace ActiveListExtensions.Utilities
 	internal class ActiveListJoiner<TLeft, TRight, TResult, TParameter> : IDisposable
 	{
 		private bool _hasLeft;
-		private TLeft _left;
+		private IMutableActiveValue<TLeft> _left;
 
 		private int _rightItemCount = 0;
 		private readonly CollectionWrapper<TRight> _rightCollectionWrappper;
@@ -17,6 +17,8 @@ namespace ActiveListExtensions.Utilities
 		private readonly ActiveListJoinBehaviour _joinBehaviour;
 
 		private readonly Func<TLeft, TRight, TParameter, TResult> _resultSelector;
+
+		private readonly ValueWatcher<TLeft> _leftWatcher;
 
 		private readonly ValueWatcher<TParameter> _parameterWatcher;
 
@@ -31,6 +33,10 @@ namespace ActiveListExtensions.Utilities
 			_joinBehaviour = joinBehaviour;
 
 			_resultSelector = resultSelector;
+
+			_left = ActiveValue.Create<TLeft>();
+			_leftWatcher = new ValueWatcher<TLeft>(_left, leftResultSelectorPropertiesToWatch);
+			_leftWatcher.ValuePropertyChanged += () => OnLeftChanged();
 
 			if (parameter != null)
 			{
@@ -65,17 +71,20 @@ namespace ActiveListExtensions.Utilities
 		private void OnParameterChanged()
 			=> Reset();
 
+		private void OnLeftChanged()
+			=> Reset();
+
 		public void SetLeft(TLeft left)
 		{
 			_hasLeft = true;
-			_left = left;
+			_left.Value = left;
 			Reset();
 		}
 
 		public void ClearLeft()
 		{
 			_hasLeft = false;
-			_left = default(TLeft);
+			_left.Value = default(TLeft);
 			Reset();
 		}
 
@@ -85,7 +94,7 @@ namespace ActiveListExtensions.Utilities
 		public void SetBoth(TLeft left, IReadOnlyList<TRight> right)
 		{
 			_hasLeft = true;
-			_left = left;
+			_left.Value = left;
 			_rightCollectionWrappper.ReplaceCollection(right);
 		}
 
@@ -99,13 +108,13 @@ namespace ActiveListExtensions.Utilities
 				{
 					if (SupportsInner)
 					{
-						Reset(_rightCollectionWrappper.Select(r => GetResult(_left, r)));
+						Reset(_rightCollectionWrappper.Select(r => GetResult(_left.Value, r)));
 						return;
 					}
 				}
 				else if (SupportsLeft)
 				{
-					Reset(new[] { GetLeftResult(_left) });
+					Reset(new[] { GetLeftResult(_left.Value) });
 					return;
 				}
 			}
@@ -165,11 +174,11 @@ namespace ActiveListExtensions.Utilities
 				if (!SupportsInner)
 					return;
 
-				Add(index, GetResult(_left, value));
+				Add(index, GetResult(_left.Value, value));
 			}
 			else
 			{
-				var replaceWith = SupportsInner ? new[] { GetResult(_left, value) } : new TResult[0];
+				var replaceWith = SupportsInner ? new[] { GetResult(_left.Value, value) } : new TResult[0];
 
 				ReplaceRange(0, SupportsLeft ? 1 : 0, replaceWith);
 			}
@@ -183,7 +192,7 @@ namespace ActiveListExtensions.Utilities
 
 			if (rightItemCount == 1)
 			{
-				var replaceWith = SupportsLeft ? new[] { GetLeftResult(_left) } : new TResult[0];
+				var replaceWith = SupportsLeft ? new[] { GetLeftResult(_left.Value) } : new TResult[0];
 
 				ReplaceRange(0, SupportsInner ? 1 : 0, replaceWith);
 			}
@@ -196,7 +205,7 @@ namespace ActiveListExtensions.Utilities
 			if (!SupportsInner)
 				return;
 
-			Replace(index, GetResult(_left, value));
+			Replace(index, GetResult(_left.Value, value));
 		}
 
 
