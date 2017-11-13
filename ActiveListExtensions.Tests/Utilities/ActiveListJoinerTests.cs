@@ -10,33 +10,33 @@ namespace ActiveListExtensions.Tests.Utilities
 {
 	public class ActiveListJoinerTests
 	{
-		private static ActiveListJoiner<int, int, int> CreateEmpty(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> left, out ObservableList<int> right)
+		private static ActiveListJoiner<int, int, int, object> CreateEmpty(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> left, out ObservableList<int> right)
 		{
 			left = new ObservableList<int>();
 			right = new ObservableList<int>();
-			return new ActiveListJoiner<int, int, int>(joinBehaviour, left, right, (l, r) => l + r, null, null);
+			return new ActiveListJoiner<int, int, int, object>(joinBehaviour, left, right, null, (l, r, p) => l + r, null, null, null);
 		}
 
-		private static ActiveListJoiner<int, int, int> CreateHasLeft(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> left, out ObservableList<int> right)
+		private static ActiveListJoiner<int, int, int, object> CreateHasLeft(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> left, out ObservableList<int> right)
 		{
 			left = new ObservableList<int>();
 			left.Add(0, 1);
 			left.Add(1, 2);
 			left.Add(2, 3);
 			right = new ObservableList<int>();
-			return new ActiveListJoiner<int, int, int>(joinBehaviour, left, right, (l, r) => l + r, null, null);
+			return new ActiveListJoiner<int, int, int, object>(joinBehaviour, left, right, null, (l, r, p) => l + r, null, null, null);
 		}
 
-		private static ActiveListJoiner<int, int, int> CreateHasRight(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> left, out ObservableList<int> right)
+		private static ActiveListJoiner<int, int, int, object> CreateHasRight(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> left, out ObservableList<int> right)
 		{
 			left = new ObservableList<int>();
 			right = new ObservableList<int>();
 			right.Add(0, 10);
 			right.Add(1, 100);
-			return new ActiveListJoiner<int, int, int>(joinBehaviour, left, right, (l, r) => l + r, null, null);
+			return new ActiveListJoiner<int, int, int, object>(joinBehaviour, left, right, null, (l, r, p) => l + r, null, null, null);
 		}
 
-		private static ActiveListJoiner<int, int, int> CreateHasBoth(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> left, out ObservableList<int> right)
+		private static ActiveListJoiner<int, int, int, object> CreateHasBoth(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> left, out ObservableList<int> right)
 		{
 			left = new ObservableList<int>();
 			left.Add(0, 1);
@@ -45,7 +45,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			right = new ObservableList<int>();
 			right.Add(0, 10);
 			right.Add(1, 100);
-			return new ActiveListJoiner<int, int, int>(joinBehaviour, left, right, (l, r) => l + r, null, null);
+			return new ActiveListJoiner<int, int, int, object>(joinBehaviour, left, right, null, (l, r, p) => l + r, null, null, null);
 		}
 
 		private static void TestEmptySetLeft(ActiveListJoinBehaviour joinBehaviour, int[] initial, int[] result)

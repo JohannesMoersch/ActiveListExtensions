@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	internal class ActiveListJoiner<TLeft, TRight, TResult> : ObservableList<TResult>
+	internal class ActiveListJoiner<TLeft, TRight, TResult, TParameter> : ObservableList<TResult>
 	{
 		private int _leftItemCount = 0;
 		private readonly CollectionWrapper<TLeft> _leftCollectionWrappper;
@@ -16,17 +16,27 @@ namespace ActiveListExtensions.Utilities
 
 		private readonly ActiveListJoinBehaviour _joinBehaviour;
 
-		private readonly Func<TLeft, TRight, TResult> _resultSelector;
+		private readonly Func<TLeft, TRight, TParameter, TResult> _resultSelector;
 
-		public bool SupportsInner => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.Inner);
-		public bool SupportsLeft => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.LeftExcluding);
-		public bool SupportsRight => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.RightExcluding);
+		private readonly ValueWatcher<TParameter> _parameterWatcher;
 
-		public ActiveListJoiner(ActiveListJoinBehaviour joinBehaviour, IReadOnlyList<TLeft> left, IReadOnlyList<TRight> right, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
+		private TParameter ParameterValue => _parameterWatcher != null ? _parameterWatcher.Value : default(TParameter);
+
+		private bool SupportsInner => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.Inner);
+		private bool SupportsLeft => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.LeftExcluding);
+		private bool SupportsRight => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.RightExcluding);
+
+		public ActiveListJoiner(ActiveListJoinBehaviour joinBehaviour, IReadOnlyList<TLeft> left, IReadOnlyList<TRight> right, IActiveValue<TParameter> parameter, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
 		{
 			_joinBehaviour = joinBehaviour;
 
 			_resultSelector = resultSelector;
+
+			if (parameter != null)
+			{
+				_parameterWatcher = new ValueWatcher<TParameter>(parameter, parameterPropertiesToWatch);
+				_parameterWatcher.ValueOrValuePropertyChanged += () => OnParameterChanged();
+			}
 
 			_leftCollectionWrappper = new CollectionWrapper<TLeft>(left, leftResultSelectorPropertiesToWatch?.ToArray());
 			_leftCollectionWrappper.ItemModified += (s, i, v) => OnLeftReplaced(i, v, v);
@@ -52,8 +62,13 @@ namespace ActiveListExtensions.Utilities
 			_leftCollectionWrappper.Dispose();
 			_rightCollectionWrappper.Dispose();
 
+			_parameterWatcher?.Dispose();
+
 			base.Dispose();
 		}
+
+		private void OnParameterChanged() 
+			=> Reset();
 
 		public void SetLeft(IReadOnlyList<TLeft> left)
 			=> _leftCollectionWrappper.ReplaceCollection(left);
@@ -72,19 +87,19 @@ namespace ActiveListExtensions.Utilities
 				{
 					if (SupportsInner)
 					{
-						Reset(_leftCollectionWrappper.SelectMany(l => _rightCollectionWrappper.Select(r => _resultSelector.Invoke(l, r))));
+						Reset(_leftCollectionWrappper.SelectMany(l => _rightCollectionWrappper.Select(r => GetResult(l, r))));
 						return;
 					}
 				}
 				else if (SupportsLeft)
 				{
-					Reset(_leftCollectionWrappper.Select(l => _resultSelector.Invoke(l, default(TRight))));
+					Reset(_leftCollectionWrappper.Select(l => GetLeftResult(l)));
 					return;
 				}
 			}
 			else if (_rightItemCount > 0 && SupportsRight)
 			{
-				Reset(_rightCollectionWrappper.Select(r => _resultSelector.Invoke(default(TLeft), r)));
+				Reset(_rightCollectionWrappper.Select(r => GetRightResult(r)));
 				return;
 			}
 
@@ -284,13 +299,13 @@ namespace ActiveListExtensions.Utilities
 		}
 
 		private TResult GetLeftResult(TLeft left)
-			=> _resultSelector.Invoke(left, default(TRight));
+			=> _resultSelector.Invoke(left, default(TRight), ParameterValue);
 
 		private TResult GetRightResult(TRight right)
-			=> _resultSelector.Invoke(default(TLeft), right);
+			=> _resultSelector.Invoke(default(TLeft), right, ParameterValue);
 
 		private TResult GetResult(TLeft left, TRight right)
-			=> _resultSelector.Invoke(left, right);
+			=> _resultSelector.Invoke(left, right, ParameterValue);
 
 		private void OnLeftAdded(int index, TLeft value)
 		{
@@ -325,7 +340,12 @@ namespace ActiveListExtensions.Utilities
 		}
 
 		private void OnLeftReset(IReadOnlyList<TLeft> newItems)
-			=> Reset();
+		{
+			if (_leftItemCount == 0 && newItems.Count == 0)
+				return;
+
+			Reset();
+		}
 
 		private void OnRightAdded(int index, TRight value)
 		{
@@ -360,6 +380,11 @@ namespace ActiveListExtensions.Utilities
 		}
 
 		private void OnRightReset(IReadOnlyList<TRight> newItems)
-			=> Reset();
+		{
+			if (_rightItemCount == 0 && newItems.Count == 0)
+				return;
+
+			Reset();
+		}
 	}
 }
