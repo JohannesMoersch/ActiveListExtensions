@@ -108,6 +108,14 @@ namespace ActiveListExtensions.Utilities
 			Replace(index, GetLeftResult(value));
 		}
 
+		private void MoveLeftValue(int oldIndex, int newIndex)
+		{
+			if (!SupportsLeft)
+				return;
+
+			Move(oldIndex, newIndex);
+		}
+
 		private void AddRightValue(int index, TRight value)
 		{
 			if (!SupportsRight)
@@ -134,6 +142,14 @@ namespace ActiveListExtensions.Utilities
 				return;
 
 			Replace(index, GetRightResult(value));
+		}
+
+		private void MoveRightValue(int oldIndex, int newIndex)
+		{
+			if (!SupportsRight)
+				return;
+
+			Move(oldIndex, newIndex);
 		}
 
 		private void AddLeftIntersectionValue(int index, TLeft value)
@@ -170,6 +186,14 @@ namespace ActiveListExtensions.Utilities
 				return;
 
 			ReplaceRange(index * _rightItemCount, _rightItemCount, _rightCollectionWrappper.Select(r => GetResult(value, r)).ToArray());
+		}
+
+		private void MoveLeftIntersectionValue(int oldIndex, int newIndex)
+		{
+			if (!SupportsInner)
+				return;
+
+			MoveRange(oldIndex * _rightItemCount, newIndex * _rightItemCount, _rightItemCount);
 		}
 
 		private void AddRightIntersectionValue(int index, TRight value)
@@ -234,6 +258,20 @@ namespace ActiveListExtensions.Utilities
 			}
 		}
 
+
+		private void MoveRightIntersectionValue(int oldIndex, int newIndex)
+		{
+			if (!SupportsInner)
+				return;
+
+			for (int i = 0; i < _leftItemCount; ++i)
+			{
+				var currentIndex = i * _rightItemCount;
+
+				Move(currentIndex + oldIndex, currentIndex + newIndex);
+			}
+		}
+
 		private TResult GetLeftResult(TLeft left)
 			=> _resultSelector.Invoke(left, default(TRight));
 
@@ -269,6 +307,10 @@ namespace ActiveListExtensions.Utilities
 
 		private void OnLeftMoved(int oldIndex, int newIndex, TLeft value)
 		{
+			if (_rightItemCount > 0)
+				MoveLeftIntersectionValue(oldIndex, newIndex);
+			else
+				MoveLeftValue(oldIndex, newIndex);
 		}
 
 		private void OnLeftReset(IReadOnlyList<TLeft> newItems)
@@ -301,6 +343,10 @@ namespace ActiveListExtensions.Utilities
 
 		private void OnRightMoved(int oldIndex, int newIndex, TRight value)
 		{
+			if (_leftItemCount > 0)
+				MoveRightIntersectionValue(oldIndex, newIndex);
+			else
+				MoveRightValue(oldIndex, newIndex);
 		}
 
 		private void OnRightReset(IReadOnlyList<TRight> newItems)

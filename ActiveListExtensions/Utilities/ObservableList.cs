@@ -194,7 +194,7 @@ namespace ActiveListExtensions.Utilities
 			if (count == 0)
 				return;
 
-			if (oldIndex < 0 || oldIndex + count >= Count)
+			if (oldIndex < 0 || oldIndex + count > Count)
 				throw new ArgumentOutOfRangeException(nameof(oldIndex));
 
 			if (newIndex + count > Count || newIndex < 0)
