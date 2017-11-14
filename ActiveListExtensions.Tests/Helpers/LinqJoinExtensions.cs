@@ -21,7 +21,7 @@ namespace ActiveListExtensions.Tests.Helpers
 			=> source.InnerJoin(join, leftKeySelector, rightKeySelector, resultSelector).Concat(source.RightExcludingJoin(join, leftKeySelector, rightKeySelector, resultSelector));
 
 		public static IEnumerable<TResult> RightExcludingJoin<TLeft, TRight, TKey, TResult>(this IEnumerable<TLeft> source, IEnumerable<TRight> join, Func<TLeft, TKey> leftKeySelector, Func<TRight, TKey> rightKeySelector, Func<TLeft, TRight, TResult> resultSelector)
-			=> join.GroupJoin(source, rightKeySelector, leftKeySelector, (r, ls) => ls.DefaultIfEmpty().Where(o => o == null).Select(l => resultSelector.Invoke(l, r))).SelectMany(o => o).ToArray();
+			=> join.GroupBy(rightKeySelector).SelectMany(g => g).GroupJoin(source, rightKeySelector, leftKeySelector, (r, ls) => ls.DefaultIfEmpty().Where(o => o == null).Select(l => resultSelector.Invoke(l, r))).SelectMany(o => o).ToArray();
 
 		public static IEnumerable<TResult> OuterJoin<TLeft, TRight, TKey, TResult>(this IEnumerable<TLeft> source, IEnumerable<TRight> join, Func<TLeft, TKey> leftKeySelector, Func<TRight, TKey> rightKeySelector, Func<TLeft, TRight, TResult> resultSelector)
 			=> source.LeftJoin(join, leftKeySelector, rightKeySelector, resultSelector).Concat(source.RightExcludingJoin(join, leftKeySelector, rightKeySelector, resultSelector));

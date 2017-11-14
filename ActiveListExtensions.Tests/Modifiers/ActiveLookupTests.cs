@@ -46,6 +46,34 @@ namespace ActiveListExtensions.Tests.Modifiers
 		}
 
 		[Fact]
+		public void ExistingGroupStaysUpToDateAfterReset()
+		{
+			var list = ActiveList.Create(Enumerable.Range(0, 5));
+
+			var sut = list.ToActiveLookup(i => i / 10);
+
+			Assert.True(list.SequenceEqual(sut[0]));
+
+			list.Reset(new[] { 1, 12, 7, 3, 18 });
+
+			Assert.True(new[] { 1, 7, 3 }.SequenceEqual(sut[0]));
+		}
+
+		[Fact]
+		public void SelectByKeyGroupStaysUpToDateAfterReset()
+		{
+			var list = ActiveList.Create(Enumerable.Range(0, 5));
+
+			var sut = list.ToActiveLookup(i => i / 10).ActiveSelectByKey(0);
+
+			Assert.True(list.SequenceEqual(sut));
+
+			list.Reset(new[] { 1, 12, 7, 3, 18 });
+
+			Assert.True(new[] { 1, 7, 3 }.SequenceEqual(sut));
+		}
+
+		[Fact]
 		public void NewGroupThrowsChangeNotifications()
 		{
 			var list = ActiveList.Create(Enumerable.Range(0, 5));

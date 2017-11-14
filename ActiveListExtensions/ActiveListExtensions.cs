@@ -473,7 +473,7 @@ namespace ActiveListExtensions
 
 
 		public static IActiveList<TSource> ActiveSelectByKey<TKey, TSource>(this IActiveLookup<TKey, TSource> source, TKey key)
-			=> ActiveSelectByKey(source, new ActiveValueWrapper<TKey>(key));
+			=> source[key];
 
 		public static IActiveList<TSource> ActiveSelectByKey<TKey, TSource>(this IActiveLookup<TKey, TSource> source, IActiveValue<TKey> key)
 			=> new ActiveGetOrDefault<TKey, TSource>(source, key).ToActiveList();

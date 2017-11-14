@@ -24,8 +24,11 @@ namespace ActiveListExtensions.Tests.Helpers
 			joiner.ResetRequested += Reset;
 		}
 
-		public void SetLeft(IReadOnlyList<TLeft> left)
+		public void SetLeft(TLeft left)
 			=> _joiner.SetLeft(left);
+
+		public void ClearLeft()
+			=> _joiner.ClearLeft();
 
 		public void SetRight(IReadOnlyList<TRight> right)
 			=> _joiner.SetRight(right);

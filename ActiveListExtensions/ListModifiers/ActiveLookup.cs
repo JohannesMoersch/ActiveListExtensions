@@ -68,7 +68,7 @@ namespace ActiveListExtensions.ListModifiers
 					_emptyGroups.Add(key, group);
 				}
 
-				return group.Items;
+				return group.Items.ToActiveList();
 			}
 		}
 
@@ -178,6 +178,15 @@ namespace ActiveListExtensions.ListModifiers
 		protected override void OnReset(IReadOnlyList<TSource> newItems)
 		{
 			_sourceData.Clear();
+
+			foreach (var set in _resultSet)
+			{
+				try { set.Value.Items.Reset(Enumerable.Empty<ItemData>()); }
+				catch { }
+				set.Value.TargetIndex = 0;
+				_emptyGroups.Add(set.Key, set.Value);
+			}
+
 			_resultSet.Clear();
 
 			foreach (var value in newItems)
@@ -185,7 +194,7 @@ namespace ActiveListExtensions.ListModifiers
 				var item = new ItemData(_keySelector.Invoke(value), value);
 				item.SourceIndex = _sourceData.Count;
 				_sourceData.Add(_sourceData.Count, item);
-				AddToGroup(item, false);
+				AddToGroup(item, true);
 			}
 
 			ResultList.Reset(_resultSet.Values.Select((g, i) =>
@@ -197,8 +206,10 @@ namespace ActiveListExtensions.ListModifiers
 
 		protected override void ItemModified(int index, TSource value) => OnReplaced(index, value, value);
 
-		private void AddToGroup(ItemData item, bool addToResultList = true)
+		private void AddToGroup(ItemData item, bool isResetting = false)
 		{
+			bool addToResultList = !isResetting;
+
 			if (!_resultSet.TryGetValue(item.Key, out var group))
 			{
 				if (!_emptyGroups.TryGetValue(item.Key, out group))
@@ -221,12 +232,15 @@ namespace ActiveListExtensions.ListModifiers
 			{
 				group.TargetIndex = FindTargetIndexForGroup(group.SourceIndex, -1);
 
-				for (int i = group.TargetIndex; i < ResultList.Count; ++i)
-					ResultList[i].TargetIndex = i + 1;
+				if (!isResetting)
+				{
+					for (int i = group.TargetIndex; i < ResultList.Count; ++i)
+						ResultList[i].TargetIndex = i + 1;
+				}
 
 				ResultList.Add(group.TargetIndex, group);
 			}
-			else if (item.TargetIndex == 0)
+			else if (item.TargetIndex == 0 && !isResetting)
 				UpdateGroupIndex(group);
 		}
 
@@ -245,15 +259,15 @@ namespace ActiveListExtensions.ListModifiers
 
 				if (group.Items.Count == 0)
 				{
-					_emptyGroups.Add(item.Key, _resultSet[item.Key]);
-					_resultSet.Remove(item.Key);
-
 					var removeIndex = group.TargetIndex;
 
-					for (int i = group.TargetIndex + 1; i < ResultList.Count; ++i)
-						ResultList[i].TargetIndex = i - 1;
+					group.TargetIndex = 0;
+					
+					_emptyGroups.Add(item.Key, group);
+					_resultSet.Remove(item.Key);
 
-					group.TargetIndex = -1;
+					for (int i = removeIndex + 1; i < ResultList.Count; ++i)
+						ResultList[i].TargetIndex = i - 1;
 
 					ResultList.Remove(removeIndex);
 				}
