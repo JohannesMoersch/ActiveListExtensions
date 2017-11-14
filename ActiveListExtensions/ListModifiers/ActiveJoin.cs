@@ -10,29 +10,6 @@ namespace ActiveListExtensions.ListModifiers
 {
 	internal class ActiveJoin<TLeft, TRight, TResult, TKey, TParameter> : ActiveBase<TResult>
 	{
-		private class JoinerData
-		{
-			public int? LeftSourceIndex { get; set; }
-
-			public int RightSourceIndex { get; set; }
-
-			public int GetTargetIndex(int leftCount)
-				=> LeftSourceIndex ?? (RightSourceIndex + leftCount);
-
-			public int Offset { get; set; }
-
-			public int Count { get; set; }
-
-			public ActiveListJoiner<TLeft, TRight, TResult, TParameter> Joiner { get; set; }
-		}
-
-		private class JoinerSets
-		{
-			public IList<JoinerData> Joiners { get; } = new List<JoinerData>();
-
-			public JoinerData NullJoiner { get; set; }
-		}
-
 		public override int Count => _resultList.Count;
 
 		public override TResult this[int index] => _resultList[index];
@@ -43,11 +20,11 @@ namespace ActiveListExtensions.ListModifiers
 
 		private readonly CollectionWrapper<IActiveGrouping<TKey, TRight>> _rightGroups;
 
-		private readonly QuickList<JoinerData> _leftJoiners;
+		private readonly QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>> _leftJoiners;
 
-		private readonly QuickList<JoinerData> _rightJoiners;
+		private readonly QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>> _rightJoiners;
 
-		private readonly IDictionary<TKey, JoinerSets> _joinerLookup;
+		private readonly IDictionary<TKey, ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter>> _joinerLookup;
 
 		private readonly ActiveListJoinBehaviour _joinBehaviour;
 
@@ -97,9 +74,9 @@ namespace ActiveListExtensions.ListModifiers
 			_rightResultSelectorPropertiesToWatch = rightResultSelectorPropertiesToWatch;
 			_resultSelectorParameterPropertiesToWatch = resultSelectorParameterPropertiesToWatch;
 
-			_leftJoiners = new QuickList<JoinerData>();
-			_rightJoiners = new QuickList<JoinerData>();
-			_joinerLookup = new Dictionary<TKey, JoinerSets>();
+			_leftJoiners = new QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>>();
+			_rightJoiners = new QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>>();
+			_joinerLookup = new Dictionary<TKey, ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter>>();
 
 			_leftItems = new CollectionWrapper<KeyValuePair<TKey, TLeft>>(left);
 			_leftItems.ItemModified += (s, i, v) => OnLeftReplaced(i, v, v);
@@ -123,37 +100,44 @@ namespace ActiveListExtensions.ListModifiers
 			_resultList.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
 			_resultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);
 
+			Initialize();
+		}
+
+		private ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter> CreateJoinerSet(TKey key)
+		{
+			var set = new ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter>(_joinBehaviour, key, _rightItems, _parameter, _resultSelector, _leftResultSelectorPropertiesToWatch, _rightResultSelectorPropertiesToWatch, _resultSelectorParameterPropertiesToWatch);
+
+			set.JoinerAdded += OnJoinerAdded;
+			set.JoinerRemoved += OnJoinerRemoved;
+			set.SetEmptied += OnSetEmptied;
+
+			return set;
+		}
+
+		private void Initialize()
+		{
 			OnLeftReset(_leftItems);
-			OnRightReset(_rightGroups);
+			OnRightReset(_rightItems);
 		}
 
 		private void OnLeftAdded(int index, KeyValuePair<TKey, TLeft> value)
 		{
-			var joiner = AddLeftJoiner(index, value.Key);
+			if (!_joinerLookup.TryGetValue(value.Key, out var set))
+			{
+				set = CreateJoinerSet(value.Key);
+				_joinerLookup.Add(value.Key, set);
+			}
 
-			joiner.Joiner.SetBoth(value.Value, _rightItems[value.Key]);
+			set.AddLeft(index, value.Value);
 		}
 
 		private void OnLeftRemoved(int index, KeyValuePair<TKey, TLeft> value)
-		{
-			var oldJoiner = _leftJoiners[index];
-
-			_leftJoiners.Remove(index);
-
-			for (int i = index; i < _leftJoiners.Count; ++i)
-				_leftJoiners[i].LeftSourceIndex = i;
-
-			UpdateIndices(index);
-
-			oldJoiner.Joiner.Dispose();
-
-			_resultList.ReplaceRange(oldJoiner.Offset, oldJoiner.Count, new TResult[0]);
-		}
+			=> _joinerLookup[value.Key].RemoveLeft(index);
 
 		private void OnLeftReplaced(int index, KeyValuePair<TKey, TLeft> oldValue, KeyValuePair<TKey, TLeft> newValue)
 		{
 			if (Equals(oldValue.Key, newValue.Key))
-				_leftJoiners[index].Joiner.SetLeft(newValue.Value);
+				_joinerLookup[oldValue.Key].ReplaceLeft(index, newValue.Value);
 			else
 			{
 				OnLeftRemoved(index, oldValue);
@@ -177,7 +161,7 @@ namespace ActiveListExtensions.ListModifiers
 			var max = oldIndex > newIndex ? oldIndex : newIndex;
 
 			for (int i = min; i <= max; ++i)
-				_leftJoiners[i].LeftSourceIndex = i;
+				_leftJoiners[i].SourceIndex = i;
 
 			UpdateIndices(min);
 
@@ -186,44 +170,44 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void OnLeftReset(IReadOnlyList<KeyValuePair<TKey, TLeft>> newItems)
 		{
-			var total = _rightJoiners.Sum(joiner => joiner.Count);
-			_resultList.ReplaceRange(0, _resultList.Count - total, new TResult[0]);
+			var resets = _joinerLookup.Values.Select(set => set.ResetLeft()).ToArray();
 
-			foreach (var joiner in _leftJoiners)
-				joiner.Joiner.Dispose();
+			try
+			{
+				for (int i = 0; i < newItems.Count; ++i)
+				{
+					var item = newItems[i];
 
-			_leftJoiners.Clear();
+					if (!_joinerLookup.TryGetValue(item.Key, out var set))
+					{
+						set = CreateJoinerSet(item.Key);
+						_joinerLookup.Add(item.Key, set);
+					}
 
-			foreach (var set in _joinerLookup.Values)
-				set.Joiners.Clear();
-
-			UpdateIndices(0);
-
-			for (int i = 0; i < newItems.Count; ++i)
-				OnLeftAdded(i, newItems[i]);
+					set.AddLeft(i, item.Value);
+				}
+			}
+			finally
+			{
+				foreach (var reset in resets)
+					reset.Dispose();
+			}
 		}
 
 		private void OnRightAdded(int index, IActiveGrouping<TKey, TRight> value)
 		{
-			var joiner = AddRightJoiner(index, value.Key);
+			if (!_joinerLookup.TryGetValue(value.Key, out var set))
+			{
+				set = CreateJoinerSet(value.Key);
+				_joinerLookup.Add(value.Key, set);
+			}
 
-			joiner.Joiner?.SetRight(value);
+			set.SetRight(index);
 		}
 
 		private void OnRightRemoved(int index, IActiveGrouping<TKey, TRight> value)
 		{
-			var joiner = _rightJoiners[index];
-			if (joiner.Joiner != null)
-			{
-				_resultList.ReplaceRange(joiner.Offset, joiner.Count, new TResult[0]);
-
-				joiner.Joiner.Dispose();
-			}
-
-			_rightJoiners.Remove(index);
-
-			for (int i = index; i < _rightJoiners.Count; ++i)
-				_rightJoiners[i].RightSourceIndex = i;
+			_joinerLookup[value.Key].ClearRight();
 		}
 
 		private void OnRightReplaced(int index, IActiveGrouping<TKey, TRight> oldValue, IActiveGrouping<TKey, TRight> newValue)
@@ -233,6 +217,9 @@ namespace ActiveListExtensions.ListModifiers
 		}
 
 		private void OnRightMoved(int oldIndex, int newIndex, IActiveGrouping<TKey, TRight> value)
+			=> HandleRightMoved(oldIndex, newIndex);
+
+		private void HandleRightMoved(int oldIndex, int newIndex)
 		{
 			var startIndex = _rightJoiners[oldIndex].Offset;
 			int endIndex;
@@ -248,7 +235,7 @@ namespace ActiveListExtensions.ListModifiers
 			var max = oldIndex > newIndex ? oldIndex : newIndex;
 
 			for (int i = min; i <= max; ++i)
-				_rightJoiners[i].RightSourceIndex = i;
+				_rightJoiners[i].SourceIndex = i;
 
 			UpdateIndices(min);
 
@@ -257,32 +244,54 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void OnRightReset(IReadOnlyList<IActiveGrouping<TKey, TRight>> newItems)
 		{
-			for (int i = _rightJoiners.Count - 1; i >= 0; --i)
+			var groups = newItems
+				.Select((item, index) => Tuple.Create(item.Key, new Func<int>(() => index), true))
+				.Concat(_joinerLookup.Where(kvp => kvp.Value.HasRight).Select(kvp => Tuple.Create(kvp.Key, new Func<int>(() => kvp.Value.RightSourceIndex.Value), false)))
+				.GroupBy(t => t.Item1).ToArray();
+
+			foreach (var group in groups)
 			{
-				if (_rightJoiners[i].Joiner == null)
-					continue;
+				if (!_joinerLookup.TryGetValue(group.Key, out var set))
+				{
+					set = CreateJoinerSet(group.Key);
+					_joinerLookup.Add(group.Key, set);
+				}
 
-				_rightJoiners[i].Joiner.Dispose();
+				var newItem = group.FirstOrDefault(item => item.Item3);
+				var oldItem = group.FirstOrDefault(item => !item.Item3);
 
-				_resultList.ReplaceRange(_rightJoiners[i].Offset, _rightJoiners[i].Count, new TResult[0]); 
+				if (newItem != null)
+				{
+					if (oldItem != null)
+						HandleRightMoved(oldItem.Item2.Invoke(), newItem.Item2.Invoke());
+					else
+						set.SetRight(newItem.Item2.Invoke());
+				}
+				else if (oldItem != null)
+					set.ClearRight();
 			}
-
-			_rightJoiners.Clear();
-
-			foreach (var set in _joinerLookup.Values)
-				set.NullJoiner = null;
-
-			UpdateIndices(0);
-
-			for (int i = 0; i < newItems.Count; ++i)
-				OnRightAdded(i, newItems[i]);
 		}
 
-		private void CreateJoiner(JoinerData data)
+		private void OnJoinerAdded(ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter> data)
 		{
-			var joiner = new ActiveListJoiner<TLeft, TRight, TResult, TParameter>(_joinBehaviour, _parameter, _resultSelector, _leftResultSelectorPropertiesToWatch, _rightResultSelectorPropertiesToWatch, _resultSelectorParameterPropertiesToWatch);
+			if (data.IsLeftJoiner)
+			{
+				_leftJoiners.Add(data.SourceIndex, data);
 
-			joiner.AddRequested += (index, value) =>
+				for (int i = data.SourceIndex + 1; i < _leftJoiners.Count; ++i)
+					_leftJoiners[i].SourceIndex = i;
+			}
+			else
+			{
+				_rightJoiners.Add(data.SourceIndex, data);
+
+				for (int i = data.SourceIndex + 1; i < _rightJoiners.Count; ++i)
+					_rightJoiners[i].SourceIndex = i;
+			}
+
+			UpdateIndices(data.GetTargetIndex(_leftJoiners.Count));
+
+			data.Joiner.AddRequested += (index, value) =>
 			{
 				++data.Count;
 
@@ -290,7 +299,7 @@ namespace ActiveListExtensions.ListModifiers
 
 				_resultList.Add(data.Offset + index, value);
 			};
-			joiner.RemoveRequested += index =>
+			data.Joiner.RemoveRequested += index =>
 			{
 				--data.Count;
 
@@ -298,11 +307,11 @@ namespace ActiveListExtensions.ListModifiers
 
 				_resultList.Remove(data.Offset + index);
 			};
-			joiner.ReplaceRequested += (index, newValue) =>
+			data.Joiner.ReplaceRequested += (index, newValue) =>
 			{
 				_resultList.Replace(data.Offset, newValue);
 			};
-			joiner.ReplaceRangeRequested += (index, oldCount, values) =>
+			data.Joiner.ReplaceRangeRequested += (index, oldCount, values) =>
 			{
 				var diff = values.Count - oldCount;
 
@@ -315,15 +324,15 @@ namespace ActiveListExtensions.ListModifiers
 
 				_resultList.ReplaceRange(data.Offset + index, oldCount, values);
 			};
-			joiner.MoveRequested += (oldIndex, newIndex) =>
+			data.Joiner.MoveRequested += (oldIndex, newIndex) =>
 			{
 				_resultList.Move(data.Offset + oldIndex, data.Offset + newIndex);
 			};
-			joiner.MoveRangeRequested += (oldIndex, newIndex, count) =>
+			data.Joiner.MoveRangeRequested += (oldIndex, newIndex, count) =>
 			{
 				_resultList.MoveRange(data.Offset + oldIndex, data.Offset + newIndex, count);
 			};
-			joiner.ResetRequested += values =>
+			data.Joiner.ResetRequested += values =>
 			{
 				var newValues = values.ToArray();
 
@@ -337,77 +346,37 @@ namespace ActiveListExtensions.ListModifiers
 
 				_resultList.ReplaceRange(data.Offset, oldCount, newValues);
 			};
-
-			data.Joiner = joiner;
 		}
 
-		private JoinerData AddLeftJoiner(int joinerIndex, TKey key)
+		private void OnJoinerRemoved(ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter> data)
 		{
-			var joiner = new JoinerData();
-
-			CreateJoiner(joiner);
-
-			_leftJoiners.Add(joinerIndex, joiner);
-
-			for (int i = joinerIndex; i < _leftJoiners.Count; ++i)
-				_leftJoiners[i].LeftSourceIndex = i;
-
-			if (!_joinerLookup.TryGetValue(key, out var joiners))
+			if (data.IsLeftJoiner)
 			{
-				joiners = new JoinerSets();
-				_joinerLookup.Add(key, joiners);
+				_leftJoiners.Remove(data.SourceIndex);
+
+				for (int i = data.SourceIndex; i < _leftJoiners.Count; ++i)
+					_leftJoiners[i].SourceIndex = i;
+			}
+			else
+			{
+				_rightJoiners.Remove(data.SourceIndex);
+
+				for (int i = data.SourceIndex; i < _rightJoiners.Count; ++i)
+					_rightJoiners[i].SourceIndex = i;
 			}
 
-			if (joiners.NullJoiner != null)
-			{
-				var oldOffset = joiners.NullJoiner.Offset;
-				var oldCount = joiners.NullJoiner.Count;
-
-				joiners.NullJoiner.Count = 0;
-
-				UpdateIndices(joiners.NullJoiner.GetTargetIndex(_leftJoiners.Count));
-
-				joiners.NullJoiner.Joiner?.Dispose();
-
-				joiners.NullJoiner = null;
-
-				_resultList.ReplaceRange(oldOffset, oldCount, new TResult[0]);
-			}
-
-			joiners.Joiners.Add(joiner);
-
-			UpdateIndices(joiner.GetTargetIndex(_leftJoiners.Count));
-
-			return joiner;
+			UpdateIndices(data.GetTargetIndex(_leftJoiners.Count));
 		}
 
-		private JoinerData AddRightJoiner(int joinerIndex, TKey key)
+		private void OnSetEmptied(ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter> set)
 		{
-			if (!_joinerLookup.TryGetValue(key, out var joiners))
-			{
-				joiners = new JoinerSets();
-				_joinerLookup.Add(key, joiners);
-			}
+			_joinerLookup.Remove(set.Key);
 
-			if (joiners.NullJoiner == null)
-			{
-				joiners.NullJoiner = new JoinerData();
+			set.JoinerAdded -= OnJoinerAdded;
+			set.JoinerRemoved -= OnJoinerRemoved;
+			set.SetEmptied -= OnSetEmptied;
 
-				joiners.NullJoiner.RightSourceIndex = joinerIndex;
-
-				if (joiners.Joiners.Count == 0)
-					CreateJoiner(joiners.NullJoiner);
-			}
-
-			_rightJoiners.Add(joinerIndex, joiners.NullJoiner);
-
-			for (int i = joinerIndex; i < _rightJoiners.Count; ++i)
-				_rightJoiners[i].RightSourceIndex = i;
-
-			if (joiners.NullJoiner != null)
-				UpdateIndices(joiners.NullJoiner.GetTargetIndex(_leftJoiners.Count));
-
-			return joiners.NullJoiner;
+			set.Dispose();
 		}
 
 		private void UpdateIndices(int startIndex)

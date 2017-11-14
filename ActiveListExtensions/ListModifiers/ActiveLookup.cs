@@ -68,7 +68,7 @@ namespace ActiveListExtensions.ListModifiers
 					_emptyGroups.Add(key, group);
 				}
 
-				return group.Items;
+				return group.Items.ToActiveList();
 			}
 		}
 

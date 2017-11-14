@@ -8,7 +8,8 @@ namespace ActiveListExtensions.Utilities
 {
 	internal class ActiveListJoiner<TLeft, TRight, TResult, TParameter> : IDisposable
 	{
-		private bool _hasLeft;
+		public bool HasLeft { get; private set; }
+
 		private IMutableActiveValue<TLeft> _left;
 
 		private int _rightItemCount = 0;
@@ -76,14 +77,14 @@ namespace ActiveListExtensions.Utilities
 
 		public void SetLeft(TLeft left)
 		{
-			_hasLeft = true;
+			HasLeft = true;
 			_left.Value = left;
 			Reset();
 		}
 
 		public void ClearLeft()
 		{
-			_hasLeft = false;
+			HasLeft = false;
 			_left.Value = default(TLeft);
 			Reset();
 		}
@@ -93,16 +94,23 @@ namespace ActiveListExtensions.Utilities
 
 		public void SetBoth(TLeft left, IReadOnlyList<TRight> right)
 		{
-			_hasLeft = true;
+			HasLeft = true;
 			_left.Value = left;
 			_rightCollectionWrappper.ReplaceCollection(right);
+		}
+
+		public void ClearBoth()
+		{
+			HasLeft = false;
+			_left.Value = default(TLeft);
+			_rightCollectionWrappper.ReplaceCollection(new TRight[0]);
 		}
 
 		private void Reset()
 		{
 			_rightItemCount = _rightCollectionWrappper.Count;
 
-			if (_hasLeft)
+			if (HasLeft)
 			{
 				if (_rightItemCount > 0)
 				{
@@ -228,7 +236,7 @@ namespace ActiveListExtensions.Utilities
 
 		private void OnRightAdded(int index, TRight value)
 		{
-			if (_hasLeft)
+			if (HasLeft)
 				AddRightIntersectionValue(index, value);
 			else
 				AddRightValue(index, value);
@@ -236,7 +244,7 @@ namespace ActiveListExtensions.Utilities
 
 		private void OnRightRemoved(int index, TRight value)
 		{
-			if (_hasLeft)
+			if (HasLeft)
 				RemoveRightIntersectionValue(index);
 			else
 				RemoveRightValue(index);
@@ -244,7 +252,7 @@ namespace ActiveListExtensions.Utilities
 
 		private void OnRightReplaced(int index, TRight oldValue, TRight newValue)
 		{
-			if (_hasLeft)
+			if (HasLeft)
 				ReplaceRightIntersectionValue(index, newValue);
 			else
 				ReplaceRightValue(index, newValue);
@@ -252,7 +260,7 @@ namespace ActiveListExtensions.Utilities
 
 		private void OnRightMoved(int oldIndex, int newIndex, TRight value)
 		{
-			if (_hasLeft)
+			if (HasLeft)
 				MoveRightIntersectionValue(oldIndex, newIndex);
 			else
 				MoveRightValue(oldIndex, newIndex);
