@@ -12,7 +12,12 @@ namespace ActiveListExtensions.ListModifiers
 	{
 		private class JoinerData
 		{
-			public int TargetIndex { get; set; }
+			public int? LeftSourceIndex { get; set; }
+
+			public int RightSourceIndex { get; set; }
+
+			public int GetTargetIndex(int leftCount)
+				=> LeftSourceIndex ?? (RightSourceIndex + leftCount);
 
 			public int Offset { get; set; }
 
@@ -131,7 +136,7 @@ namespace ActiveListExtensions.ListModifiers
 			_leftJoiners.Remove(index);
 
 			for (int i = index; i < _leftJoiners.Count; ++i)
-				_leftJoiners[i].TargetIndex = i;
+				_leftJoiners[i].LeftSourceIndex = i;
 
 			UpdateIndices(index);
 
@@ -162,7 +167,7 @@ namespace ActiveListExtensions.ListModifiers
 			_leftJoiners.Move(oldIndex, newIndex);
 
 			for (int i = min; i <= max; ++i)
-				_leftJoiners[i].TargetIndex = i;
+				_leftJoiners[i].LeftSourceIndex = i;
 
 			UpdateIndices(min);
 
@@ -215,7 +220,7 @@ namespace ActiveListExtensions.ListModifiers
 			{
 				++data.Count;
 
-				UpdateIndices(data.TargetIndex);
+				UpdateIndices(data.GetTargetIndex(_leftJoiners.Count));
 
 				_resultList.Add(data.Offset + index, value);
 			};
@@ -223,7 +228,7 @@ namespace ActiveListExtensions.ListModifiers
 			{
 				--data.Count;
 
-				UpdateIndices(data.TargetIndex);
+				UpdateIndices(data.GetTargetIndex(_leftJoiners.Count));
 
 				_resultList.Remove(data.Offset + index);
 			};
@@ -239,7 +244,7 @@ namespace ActiveListExtensions.ListModifiers
 				{
 					data.Count += diff;
 
-					UpdateIndices(data.TargetIndex);
+					UpdateIndices(data.GetTargetIndex(_leftJoiners.Count));
 				}
 
 				_resultList.ReplaceRange(data.Offset + index, oldCount, values);
@@ -261,7 +266,7 @@ namespace ActiveListExtensions.ListModifiers
 				{
 					data.Count = newValues.Length;
 
-					UpdateIndices(data.TargetIndex);
+					UpdateIndices(data.GetTargetIndex(_leftJoiners.Count));
 				}
 
 				_resultList.ReplaceRange(data.Offset, oldCount, newValues);
@@ -277,7 +282,7 @@ namespace ActiveListExtensions.ListModifiers
 			_leftJoiners.Add(joinerIndex, joiner);
 
 			for (int i = joinerIndex; i < _leftJoiners.Count; ++i)
-				_leftJoiners[i].TargetIndex = i;
+				_leftJoiners[i].LeftSourceIndex = i;
 
 			if (!_joinerLookup.TryGetValue(key, out var joiners))
 			{
