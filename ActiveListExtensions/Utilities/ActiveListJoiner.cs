@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	internal class ActiveListJoiner<TLeft, TRight, TResult, TParameter> : IDisposable
+	internal class ActiveListJoiner<TLeft, TRight, TResult> : IDisposable
 	{
 		public bool HasLeft { get; private set; }
 
@@ -17,19 +17,15 @@ namespace ActiveListExtensions.Utilities
 
 		private readonly ActiveListJoinBehaviour _joinBehaviour;
 
-		private readonly Func<TLeft, TRight, TParameter, TResult> _resultSelector;
+		private readonly Func<TLeft, TRight, TResult> _resultSelector;
 
 		private readonly ValueWatcher<TLeft> _leftWatcher;
-
-		private readonly ValueWatcher<TParameter> _parameterWatcher;
-
-		private TParameter ParameterValue => _parameterWatcher != null ? _parameterWatcher.Value : default(TParameter);
 
 		private bool SupportsInner => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.Inner);
 		private bool SupportsLeft => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.LeftExcluding);
 		private bool SupportsRight => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.RightExcluding);
 
-		public ActiveListJoiner(ActiveListJoinBehaviour joinBehaviour, IActiveValue<TParameter> parameter, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+		public ActiveListJoiner(ActiveListJoinBehaviour joinBehaviour, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 		{
 			_joinBehaviour = joinBehaviour;
 
@@ -38,12 +34,6 @@ namespace ActiveListExtensions.Utilities
 			_left = ActiveValue.Create<TLeft>();
 			_leftWatcher = new ValueWatcher<TLeft>(_left, leftResultSelectorPropertiesToWatch);
 			_leftWatcher.ValuePropertyChanged += () => OnLeftChanged();
-
-			if (parameter != null)
-			{
-				_parameterWatcher = new ValueWatcher<TParameter>(parameter, parameterPropertiesToWatch);
-				_parameterWatcher.ValueOrValuePropertyChanged += () => OnParameterChanged();
-			}
 
 			_rightCollectionWrappper = new CollectionWrapper<TRight>(null, rightResultSelectorPropertiesToWatch?.ToArray());
 			_rightCollectionWrappper.ItemModified += (s, i, v) => OnRightReplaced(i, v, v);
@@ -57,8 +47,6 @@ namespace ActiveListExtensions.Utilities
 		public void Dispose()
 		{
 			_rightCollectionWrappper.Dispose();
-
-			_parameterWatcher?.Dispose();
 
 			AddRequested = null;
 			RemoveRequested = null;
@@ -226,13 +214,13 @@ namespace ActiveListExtensions.Utilities
 		}
 
 		private TResult GetLeftResult(TLeft left)
-			=> _resultSelector.Invoke(left, default(TRight), ParameterValue);
+			=> _resultSelector.Invoke(left, default(TRight));
 
 		private TResult GetRightResult(TRight right)
-			=> _resultSelector.Invoke(default(TLeft), right, ParameterValue);
+			=> _resultSelector.Invoke(default(TLeft), right);
 
 		private TResult GetResult(TLeft left, TRight right)
-			=> _resultSelector.Invoke(left, right, ParameterValue);
+			=> _resultSelector.Invoke(left, right);
 
 		private void OnRightAdded(int index, TRight value)
 		{

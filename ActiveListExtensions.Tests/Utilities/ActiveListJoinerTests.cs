@@ -11,44 +11,44 @@ namespace ActiveListExtensions.Tests.Utilities
 {
 	public class ActiveListJoinerTests
 	{
-		private static ActiveListJoinerToReadOnlyList<int, int, int, object> CreateEmpty(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> right)
+		private static ActiveListJoinerToReadOnlyList<int, int, int> CreateEmpty(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> right)
 		{
 			right = new ObservableList<int>();
-			var joiner = new ActiveListJoiner<int, int, int, object>(joinBehaviour, null, (l, r, p) => l + r, null, null, null);
-			var result = new ActiveListJoinerToReadOnlyList<int, int, int, object>(joiner);
+			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l + r, null, null);
+			var result = new ActiveListJoinerToReadOnlyList<int, int, int>(joiner);
 			joiner.SetRight(right);
 			return result;
 		}
 
-		private static ActiveListJoinerToReadOnlyList<int, int, int, object> CreateHasLeft(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> right)
+		private static ActiveListJoinerToReadOnlyList<int, int, int> CreateHasLeft(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> right)
 		{
 			right = new ObservableList<int>();
-			var joiner = new ActiveListJoiner<int, int, int, object>(joinBehaviour, null, (l, r, p) => l + r, null, null, null);
-			var result = new ActiveListJoinerToReadOnlyList<int, int, int, object>(joiner);
+			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l + r, null, null);
+			var result = new ActiveListJoinerToReadOnlyList<int, int, int>(joiner);
 			joiner.SetBoth(1, right);
 			return result;
 		}
 
-		private static ActiveListJoinerToReadOnlyList<int, int, int, object> CreateHasRight(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> right)
+		private static ActiveListJoinerToReadOnlyList<int, int, int> CreateHasRight(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> right)
 		{
 			right = new ObservableList<int>();
 			right.Add(0, 10);
 			right.Add(1, 100);
 			right.Add(2, 1000);
-			var joiner = new ActiveListJoiner<int, int, int, object>(joinBehaviour, null, (l, r, p) => l + r, null, null, null);
-			var result = new ActiveListJoinerToReadOnlyList<int, int, int, object>(joiner);
+			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l + r, null, null);
+			var result = new ActiveListJoinerToReadOnlyList<int, int, int>(joiner);
 			joiner.SetRight(right);
 			return result;
 		}
 
-		private static ActiveListJoinerToReadOnlyList<int, int, int, object> CreateHasBoth(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> right)
+		private static ActiveListJoinerToReadOnlyList<int, int, int> CreateHasBoth(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> right)
 		{
 			right = new ObservableList<int>();
 			right.Add(0, 10);
 			right.Add(1, 100);
 			right.Add(2, 1000);
-			var joiner = new ActiveListJoiner<int, int, int, object>(joinBehaviour, null, (l, r, p) => l + r, null, null, null);
-			var result = new ActiveListJoinerToReadOnlyList<int, int, int, object>(joiner);
+			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l + r, null, null);
+			var result = new ActiveListJoinerToReadOnlyList<int, int, int>(joiner);
 			joiner.SetBoth(1, right);
 			return result;
 		}

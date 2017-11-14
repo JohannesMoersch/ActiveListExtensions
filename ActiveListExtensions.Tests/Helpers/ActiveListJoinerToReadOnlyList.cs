@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Tests.Helpers
 {
-	internal class ActiveListJoinerToReadOnlyList<TLeft, TRight, TResult, TParameter> : ObservableList<TResult>
+	internal class ActiveListJoinerToReadOnlyList<TLeft, TRight, TResult> : ObservableList<TResult>
 	{
-		private readonly ActiveListJoiner<TLeft, TRight, TResult, TParameter> _joiner;
+		private readonly ActiveListJoiner<TLeft, TRight, TResult> _joiner;
 
-		public ActiveListJoinerToReadOnlyList(ActiveListJoiner<TLeft, TRight, TResult, TParameter> joiner)
+		public ActiveListJoinerToReadOnlyList(ActiveListJoiner<TLeft, TRight, TResult> joiner)
 		{
 			_joiner = joiner;
 

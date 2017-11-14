@@ -2,6 +2,8 @@
 using ActiveListExtensions.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,11 +22,11 @@ namespace ActiveListExtensions.ListModifiers
 
 		private readonly CollectionWrapper<IActiveGrouping<TKey, TRight>> _rightGroups;
 
-		private readonly QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>> _leftJoiners;
+		private readonly QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey>> _leftJoiners;
 
-		private readonly QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>> _rightJoiners;
+		private readonly QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey>> _rightJoiners;
 
-		private readonly IDictionary<TKey, ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter>> _joinerLookup;
+		private readonly IDictionary<TKey, ActiveListJoinerSet<TLeft, TRight, TResult, TKey>> _joinerLookup;
 
 		private readonly ActiveListJoinBehaviour _joinBehaviour;
 
@@ -34,9 +36,14 @@ namespace ActiveListExtensions.ListModifiers
 
 		private readonly IEnumerable<string> _leftResultSelectorPropertiesToWatch;
 		private readonly IEnumerable<string> _rightResultSelectorPropertiesToWatch;
-		private readonly IEnumerable<string> _resultSelectorParameterPropertiesToWatch;
+
+		private readonly ValueWatcher<TParameter> _parameterWatcher;
+
+		private TParameter ParameterValue => _parameterWatcher != null ? _parameterWatcher.Value : default(TParameter);
 
 		private readonly ObservableList<TResult> _resultList;
+
+		private bool _fullResetInProgress;
 
 		public ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveList<TLeft> source, IReadOnlyList<TRight> join, Func<TLeft, TKey> leftKeySelector, Func<TRight, TKey> rightKeySelector, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftKeySelectorPropertiesToWatch, IEnumerable<string> rightKeySelectorPropertiesToWatch, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 			: this(
@@ -72,11 +79,16 @@ namespace ActiveListExtensions.ListModifiers
 
 			_leftResultSelectorPropertiesToWatch = leftResultSelectorPropertiesToWatch;
 			_rightResultSelectorPropertiesToWatch = rightResultSelectorPropertiesToWatch;
-			_resultSelectorParameterPropertiesToWatch = resultSelectorParameterPropertiesToWatch;
 
-			_leftJoiners = new QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>>();
-			_rightJoiners = new QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>>();
-			_joinerLookup = new Dictionary<TKey, ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter>>();
+			if (parameter != null)
+			{
+				_parameterWatcher = new ValueWatcher<TParameter>(parameter, resultSelectorParameterPropertiesToWatch);
+				_parameterWatcher.ValueOrValuePropertyChanged += () => OnParameterChanged();
+			}
+
+			_leftJoiners = new QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey>>();
+			_rightJoiners = new QuickList<ActiveListJoinerData<TLeft, TRight, TResult, TKey>>();
+			_joinerLookup = new Dictionary<TKey, ActiveListJoinerSet<TLeft, TRight, TResult, TKey>>();
 
 			_leftItems = new CollectionWrapper<KeyValuePair<TKey, TLeft>>(left);
 			_leftItems.ItemModified += (s, i, v) => OnLeftReplaced(i, v, v);
@@ -84,7 +96,7 @@ namespace ActiveListExtensions.ListModifiers
 			_leftItems.ItemRemoved += (s, i, v) => OnLeftRemoved(i, v);
 			_leftItems.ItemReplaced += (s, i, o, n) => OnLeftReplaced(i, o, n);
 			_leftItems.ItemMoved += (s, o, n, v) => OnLeftMoved(o, n, v);
-			_leftItems.ItemsReset += s => OnLeftReset(s);
+			_leftItems.ItemsReset += s => FullReset();
 
 			_rightItems = right;
 
@@ -94,30 +106,63 @@ namespace ActiveListExtensions.ListModifiers
 			_rightGroups.ItemRemoved += (s, i, v) => OnRightRemoved(i, v);
 			_rightGroups.ItemReplaced += (s, i, o, n) => OnRightReplaced(i, o, n);
 			_rightGroups.ItemMoved += (s, o, n, v) => OnRightMoved(o, n, v);
-			_rightGroups.ItemsReset += s => OnRightReset(s);
+			_rightGroups.ItemsReset += s => FullReset();
 
 			_resultList = new ObservableList<TResult>();
-			_resultList.PropertyChanged += (s, e) => NotifyOfPropertyChange(e);
-			_resultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);
+			_resultList.PropertyChanged += (s, e) =>
+			{
+				if (!_fullResetInProgress)
+					NotifyOfPropertyChange(e);
+			};
+			_resultList.CollectionChanged += (s, e) =>
+			{
+				if (!_fullResetInProgress)
+					NotifyOfCollectionChange(e);
+			};
 
-			Initialize();
+			FullReset();
 		}
 
-		private ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter> CreateJoinerSet(TKey key)
+		private void FullReset()
 		{
-			var set = new ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter>(_joinBehaviour, key, _rightItems, _parameter, _resultSelector, _leftResultSelectorPropertiesToWatch, _rightResultSelectorPropertiesToWatch, _resultSelectorParameterPropertiesToWatch);
+			var oldCount = _resultList.Count;
+
+			_fullResetInProgress = true;
+			try
+			{
+				_resultList.Clear();
+
+				foreach (var set in _joinerLookup.Values)
+					set.Dispose();
+
+				_joinerLookup.Clear();
+				_leftJoiners.Clear();
+				_rightJoiners.Clear();
+
+				OnLeftReset(_leftItems);
+				OnRightReset(_rightItems);
+			}
+			finally
+			{
+				_fullResetInProgress = false;
+				if (oldCount != _resultList.Count)
+					NotifyOfPropertyChange(new PropertyChangedEventArgs(nameof(Count)));
+				NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+			}
+		}
+
+		private void OnParameterChanged()
+			=> FullReset();
+
+		private ActiveListJoinerSet<TLeft, TRight, TResult, TKey> CreateJoinerSet(TKey key)
+		{
+			var set = new ActiveListJoinerSet<TLeft, TRight, TResult, TKey>(_joinBehaviour, key, _rightItems, (l, r) => _resultSelector.Invoke(l, r, ParameterValue), _leftResultSelectorPropertiesToWatch, _rightResultSelectorPropertiesToWatch);
 
 			set.JoinerAdded += OnJoinerAdded;
 			set.JoinerRemoved += OnJoinerRemoved;
 			set.SetEmptied += OnSetEmptied;
 
 			return set;
-		}
-
-		private void Initialize()
-		{
-			OnLeftReset(_leftItems);
-			OnRightReset(_rightItems);
 		}
 
 		private void OnLeftAdded(int index, KeyValuePair<TKey, TLeft> value)
@@ -272,7 +317,7 @@ namespace ActiveListExtensions.ListModifiers
 			}
 		}
 
-		private void OnJoinerAdded(ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter> data)
+		private void OnJoinerAdded(ActiveListJoinerData<TLeft, TRight, TResult, TKey> data)
 		{
 			if (data.IsLeftJoiner)
 			{
@@ -348,7 +393,7 @@ namespace ActiveListExtensions.ListModifiers
 			};
 		}
 
-		private void OnJoinerRemoved(ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter> data)
+		private void OnJoinerRemoved(ActiveListJoinerData<TLeft, TRight, TResult, TKey> data)
 		{
 			if (data.IsLeftJoiner)
 			{
@@ -368,7 +413,7 @@ namespace ActiveListExtensions.ListModifiers
 			UpdateIndices(data.GetTargetIndex(_leftJoiners.Count));
 		}
 
-		private void OnSetEmptied(ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter> set)
+		private void OnSetEmptied(ActiveListJoinerSet<TLeft, TRight, TResult, TKey> set)
 		{
 			_joinerLookup.Remove(set.Key);
 

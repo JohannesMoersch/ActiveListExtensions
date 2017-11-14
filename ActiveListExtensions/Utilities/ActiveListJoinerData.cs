@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	internal class ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter> : IDisposable
+	internal class ActiveListJoinerData<TLeft, TRight, TResult, TKey> : IDisposable
 	{
 		public int SourceIndex { get; set; }
 
@@ -14,19 +14,19 @@ namespace ActiveListExtensions.Utilities
 
 		public int Count { get; set; }
 
-		public ActiveListJoiner<TLeft, TRight, TResult, TParameter> Joiner { get; }
+		public ActiveListJoiner<TLeft, TRight, TResult> Joiner { get; }
 
 		public TKey Key { get; }
 
 		public bool IsLeftJoiner { get; }
 
-		public ActiveListJoinerData(bool isLeftJoiner, ActiveListJoinBehaviour joinBehaviour, TKey key, IActiveValue<TParameter> parameter, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+		public ActiveListJoinerData(bool isLeftJoiner, ActiveListJoinBehaviour joinBehaviour, TKey key, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 		{
 			Key = key;
 
 			IsLeftJoiner = isLeftJoiner;
 
-			Joiner = CreateJoiner(joinBehaviour, parameter, resultSelector, leftResultSelectorPropertiesToWatch, rightResultSelectorPropertiesToWatch, parameterPropertiesToWatch);
+			Joiner = CreateJoiner(joinBehaviour, resultSelector, leftResultSelectorPropertiesToWatch, rightResultSelectorPropertiesToWatch);
 		}
 
 		public void Set(TLeft left)
@@ -47,7 +47,7 @@ namespace ActiveListExtensions.Utilities
 		public int GetTargetIndex(int leftJoinerCount)
 			=> IsLeftJoiner ? SourceIndex : SourceIndex + leftJoinerCount;
 
-		private ActiveListJoiner<TLeft, TRight, TResult, TParameter> CreateJoiner(ActiveListJoinBehaviour joinBehaviour, IActiveValue<TParameter> parameter, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
-			=> new ActiveListJoiner<TLeft, TRight, TResult, TParameter>(joinBehaviour, parameter, resultSelector, leftResultSelectorPropertiesToWatch, rightResultSelectorPropertiesToWatch, parameterPropertiesToWatch);
+		private ActiveListJoiner<TLeft, TRight, TResult> CreateJoiner(ActiveListJoinBehaviour joinBehaviour, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
+			=> new ActiveListJoiner<TLeft, TRight, TResult>(joinBehaviour, resultSelector, leftResultSelectorPropertiesToWatch, rightResultSelectorPropertiesToWatch);
 	}
 }

@@ -6,19 +6,17 @@ using System.Threading.Tasks;
 
 namespace ActiveListExtensions.Utilities
 {
-	internal class ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter> : IDisposable
+	internal class ActiveListJoinerSet<TLeft, TRight, TResult, TKey> : IDisposable
 	{
 		private readonly ActiveListJoinBehaviour _joinBehaviour;
 		private readonly IActiveList<TRight> _right;
-		private readonly IActiveValue<TParameter> _parameter;
-		private readonly Func<TLeft, TRight, TParameter, TResult> _resultSelector;
+		private readonly Func<TLeft, TRight, TResult> _resultSelector;
 		private readonly IEnumerable<string> _leftResultSelectorPropertiesToWatch;
 		private readonly IEnumerable<string> _rightResultSelectorPropertiesToWatch;
-		private readonly IEnumerable<string> _parameterPropertiesToWatch;
 
-		private readonly List<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>> _leftJoiners = new List<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>>();
+		private readonly List<ActiveListJoinerData<TLeft, TRight, TResult, TKey>> _leftJoiners = new List<ActiveListJoinerData<TLeft, TRight, TResult, TKey>>();
 
-		private ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter> _rightJoiner;
+		private ActiveListJoinerData<TLeft, TRight, TResult, TKey> _rightJoiner;
 
 		public TKey Key { get; }
 
@@ -26,17 +24,15 @@ namespace ActiveListExtensions.Utilities
 
 		public int? RightSourceIndex => HasRight ? _rightJoiner.SourceIndex : (int?)null;
 
-		public ActiveListJoinerSet(ActiveListJoinBehaviour joinBehaviour, TKey key, IActiveLookup<TKey, TRight> right, IActiveValue<TParameter> parameter, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+		public ActiveListJoinerSet(ActiveListJoinBehaviour joinBehaviour, TKey key, IActiveLookup<TKey, TRight> right, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 		{
 			Key = key;
 
 			_joinBehaviour = joinBehaviour;
 			_right = right[key];
-			_parameter = parameter;
 			_resultSelector = resultSelector;
 			_leftResultSelectorPropertiesToWatch = leftResultSelectorPropertiesToWatch;
 			_rightResultSelectorPropertiesToWatch = rightResultSelectorPropertiesToWatch;
-			_parameterPropertiesToWatch = parameterPropertiesToWatch;
 		}
 
 		public void Dispose()
@@ -81,6 +77,9 @@ namespace ActiveListExtensions.Utilities
 			{
 				JoinerRemoved.Invoke(data);
 				data.Dispose();
+
+				if (_leftJoiners.Count == 0 && !HasRight)
+					SetEmptied?.Invoke(this);
 			}
 		}
 
@@ -130,7 +129,7 @@ namespace ActiveListExtensions.Utilities
 			}
 		}
 
-		private void RemoveLeft(ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter> data)
+		private void RemoveLeft(ActiveListJoinerData<TLeft, TRight, TResult, TKey> data)
 		{
 			try
 			{
@@ -143,6 +142,9 @@ namespace ActiveListExtensions.Utilities
 
 				if (_leftJoiners.Count == 0)
 					_rightJoiner?.Set(_right);
+
+				if (_leftJoiners.Count == 0 && !HasRight)
+					SetEmptied?.Invoke(this);
 			}
 		}
 
@@ -162,15 +164,18 @@ namespace ActiveListExtensions.Utilities
 		{
 			if (oldCount > 0 && _leftJoiners.Count == 0)
 				_rightJoiner?.Set(_right);
+
+			if (_leftJoiners.Count == 0 && !HasRight)
+				SetEmptied?.Invoke(this);
 		}
 
-		private ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter> CreateJoinerData(bool isLeftJoiner)
-			=> new ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>(isLeftJoiner, _joinBehaviour, Key, _parameter, _resultSelector, _leftResultSelectorPropertiesToWatch, _rightResultSelectorPropertiesToWatch, _parameterPropertiesToWatch);
+		private ActiveListJoinerData<TLeft, TRight, TResult, TKey> CreateJoinerData(bool isLeftJoiner)
+			=> new ActiveListJoinerData<TLeft, TRight, TResult, TKey>(isLeftJoiner, _joinBehaviour, Key, _resultSelector, _leftResultSelectorPropertiesToWatch, _rightResultSelectorPropertiesToWatch);
 
-		public event Action<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>> JoinerAdded;
+		public event Action<ActiveListJoinerData<TLeft, TRight, TResult, TKey>> JoinerAdded;
 
-		public event Action<ActiveListJoinerData<TLeft, TRight, TResult, TKey, TParameter>> JoinerRemoved;
+		public event Action<ActiveListJoinerData<TLeft, TRight, TResult, TKey>> JoinerRemoved;
 
-		public event Action<ActiveListJoinerSet<TLeft, TRight, TResult, TKey, TParameter>> SetEmptied;
+		public event Action<ActiveListJoinerSet<TLeft, TRight, TResult, TKey>> SetEmptied;
 	}
 }
