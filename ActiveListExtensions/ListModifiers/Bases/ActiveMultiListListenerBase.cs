@@ -9,7 +9,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 {
 	internal abstract class ActiveMultiListListenerBase<TSource, TOtherSources, TParameter, TResult> : ActiveListListenerBase<TSource, TParameter, TResult>
 	{
-		private List<CollectionWrapper<TOtherSources>> _sourceLists = new List<CollectionWrapper<TOtherSources>>();
+		private QuickList<CollectionWrapper<TOtherSources>> _sourceLists = new QuickList<CollectionWrapper<TOtherSources>>();
 
 		protected IReadOnlyList<IReadOnlyList<TOtherSources>> SourceLists => _sourceLists;
 
@@ -42,7 +42,7 @@ namespace ActiveListExtensions.ListModifiers.Bases
 			wrapper.ItemMoved += (s, o, n, v) => OnMoved(wrapper.CollectionIndex, o, n, v);
 			wrapper.ItemsReset += s => OnReset(wrapper.CollectionIndex, s);
 
-			_sourceLists.Insert(collectionIndex, wrapper);
+			_sourceLists.Add(collectionIndex, wrapper);
 			for (int i = collectionIndex; i < _sourceLists.Count; ++i)
 				_sourceLists[i].CollectionIndex = i;
 			OnCollectionInserted(collectionIndex);
@@ -54,13 +54,30 @@ namespace ActiveListExtensions.ListModifiers.Bases
 			if (collectionIndex < 0 || collectionIndex >= _sourceLists.Count)
 				throw new ArgumentOutOfRangeException(nameof(collectionIndex));
 
-			OnReset(collectionIndex, new TOtherSources[0]);
 			var wrapper = _sourceLists[collectionIndex];
-			_sourceLists.RemoveAt(collectionIndex);
+			_sourceLists.Remove(collectionIndex);
 			for (int i = collectionIndex; i < _sourceLists.Count; ++i)
 				_sourceLists[i].CollectionIndex = i;
-			OnCollectionRemoved(collectionIndex);
 			wrapper.Dispose();
+			OnCollectionRemoved(collectionIndex);
+			OnReset(collectionIndex, new TOtherSources[0]);
+		}
+
+		protected void MoveSourceCollection(int oldCollectionIndex, int newCollectionIndex)
+		{
+			if (oldCollectionIndex < 0 || oldCollectionIndex >= _sourceLists.Count)
+				throw new ArgumentOutOfRangeException(nameof(oldCollectionIndex));
+
+			if (newCollectionIndex < 0 || newCollectionIndex >= _sourceLists.Count)
+				throw new ArgumentOutOfRangeException(nameof(newCollectionIndex));
+
+			_sourceLists.Move(oldCollectionIndex, newCollectionIndex);
+
+			var min = oldCollectionIndex < newCollectionIndex ? oldCollectionIndex : newCollectionIndex;
+			var max = oldCollectionIndex > newCollectionIndex ? oldCollectionIndex : newCollectionIndex;
+
+			for (int i = min; i <= max; ++i)
+				_sourceLists[i].CollectionIndex = i;
 		}
 
 		protected abstract void OnAdded(int collectionIndex, int index, TOtherSources value);

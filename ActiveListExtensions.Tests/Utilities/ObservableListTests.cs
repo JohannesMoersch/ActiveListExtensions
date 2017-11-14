@@ -121,5 +121,51 @@ namespace ActiveListExtensions.Tests.Utilities
 
 			Assert.Equal(sut.Count, count);
 		}
+
+		[Fact]
+		public void RandomlyMoveRangesOfItems()
+		{
+			RandomGenerator.ResetRandomGenerator();
+
+			var sut = new ObservableList<int>();
+			foreach (var value in Enumerable.Range(0, 100))
+				sut.Add(sut.Count, value);
+
+			var watcher = new CollectionSynchronizationWatcher<int>(sut);
+
+			foreach (var value in Enumerable.Range(0, 50))
+			{
+				var count = RandomGenerator.GenerateRandomInteger(0, sut.Count + 1);
+				var start = RandomGenerator.GenerateRandomInteger(0, sut.Count - count + 1);
+				var target = RandomGenerator.GenerateRandomInteger(0, sut.Count - count + 1);
+				sut.MoveRange(start, target, count);
+			}
+
+			Assert.Equal(sut.Count, 100);
+		}
+
+		[Fact]
+		public void MoveRangeUp()
+		{
+			var sut = new ObservableList<int>();
+			foreach (var value in Enumerable.Range(0, 11))
+				sut.Add(sut.Count, value);
+
+			sut.MoveRange(5, 3, 3);
+
+			Assert.True(sut.SequenceEqual(new[] { 0, 1, 2, 5, 6, 7, 3, 4, 8, 9, 10 }));
+		}
+
+		[Fact]
+		public void MoveRangeDown()
+		{
+			var sut = new ObservableList<int>();
+			foreach (var value in Enumerable.Range(0, 11))
+				sut.Add(sut.Count, value);
+
+			sut.MoveRange(3, 6, 2);
+
+			Assert.True(sut.SequenceEqual(new[] { 0, 1, 2, 5, 6, 7, 3, 4, 8, 9, 10 }));
+		}
 	}
 }

@@ -92,10 +92,12 @@
   <ItemGroup>
     <Compile Include="ActiveRangeTests.cs" />
     <Compile Include="ActiveRepeatTests.cs" />
+    <Compile Include="Helpers\ActiveListJoinerToReadOnlyList.cs" />
     <Compile Include="Helpers\CollectionSynchronizationWatcher.cs" />
     <Compile Include="Helpers\CollectionTestHelpers.cs" />
     <Compile Include="Helpers\IntegerTestClass.cs" />
     <Compile Include="Helpers\KeyEqualityComparer.cs" />
+    <Compile Include="Helpers\LinqJoinExtensions.cs" />
     <Compile Include="Helpers\LinqValidator.cs" />
     <Compile Include="Helpers\RandomGenerator.cs" />
     <Compile Include="Helpers\ValueTestHelpers.cs" />
@@ -104,10 +106,17 @@
     <Compile Include="Modifiers\ActiveElementsAtOrEmptyTests.cs" />
     <Compile Include="Modifiers\ActiveExceptTests.cs" />
     <Compile Include="Modifiers\ActiveGroupByTests.cs" />
+    <Compile Include="Modifiers\ActiveInnerJoinTests.cs" />
     <Compile Include="Modifiers\ActiveIntersectTests.cs" />
+    <Compile Include="Modifiers\ActiveLeftExcludingJoinTests.cs" />
+    <Compile Include="Modifiers\ActiveLeftJoinTests.cs" />
     <Compile Include="Modifiers\ActiveLookupTests.cs" />
     <Compile Include="Modifiers\ActiveOfTypeTests.cs" />
     <Compile Include="Modifiers\ActiveOrderByTests.cs" />
+    <Compile Include="Modifiers\ActiveOuterExcludingJoinTests.cs" />
+    <Compile Include="Modifiers\ActiveOuterJoinTests.cs" />
+    <Compile Include="Modifiers\ActiveRightExcludingJoinTests.cs" />
+    <Compile Include="Modifiers\ActiveRightJoinTests.cs" />
     <Compile Include="Modifiers\ActiveSelectByKeyTests.cs" />
     <Compile Include="Modifiers\ActiveTranslateResetNotificationsTests.cs" />
     <Compile Include="Modifiers\ActiveReverseTests.cs" />
@@ -126,6 +135,7 @@
     <Compile Include="Reactive\ObservableToActiveValueTests.cs" />
     <Compile Include="Reactive\ReactiveListTests.cs" />
     <Compile Include="Reactive\ReactiveValueTests.cs" />
+    <Compile Include="Utilities\ActiveListJoinerTests.cs" />
     <Compile Include="Utilities\BooleanListTests.cs" />
     <Compile Include="Utilities\ObservableListTests.cs" />
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />

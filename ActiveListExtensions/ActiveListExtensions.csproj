@@ -52,7 +52,13 @@
     <Compile Include="ListModifiers\ActiveDistinct.cs" />
     <Compile Include="ListModifiers\ActiveElementsOrEmpty.cs" />
     <Compile Include="ListModifiers\ActiveExcept.cs" />
+    <Compile Include="ListModifiers\ActiveJoin.cs" />
     <Compile Include="MutableActiveListExtensions.cs" />
+    <Compile Include="Utilities\ActiveListJoinBehaviour.cs" />
+    <Compile Include="Utilities\ActiveListJoiner.cs" />
+    <Compile Include="Utilities\ActiveListJoinerData.cs" />
+    <Compile Include="Utilities\ActiveListJoinerSet.cs" />
+    <Compile Include="Utilities\OnDisposeAction.cs" />
     <Compile Include="ValueModifiers\ActiveGetOrDefault.cs" />
     <Compile Include="ListModifiers\ActiveIntersect.cs" />
     <Compile Include="ListModifiers\ActiveListWrapper.cs" />

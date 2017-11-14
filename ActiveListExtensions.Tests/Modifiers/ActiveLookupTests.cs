@@ -46,6 +46,34 @@ namespace ActiveListExtensions.Tests.Modifiers
 		}
 
 		[Fact]
+		public void ExistingGroupStaysUpToDateAfterReset()
+		{
+			var list = ActiveList.Create(Enumerable.Range(0, 5));
+
+			var sut = list.ToActiveLookup(i => i / 10);
+
+			Assert.True(list.SequenceEqual(sut[0]));
+
+			list.Reset(new[] { 1, 12, 7, 3, 18 });
+
+			Assert.True(new[] { 1, 7, 3 }.SequenceEqual(sut[0]));
+		}
+
+		[Fact]
+		public void SelectByKeyGroupStaysUpToDateAfterReset()
+		{
+			var list = ActiveList.Create(Enumerable.Range(0, 5));
+
+			var sut = list.ToActiveLookup(i => i / 10).ActiveSelectByKey(0);
+
+			Assert.True(list.SequenceEqual(sut));
+
+			list.Reset(new[] { 1, 12, 7, 3, 18 });
+
+			Assert.True(new[] { 1, 7, 3 }.SequenceEqual(sut));
+		}
+
+		[Fact]
 		public void NewGroupThrowsChangeNotifications()
 		{
 			var list = ActiveList.Create(Enumerable.Range(0, 5));
@@ -79,6 +107,49 @@ namespace ActiveListExtensions.Tests.Modifiers
 			list.Add(2, 15);
 
 			Assert.True(new[] { 15 }.SequenceEqual(sut[1]));
+		}
+
+		[Fact]
+		public void OrderingInsideGroupMatchesSourceOrdering()
+		{
+			var list = ActiveList.Create(Enumerable.Range(0, 5));
+
+			var sut = list.ToActiveLookup(i => i / 10);
+
+			Assert.True(new int[] { 0, 1, 2, 3, 4 }.SequenceEqual(sut[0]));
+
+			list.Add(2, 7);
+			list.Add(1, 15);
+			list.Add(0, 9);
+
+			Assert.True(new int[] { 9, 0, 1, 7, 2, 3, 4 }.SequenceEqual(sut[0]));
+		}
+
+		[Fact]
+		public void GroupOrderingMatchesSourceOrdering()
+		{
+
+			var list = ActiveList.Create(new[] { 1, 2, 5, 3 });
+
+			var sut = list.ToActiveLookup(i => i / 2);
+			
+			Assert.True(new int[] { 0, 1, 2 }.SequenceEqual(sut.Select(g => g.Key)));
+
+			list.Remove(1);
+
+			Assert.True(new int[] { 0, 2, 1 }.SequenceEqual(sut.Select(g => g.Key)));
+
+			list.Add(4);
+
+			Assert.True(new int[] { 0, 2, 1 }.SequenceEqual(sut.Select(g => g.Key)));
+
+			list.Move(1, 0);
+
+			Assert.True(new int[] { 2, 0, 1 }.SequenceEqual(sut.Select(g => g.Key)));
+
+			list.Add(0, 8);
+
+			Assert.True(new int[] { 4, 2, 0, 1 }.SequenceEqual(sut.Select(g => g.Key)));
 		}
 	}
 }

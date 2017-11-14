@@ -35,21 +35,24 @@ namespace ActiveListExtensions.Utilities
 
 	internal abstract class ObservableList<TSource, TStore, TResult> : IActiveList<TResult>
 	{
-		private int _skipStart, _skipCount;
+		private int _skipStart1, _skipCount1;
+		private int _skipStart2, _skipCount2;
 
 		public TStore this[int index]
 		{
 			get
 			{
-				if (index >= _skipStart)
-					index += _skipCount;
+				if (index >= _skipStart1)
+					index += _skipCount1;
+				if (index >= _skipStart2)
+					index += _skipCount2;
 				return List[index];
 			}
 		}
 
 		TResult IReadOnlyList<TResult>.this[int index] => GetResultFromItem(this[index]);
 
-		public int Count => List.Count - _skipCount;
+		public int Count => List.Count - _skipCount1 - _skipCount2;
 
 		protected QuickList<TStore> List { get; }
 
@@ -122,6 +125,9 @@ namespace ActiveListExtensions.Utilities
 
 		public virtual void ReplaceRange(int startIndex, int oldCount, IReadOnlyList<TSource> newValues)
 		{
+			if (oldCount == 0 && newValues.Count == 0)
+				return;
+
 			try
 			{
 				var top = List.Count - 1;
@@ -141,12 +147,12 @@ namespace ActiveListExtensions.Utilities
 					for (int i = oldCount; i < newValues.Count; ++i)
 						List[startIndex + i] = GetStoreFromSource(newValues[i]);
 
-					_skipStart = startIndex + oldCount;
-					_skipCount = newValues.Count - oldCount;
+					_skipStart1 = startIndex + oldCount;
+					_skipCount1 = newValues.Count - oldCount;
 					for (int i = oldCount; i < newValues.Count; ++i)
 					{
-						--_skipCount;
-						++_skipStart;
+						--_skipCount1;
+						++_skipStart1;
 						var index = startIndex + i;
 						NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, GetResultFromItem(List[index]), index));
 					}
@@ -154,13 +160,13 @@ namespace ActiveListExtensions.Utilities
 				else if (diff < 0)
 				{
 					var end = newValues.Count + startIndex;
-					_skipStart = oldCount - 1 + startIndex;
-					_skipCount = 0;
-					for (int i = _skipStart; i >= end; --i)
+					_skipStart1 = oldCount - 1 + startIndex;
+					_skipCount1 = 0;
+					for (int i = _skipStart1; i >= end; --i)
 					{
-						++_skipCount;
+						++_skipCount1;
 						NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, GetResultFromItem(List[i]), i));
-						--_skipStart;
+						--_skipStart1;
 					}
 
 					for (int i = bottom; i <= top; ++i)
@@ -178,8 +184,85 @@ namespace ActiveListExtensions.Utilities
 			}
 			finally
 			{
-				_skipStart = 0;
-				_skipCount = 0;
+				_skipStart1 = 0;
+				_skipCount1 = 0;
+			}
+		}
+
+		public virtual void MoveRange(int oldIndex, int newIndex, int count)
+		{
+			if (count == 0)
+				return;
+
+			if (oldIndex < 0 || oldIndex + count > Count)
+				throw new ArgumentOutOfRangeException(nameof(oldIndex));
+
+			if (newIndex + count > Count || newIndex < 0)
+				throw new ArgumentOutOfRangeException(nameof(newIndex));
+
+			try
+			{
+				for (int i = 0; i < count; ++i)
+					List.Add(List.Count, default(TStore));
+
+				if (oldIndex < newIndex)
+				{
+					for (int i = List.Count - 1; i >= newIndex + count; --i)
+						List[i] = List[i - count];
+
+					for (int i = count - 1; i >= 0; --i)
+						List[newIndex + count + i] = List[oldIndex + i];
+
+					_skipStart1 = oldIndex + count;
+					_skipStart2 = newIndex + count;
+					_skipCount2 = count;
+
+					for (int i = count - 1; i >= 0; --i)
+					{
+						--_skipStart1;
+						++_skipCount1;
+						--_skipCount2;
+
+						NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetResultFromItem(List[_skipStart2 - _skipCount1 + count]), _skipStart2 - _skipCount1, _skipStart1));
+					}
+
+					for (int i = oldIndex; i < List.Count - count; ++i)
+						List[i] = List[i + count];
+				}
+				else
+				{
+					for (int i = List.Count - 1; i >= newIndex + count; --i)
+						List[i] = List[i - count];
+
+					for (int i = 0; i < count; ++i)
+						List[newIndex + i] = List[oldIndex + i + count];
+
+					_skipStart1 = newIndex;
+					_skipCount1 = count;
+					_skipStart2 = oldIndex + count;
+
+					for (int i = 0; i < count; ++i)
+					{
+						++_skipStart1;
+						--_skipCount1;
+						++_skipCount2;
+
+						NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetResultFromItem(List[newIndex + i]), newIndex + i, oldIndex + i));
+					}
+
+					for (int i = oldIndex + count; i < List.Count - count; ++i)
+						List[i] = List[i + count];
+				}
+
+				for (int i = 0; i < count; ++i)
+					List.Remove(List.Count - 1);
+			}
+			finally
+			{
+				_skipStart1 = 0;
+				_skipCount1 = 0;
+				_skipStart2 = 0;
+				_skipCount2 = 0;
 			}
 		}
 

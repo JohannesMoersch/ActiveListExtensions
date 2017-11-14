@@ -42,7 +42,7 @@ namespace ActiveListExtensions.Utilities
 			_isDisposed = true;
 			Reset(Enumerable.Empty<T>());
 			_propertiesToWatch = null;
-			_keyToIndexMap = null;
+			_keyToIndexMap.Clear();
 			_data = null;
 		}
 
