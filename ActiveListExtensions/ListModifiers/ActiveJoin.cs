@@ -29,6 +29,13 @@ namespace ActiveListExtensions.ListModifiers
 				=> Joiner = joiner;
 		}
 
+		private class JoinerSets
+		{
+			public IList<JoinerData> Joiners { get; } = new List<JoinerData>();
+
+			public JoinerData NullJoiner { get; set; }
+		}
+
 		public override int Count => _resultList.Count;
 
 		public override TResult this[int index] => _resultList[index];
@@ -43,7 +50,7 @@ namespace ActiveListExtensions.ListModifiers
 
 		private readonly QuickList<JoinerData> _rightJoiners;
 
-		private readonly IDictionary<TKey, IList<JoinerData>> _joinerLookup;
+		private readonly IDictionary<TKey, JoinerSets> _joinerLookup;
 
 		private readonly ActiveListJoinBehaviour _joinBehaviour;
 
@@ -95,7 +102,7 @@ namespace ActiveListExtensions.ListModifiers
 
 			_leftJoiners = new QuickList<JoinerData>();
 			_rightJoiners = new QuickList<JoinerData>();
-			_joinerLookup = new Dictionary<TKey, IList<JoinerData>>();
+			_joinerLookup = new Dictionary<TKey, JoinerSets>();
 
 			_leftItems = new CollectionWrapper<KeyValuePair<TKey, TLeft>>(left);
 			_leftItems.ItemModified += (s, i, v) => OnLeftReplaced(i, v, v);
@@ -147,8 +154,13 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void OnLeftReplaced(int index, KeyValuePair<TKey, TLeft> oldValue, KeyValuePair<TKey, TLeft> newValue)
 		{
-			OnLeftRemoved(index, oldValue);
-			OnLeftAdded(index, newValue);
+			if (Equals(oldValue.Key, newValue.Key))
+				_leftJoiners[index].Joiner.SetLeft(newValue.Value);
+			else
+			{
+				OnLeftRemoved(index, oldValue);
+				OnLeftAdded(index, newValue);
+			}
 		}
 
 		private void OnLeftMoved(int oldIndex, int newIndex, KeyValuePair<TKey, TLeft> value)
@@ -192,6 +204,9 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void OnRightAdded(int index, IActiveGrouping<TKey, TRight> value)
 		{
+			//var joiner = AddRightJoiner(index, value.Key);
+//
+			//joiner.Joiner.SetRight(value);
 		}
 
 		private void OnRightRemoved(int index, IActiveGrouping<TKey, TRight> value)
@@ -286,11 +301,11 @@ namespace ActiveListExtensions.ListModifiers
 
 			if (!_joinerLookup.TryGetValue(key, out var joiners))
 			{
-				joiners = new List<JoinerData>();
+				joiners = new JoinerSets();
 				_joinerLookup.Add(key, joiners);
 			}
 
-			joiners.Add(joiner);
+			joiners.Joiners.Add(joiner);
 
 			UpdateIndices(joinerIndex);
 
@@ -299,19 +314,19 @@ namespace ActiveListExtensions.ListModifiers
 
 		private JoinerData AddRightJoiner(int joinerIndex, TKey key)
 		{
-			var joiner = CreateJoiner();
-
-			_rightJoiners.Add(joinerIndex, joiner);
-
 			if (!_joinerLookup.TryGetValue(key, out var joiners))
 			{
-				joiners = new List<JoinerData>();
+				joiners = new JoinerSets();
 				_joinerLookup.Add(key, joiners);
 			}
+			if (joiners.NullJoiner == null)
+				joiners.NullJoiner = CreateJoiner();
 
-			joiners.Add(joiner);
+			joiners.NullJoiner.RightSourceIndex = joinerIndex;
 
-			return joiner;
+			_rightJoiners.Add(joinerIndex, joiners.NullJoiner);
+
+			return joiners.NullJoiner;
 		}
 
 		private void UpdateIndices(int startIndex)
