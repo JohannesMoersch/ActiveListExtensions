@@ -58,11 +58,30 @@ namespace ActiveListExtensions.Utilities
 
 		private readonly Func<TStore, TResult> _itemSelector;
 
+		private int _changeNotificationDeferralCounter = 0;
+
 		public ObservableList(Func<TStore, TResult> itemSelector)
 		{
 			List = new QuickList<TStore>();
 
 			_itemSelector = itemSelector;
+		}
+
+		public IDisposable DeferChangeNotifications()
+		{
+			++_changeNotificationDeferralCounter;
+
+			var oldCount = Count;
+			return new OnDisposeAction(() =>
+			{
+				if (--_changeNotificationDeferralCounter != 0)
+					return;
+
+				if (oldCount != Count)
+					NotifyOfPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
+				if (oldCount != 0 || Count != 0)
+					NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+			});
 		}
 
 		protected abstract TStore GetStoreFromSource(TSource source);
@@ -81,7 +100,7 @@ namespace ActiveListExtensions.Utilities
 			var store = GetStoreFromSource(value);
 			List.Add(index, store);
 			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, GetResultFromItem(store), index));
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+			NotifyOfPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
 		}
 
 		public virtual void Remove(int index)
@@ -91,7 +110,7 @@ namespace ActiveListExtensions.Utilities
 			var value = GetResultFromItem(store);
 			DisposeOfStore(store);
 			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, value, index));
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+			NotifyOfPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
 		}
 
 		public virtual void Replace(int index, TSource newValue)
@@ -120,7 +139,7 @@ namespace ActiveListExtensions.Utilities
 				List.Add(List.Count, GetStoreFromSource(value));
 			NotifyOfCollectionChange(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 			if (oldCount != Count)
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+				NotifyOfPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
 		}
 
 		public virtual void ReplaceRange(int startIndex, int oldCount, IReadOnlyList<TSource> newValues)
@@ -180,7 +199,7 @@ namespace ActiveListExtensions.Utilities
 				}
 
 				if (diff != 0)
-					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+					NotifyOfPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
 			}
 			finally
 			{
@@ -268,8 +287,16 @@ namespace ActiveListExtensions.Utilities
 
 		protected TResult GetResultFromItem(TStore item) => _itemSelector.Invoke(item);
 
-		protected void NotifyOfCollectionChange(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
-
+		protected void NotifyOfPropertyChanged(PropertyChangedEventArgs e)
+		{
+			if (_changeNotificationDeferralCounter == 0)
+				PropertyChanged?.Invoke(this, e);
+		}
+		protected void NotifyOfCollectionChange(NotifyCollectionChangedEventArgs e)
+		{
+			if (_changeNotificationDeferralCounter == 0)
+				CollectionChanged?.Invoke(this, e);
+		}
 		public event PropertyChangedEventHandler PropertyChanged;
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
 

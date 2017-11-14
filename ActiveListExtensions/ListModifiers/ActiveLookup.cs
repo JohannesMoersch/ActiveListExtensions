@@ -179,22 +179,32 @@ namespace ActiveListExtensions.ListModifiers
 		{
 			_sourceData.Clear();
 
-			foreach (var set in _resultSet)
+			var deferrals = _resultSet.Values.Concat(_emptyGroups.Values).Select(group => group.Items.DeferChangeNotifications()).ToArray();
+
+			try
 			{
-				try { set.Value.Items.Reset(Enumerable.Empty<ItemData>()); }
-				catch { }
-				set.Value.TargetIndex = 0;
-				_emptyGroups.Add(set.Key, set.Value);
+				foreach (var set in _resultSet)
+				{
+					try { set.Value.Items.Reset(Enumerable.Empty<ItemData>()); }
+					catch { }
+					set.Value.TargetIndex = 0;
+					_emptyGroups.Add(set.Key, set.Value);
+				}
+
+				_resultSet.Clear();
+
+				foreach (var value in newItems)
+				{
+					var item = new ItemData(_keySelector.Invoke(value), value);
+					item.SourceIndex = _sourceData.Count;
+					_sourceData.Add(_sourceData.Count, item);
+					AddToGroup(item, true);
+				}
 			}
-
-			_resultSet.Clear();
-
-			foreach (var value in newItems)
+			finally
 			{
-				var item = new ItemData(_keySelector.Invoke(value), value);
-				item.SourceIndex = _sourceData.Count;
-				_sourceData.Add(_sourceData.Count, item);
-				AddToGroup(item, true);
+				foreach (var deferral in deferrals)
+					deferral.Dispose();
 			}
 
 			ResultList.Reset(_resultSet.Values.Select((g, i) =>
@@ -236,9 +246,9 @@ namespace ActiveListExtensions.ListModifiers
 				{
 					for (int i = group.TargetIndex; i < ResultList.Count; ++i)
 						ResultList[i].TargetIndex = i + 1;
-				}
 
-				ResultList.Add(group.TargetIndex, group);
+					ResultList.Add(group.TargetIndex, group);
+				}
 			}
 			else if (item.TargetIndex == 0 && !isResetting)
 				UpdateGroupIndex(group);
