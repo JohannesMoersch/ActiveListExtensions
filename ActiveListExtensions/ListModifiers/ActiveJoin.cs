@@ -132,8 +132,6 @@ namespace ActiveListExtensions.ListModifiers
 			var joiner = AddLeftJoiner(index, value.Key);
 
 			joiner.Joiner.SetBoth(value.Value, _rightItems[value.Key]);
-
-			Check();
 		}
 
 		private void OnLeftRemoved(int index, KeyValuePair<TKey, TLeft> value)
@@ -150,8 +148,6 @@ namespace ActiveListExtensions.ListModifiers
 			oldJoiner.Joiner.Dispose();
 
 			_resultList.ReplaceRange(oldJoiner.Offset, oldJoiner.Count, new TResult[0]);
-
-			Check();
 		}
 
 		private void OnLeftReplaced(int index, KeyValuePair<TKey, TLeft> oldValue, KeyValuePair<TKey, TLeft> newValue)
@@ -163,8 +159,6 @@ namespace ActiveListExtensions.ListModifiers
 				OnLeftRemoved(index, oldValue);
 				OnLeftAdded(index, newValue);
 			}
-
-			Check();
 		}
 
 		private void OnLeftMoved(int oldIndex, int newIndex, KeyValuePair<TKey, TLeft> value)
@@ -188,8 +182,6 @@ namespace ActiveListExtensions.ListModifiers
 			UpdateIndices(min);
 
 			_resultList.MoveRange(startIndex, endIndex, count);
-
-			Check();
 		}
 
 		private void OnLeftReset(IReadOnlyList<KeyValuePair<TKey, TLeft>> newItems)
@@ -202,12 +194,13 @@ namespace ActiveListExtensions.ListModifiers
 
 			_leftJoiners.Clear();
 
+			foreach (var set in _joinerLookup.Values)
+				set.Joiners.Clear();
+
 			UpdateIndices(0);
 
 			for (int i = 0; i < newItems.Count; ++i)
 				OnLeftAdded(i, newItems[i]);
-
-			Check();
 		}
 
 		private void OnRightAdded(int index, IActiveGrouping<TKey, TRight> value)
@@ -215,8 +208,6 @@ namespace ActiveListExtensions.ListModifiers
 			var joiner = AddRightJoiner(index, value.Key);
 
 			joiner.Joiner?.SetRight(value);
-
-			Check();
 		}
 
 		private void OnRightRemoved(int index, IActiveGrouping<TKey, TRight> value)
@@ -233,16 +224,12 @@ namespace ActiveListExtensions.ListModifiers
 
 			for (int i = index; i < _rightJoiners.Count; ++i)
 				_rightJoiners[i].RightSourceIndex = i;
-
-			Check();
 		}
 
 		private void OnRightReplaced(int index, IActiveGrouping<TKey, TRight> oldValue, IActiveGrouping<TKey, TRight> newValue)
 		{
 			OnRightRemoved(index, oldValue);
 			OnRightAdded(index, newValue);
-
-			Check();
 		}
 
 		private void OnRightMoved(int oldIndex, int newIndex, IActiveGrouping<TKey, TRight> value)
@@ -266,8 +253,6 @@ namespace ActiveListExtensions.ListModifiers
 			UpdateIndices(min);
 
 			_resultList.MoveRange(startIndex, endIndex, count);
-
-			Check();
 		}
 
 		private void OnRightReset(IReadOnlyList<IActiveGrouping<TKey, TRight>> newItems)
@@ -287,26 +272,10 @@ namespace ActiveListExtensions.ListModifiers
 			foreach (var set in _joinerLookup.Values)
 				set.NullJoiner = null;
 
+			UpdateIndices(0);
+
 			for (int i = 0; i < newItems.Count; ++i)
 				OnRightAdded(i, newItems[i]);
-
-			Check();
-		}
-
-		private void Check()
-		{
-			for (int i = 0; i < _rightJoiners.Count; ++i)
-			{
-				var group = _rightGroups[i];
-
-				var lookup = _joinerLookup.FirstOrDefault(kvp => kvp.Value.NullJoiner == _rightJoiners[i]);
-
-				if (lookup.Value != null && !Equals(lookup.Key, group.Key))
-					Console.WriteLine();
-			}
-
-			if ((_leftJoiners.Concat(_rightJoiners).Max(j => j?.Offset + j.Count) ?? 0) != _resultList.Count)
-				Console.WriteLine();
 		}
 
 		private void CreateJoiner(JoinerData data)
@@ -320,8 +289,6 @@ namespace ActiveListExtensions.ListModifiers
 				UpdateIndices(data.GetTargetIndex(_leftJoiners.Count));
 
 				_resultList.Add(data.Offset + index, value);
-
-				Check();
 			};
 			joiner.RemoveRequested += index =>
 			{
@@ -330,14 +297,10 @@ namespace ActiveListExtensions.ListModifiers
 				UpdateIndices(data.GetTargetIndex(_leftJoiners.Count));
 
 				_resultList.Remove(data.Offset + index);
-
-				Check();
 			};
 			joiner.ReplaceRequested += (index, newValue) =>
 			{
 				_resultList.Replace(data.Offset, newValue);
-
-				Check();
 			};
 			joiner.ReplaceRangeRequested += (index, oldCount, values) =>
 			{
@@ -351,20 +314,14 @@ namespace ActiveListExtensions.ListModifiers
 				}
 
 				_resultList.ReplaceRange(data.Offset + index, oldCount, values);
-
-				Check();
 			};
 			joiner.MoveRequested += (oldIndex, newIndex) =>
 			{
 				_resultList.Move(data.Offset + oldIndex, data.Offset + newIndex);
-
-				Check();
 			};
 			joiner.MoveRangeRequested += (oldIndex, newIndex, count) =>
 			{
 				_resultList.MoveRange(data.Offset + oldIndex, data.Offset + newIndex, count);
-
-				Check();
 			};
 			joiner.ResetRequested += values =>
 			{
@@ -379,8 +336,6 @@ namespace ActiveListExtensions.ListModifiers
 				}
 
 				_resultList.ReplaceRange(data.Offset, oldCount, newValues);
-
-				Check();
 			};
 
 			data.Joiner = joiner;
