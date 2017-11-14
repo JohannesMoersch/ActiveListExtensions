@@ -127,6 +127,7 @@ namespace ActiveListExtensions.ListModifiers
 			_resultList.CollectionChanged += (s, e) => NotifyOfCollectionChange(e);
 
 			OnLeftReset(_leftItems);
+			OnRightReset(_rightGroups);
 		}
 
 		private void OnLeftAdded(int index, KeyValuePair<TKey, TLeft> value)
@@ -188,7 +189,7 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void OnLeftReset(IReadOnlyList<KeyValuePair<TKey, TLeft>> newItems)
 		{
-			var total = _rightJoiners.Sum(joiner => joiner.Count);
+			var total = _rightJoiners.Sum(joiner => joiner?.Count ?? 0);
 			_resultList.ReplaceRange(0, _resultList.Count - total, new TResult[0]);
 
 			foreach (var joiner in _leftJoiners)
@@ -204,13 +205,22 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void OnRightAdded(int index, IActiveGrouping<TKey, TRight> value)
 		{
-			//var joiner = AddRightJoiner(index, value.Key);
-//
-			//joiner.Joiner.SetRight(value);
+			var joiner = AddRightJoiner(index, value.Key);
+
+			joiner?.Joiner.SetRight(value);
 		}
 
 		private void OnRightRemoved(int index, IActiveGrouping<TKey, TRight> value)
 		{
+			var joiner = _rightJoiners[index];
+			if (joiner != null)
+			{
+				_resultList.ReplaceRange(joiner.Offset, joiner.Count, new TResult[0]);
+
+				joiner.Joiner.Dispose();
+
+				_rightJoiners[index] = null;
+			}
 		}
 
 		private void OnRightReplaced(int index, IActiveGrouping<TKey, TRight> oldValue, IActiveGrouping<TKey, TRight> newValue)
@@ -223,6 +233,29 @@ namespace ActiveListExtensions.ListModifiers
 
 		private void OnRightReset(IReadOnlyList<IActiveGrouping<TKey, TRight>> newItems)
 		{
+			for (int i = _rightJoiners.Count - 1; i >= 0; --i)
+			{
+				if (_rightJoiners[i] == null)
+					continue;
+
+				_rightJoiners[i].Joiner.Dispose();
+
+				_resultList.ReplaceRange(_rightJoiners[i].Offset, _rightJoiners[i].Count, new TResult[0]); 
+			}
+
+			_rightJoiners.Clear();
+
+			foreach (var set in _joinerLookup.Values)
+				set.NullJoiner = null;
+
+			for (int i = 0; i < newItems.Count; ++i)
+				OnRightAdded(i, newItems[i]);
+		}
+
+		private void Check()
+		{
+			if (_leftJoiners.Concat(_rightJoiners).Where(j => j != null).Max(j => j.Offset + j.Count) != _resultList.Count)
+				Console.WriteLine();
 		}
 
 		private JoinerData CreateJoiner()
@@ -233,11 +266,15 @@ namespace ActiveListExtensions.ListModifiers
 
 			joiner.AddRequested += (index, value) =>
 			{
+				Check();
+
 				++data.Count;
 
 				UpdateIndices(data.GetTargetIndex(_leftJoiners.Count));
 
 				_resultList.Add(data.Offset + index, value);
+
+				Check();
 			};
 			joiner.RemoveRequested += index =>
 			{
@@ -274,6 +311,8 @@ namespace ActiveListExtensions.ListModifiers
 			};
 			joiner.ResetRequested += values =>
 			{
+				Check();
+
 				var newValues = values.ToArray();
 
 				var oldCount = data.Count;
@@ -285,6 +324,8 @@ namespace ActiveListExtensions.ListModifiers
 				}
 
 				_resultList.ReplaceRange(data.Offset, oldCount, newValues);
+
+				Check();
 			};
 
 			return data;
@@ -305,6 +346,20 @@ namespace ActiveListExtensions.ListModifiers
 				_joinerLookup.Add(key, joiners);
 			}
 
+			if (joiners.NullJoiner != null)
+			{
+				var oldOffset = joiners.NullJoiner.Offset;
+				var oldCount = joiners.NullJoiner.Count;
+
+				UpdateIndices(joiners.NullJoiner.GetTargetIndex(_leftJoiners.Count));
+
+				joiners.NullJoiner.Joiner.Dispose();
+
+				joiners.NullJoiner = null;
+
+				_resultList.ReplaceRange(oldOffset, oldCount, new TResult[0]);
+			}
+
 			joiners.Joiners.Add(joiner);
 
 			UpdateIndices(joinerIndex);
@@ -319,10 +374,12 @@ namespace ActiveListExtensions.ListModifiers
 				joiners = new JoinerSets();
 				_joinerLookup.Add(key, joiners);
 			}
-			if (joiners.NullJoiner == null)
+			if (joiners.NullJoiner == null && joiners.Joiners.Count == 0)
+			{
 				joiners.NullJoiner = CreateJoiner();
 
-			joiners.NullJoiner.RightSourceIndex = joinerIndex;
+				joiners.NullJoiner.RightSourceIndex = joinerIndex;
+			}
 
 			_rightJoiners.Add(joinerIndex, joiners.NullJoiner);
 
@@ -336,8 +393,9 @@ namespace ActiveListExtensions.ListModifiers
 				offset = 0;
 			else
 			{
-				--startIndex;
-				offset = startIndex < _leftJoiners.Count ? _leftJoiners[startIndex].Offset : _rightJoiners[startIndex].Offset;
+				while (!(--startIndex < _leftJoiners.Count ? _leftJoiners[startIndex].Offset : _rightJoiners[startIndex - _leftJoiners.Count]?.Offset).HasValue)
+					continue;
+				offset = startIndex < _leftJoiners.Count ? _leftJoiners[startIndex].Offset : _rightJoiners[startIndex - _leftJoiners.Count].Offset;
 			}
 
 			for (int i = startIndex; i < _leftJoiners.Count; ++i)
@@ -352,6 +410,9 @@ namespace ActiveListExtensions.ListModifiers
 
 			for (int i = startIndex; i < _rightJoiners.Count; ++i)
 			{
+				if (_rightJoiners[i] == null)
+					continue;
+
 				_rightJoiners[i].Offset = offset;
 				offset += _rightJoiners[i].Count;
 			}
