@@ -43,6 +43,9 @@ namespace ActiveListExtensions.Utilities
 
 			private ParameterExpression GetParameterViaGetOrElse(MethodCallExpression expression)
 			{
+				if (!_stripJoinOptions)
+					return null;
+
 				if (expression.Method.IsGenericMethod && expression.Method.GetGenericMethodDefinition() == _getOrElseMethod)
 					return GetParentParameter(expression.Arguments[0]);
 				return null;
@@ -50,6 +53,9 @@ namespace ActiveListExtensions.Utilities
 
 			private ParameterExpression GetParameterViaValue(MemberExpression node)
 			{
+				if (!_stripJoinOptions)
+					return null;
+
 				if (node.Member.DeclaringType.IsGenericType && node.Member.DeclaringType.GetGenericTypeDefinition() == typeof(JoinOption<>) && node.Member.Name == nameof(JoinOption<object>.Value))
 					return GetParentParameter(node.Expression);
 				return null;
@@ -57,7 +63,7 @@ namespace ActiveListExtensions.Utilities
 
 			protected override Expression VisitMethodCall(MethodCallExpression node)
 			{
-				if (!node.Method.IsGenericMethod)
+				if (!_stripJoinOptions || !node.Method.IsGenericMethod)
 					return base.VisitMethodCall(node);
 
 				var definition = node.Method.GetGenericMethodDefinition();
@@ -82,6 +88,8 @@ namespace ActiveListExtensions.Utilities
 			protected override Expression VisitMember(MemberExpression node)
 			{
 				var parameter = GetParentParameter(node.Expression);
+				if (_stripJoinOptions && parameter != null && parameter.Type.IsGenericType && parameter.Type.GetGenericTypeDefinition() == typeof(JoinOption<>))
+					parameter = null;
 				if (parameter == null && node.Expression.NodeType == ExpressionType.Call && node.Expression is MethodCallExpression callExpression)
 					parameter = GetParameterViaGetOrElse(callExpression);
 				if (parameter == null && node.Expression.NodeType == ExpressionType.MemberAccess && node.Expression is MemberExpression expression)
