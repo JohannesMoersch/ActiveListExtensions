@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Nito.AsyncEx;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using Xunit;
 
 namespace ActiveListExtensions.Tests.ValueModifiers
@@ -23,15 +25,18 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 		[Fact]
 		public void ValueUpdatedWhenTaskCompleted()
 		{
-			var task = new TaskCompletionSource<int>();
+			AsyncContext.Run(async () =>
+			{
+				var task = new TaskCompletionSource<int>();
 
-			var sut = task.Task.ToActiveValue();
+				var sut = task.Task.ToActiveValue();
 
-			task.SetResult(-1);
+				task.SetResult(-1);
 
-			Thread.Sleep(50);
+				await task.Task.ContinueWith(_ => { });
 
-			Assert.Equal(-1, sut.Value);
+				Assert.Equal(-1, sut.Value);
+			});
 		}
 
 		[Fact]
