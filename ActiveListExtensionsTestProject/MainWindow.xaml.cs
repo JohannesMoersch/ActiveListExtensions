@@ -19,6 +19,7 @@ using ActiveListExtensions;
 using ActiveListExtensions.Utilities;
 using System.Data;
 using System.Collections.Specialized;
+using System.Collections;
 
 namespace ActiveListExtensionsTestProject
 {
@@ -123,7 +124,7 @@ namespace ActiveListExtensionsTestProject
 
 			var activeList = (Source as IList<TestData>).ToActiveList();
 
-			Data = activeList.ActiveWhere(x => x.One % 2 == 0).ActiveSelect(x => $"{x.One} - {x.Two}");
+			Data = activeList.ActiveWhere(o => o.One % 2 == 0).ActiveSelect(o => $"{o.One} - {o.Two}");
 
 			Data.ToActiveValue(s => (s as IReadOnlyList<string>).Count);
 

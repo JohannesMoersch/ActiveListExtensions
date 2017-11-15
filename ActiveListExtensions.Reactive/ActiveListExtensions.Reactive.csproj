@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActiveValueChangedEventArgs.cs" />
+    <Compile Include="ConcatObservableToActiveList.cs" />
     <Compile Include="ItemAdded.cs" />
     <Compile Include="ItemRemoved.cs" />
     <Compile Include="ObservableToActiveValue.cs" />

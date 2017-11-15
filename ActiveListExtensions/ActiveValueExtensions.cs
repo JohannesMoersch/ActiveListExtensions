@@ -19,6 +19,12 @@ namespace ActiveListExtensions
 		public static IActiveValue<TValue> ToActiveValue<TSource, TValue>(this TSource source, Func<TSource, TValue> valueGetter, IEnumerable<string> propertiesToWatch)
 			=> new ActiveValueListener<TSource, TValue>(source, valueGetter, propertiesToWatch);
 
+		public static IActiveValue<TValue> ToActiveValue<TValue>(this Task<TValue> source)
+			=> ToActiveValue(source, default(TValue));
+
+		public static IActiveValue<TValue> ToActiveValue<TValue>(this Task<TValue> source, TValue defaultValue)
+			=> new TaskActiveValue<TValue>(source, defaultValue);
+
 
 		public static IActiveValue<TResult> ActiveSelect<TValue, TResult>(this IActiveValue<TValue> source, Expression<Func<TValue, TResult>> mutator)
 			=> ActiveSelect(source, mutator.Compile(), mutator.GetReferencedProperties());
@@ -423,5 +429,18 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<bool> ActiveSetContains<TKey, TSource>(this IActiveLookup<TKey, TSource> source, IActiveValue<TKey> value)
 			=> new ActiveSetContains<TKey, IActiveGrouping<TKey, TSource>>(source, source, value);
+
+
+		public static IActiveValue<TValue> ActiveAggregate<TSource, TValue>(this IActiveValue<TSource> source, Expression<Func<TValue, TSource, TValue>> aggregator)
+			=> ActiveAggregate(source, default(TValue), aggregator);
+
+		public static IActiveValue<TValue> ActiveAggregate<TSource, TValue>(this IActiveValue<TSource> source, TValue initialValue, Expression<Func<TValue, TSource, TValue>> aggregator)
+			=> new ActiveAggregate<TSource, TValue>(initialValue, source, aggregator.Compile(), aggregator.GetReferencedProperties().Item2);
+
+		public static IActiveValue<TValue> ActiveAggregate<TSource, TValue>(this IActiveValue<TSource> source, Func<TValue, TSource, TValue> aggregator, IEnumerable<string> sourcePropertiesToWatch)
+			=> ActiveAggregate(source, default(TValue), aggregator, sourcePropertiesToWatch);
+
+		public static IActiveValue<TValue> ActiveAggregate<TSource, TValue>(this IActiveValue<TSource> source, TValue initialValue, Func<TValue, TSource, TValue> aggregator, IEnumerable<string> sourcePropertiesToWatch)
+			=> new ActiveAggregate<TSource, TValue>(initialValue, source, aggregator, sourcePropertiesToWatch);
 	}
 }

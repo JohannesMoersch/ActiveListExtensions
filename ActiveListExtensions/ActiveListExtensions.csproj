@@ -61,6 +61,7 @@
     <Compile Include="Utilities\ActiveListJoinerData.cs" />
     <Compile Include="Utilities\ActiveListJoinerSet.cs" />
     <Compile Include="Utilities\OnDisposeAction.cs" />
+    <Compile Include="ValueModifiers\ActiveAggregate.cs" />
     <Compile Include="ValueModifiers\ActiveGetOrDefault.cs" />
     <Compile Include="ListModifiers\ActiveIntersect.cs" />
     <Compile Include="ListModifiers\ActiveListWrapper.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="ValueModifiers\Bases\ActiveListPredicateBase.cs" />
     <Compile Include="ValueModifiers\Bases\ActiveListValueBase.cs" />
     <Compile Include="ValueModifiers\Bases\ActiveValueBase.cs" />
+    <Compile Include="ValueModifiers\TaskActiveValue.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

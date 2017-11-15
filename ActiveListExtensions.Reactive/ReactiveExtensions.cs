@@ -147,8 +147,20 @@ namespace ActiveListExtensions
 			return activeValue;
 		}
 
-		public static IActiveList<object> ToActiveList(this IObservable<IEnumerable> observable) => observable.ToActiveValue().ToActiveList();
+		public static IActiveList<object> ToActiveList(this IObservable<IEnumerable> observable) 
+			=> observable.ToActiveValue().ToActiveList();
 
-		public static IActiveList<T> ToActiveList<T>(this IObservable<IEnumerable<T>> observable) => observable.ToActiveValue().ToActiveList();
+		public static IActiveList<T> ToActiveList<T>(this IObservable<IEnumerable<T>> observable) 
+			=> observable.ToActiveValue().ToActiveList();
+
+		public static IActiveList<T> ConcatToActiveList<T>(this IObservable<T> observable)
+		{
+			var list = new ConcatObservableToActiveList<T>();
+
+			var subscription = observable.Subscribe(new WeakSubscriber<T>(list));
+			list.Disposed += subscription.Dispose;
+
+			return list;
+		}
 	}
 }

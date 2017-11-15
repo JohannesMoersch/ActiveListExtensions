@@ -132,6 +132,7 @@
     <Compile Include="Data\DataTableToActiveListTests.cs" />
     <Compile Include="Modifiers\ToActiveListTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reactive\ConcatToActiveListTests.cs" />
     <Compile Include="Reactive\ObservableToActiveValueTests.cs" />
     <Compile Include="Reactive\ReactiveListTests.cs" />
     <Compile Include="Reactive\ReactiveValueTests.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="Utilities\BooleanListTests.cs" />
     <Compile Include="Utilities\ObservableListTests.cs" />
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />
+    <Compile Include="ValueModifiers\ActiveAggregateTests.cs" />
     <Compile Include="ValueModifiers\ActiveAllTests.cs" />
     <Compile Include="ValueModifiers\ActiveAnyTests.cs" />
     <Compile Include="ValueModifiers\ActiveAverageOrDefaultTests.cs" />
@@ -156,6 +158,7 @@
     <Compile Include="ValueModifiers\ActiveSetContainsTests.cs" />
     <Compile Include="ValueModifiers\ActiveSingleOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveSumTests.cs" />
+    <Compile Include="ValueModifiers\TaskActiveValueTests.cs" />
     <Compile Include="Wpf\DependencyPropertyWatcherTests.cs" />
   </ItemGroup>
   <ItemGroup>

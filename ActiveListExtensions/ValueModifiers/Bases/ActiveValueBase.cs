@@ -15,7 +15,7 @@ namespace ActiveListExtensions.ValueModifiers.Bases
 			get => _value;
 			protected set
 			{
-				if (!_allowsThrowChangeNotifications && Equals(_value, value))
+				if (!_alwaysThrowChangeNotifications && Equals(_value, value))
 					return;
 
 				var oldValue = _value;
@@ -27,22 +27,28 @@ namespace ActiveListExtensions.ValueModifiers.Bases
 			}
 		}
 
-		private bool _allowsThrowChangeNotifications;
+		private bool _alwaysThrowChangeNotifications;
 
 		protected bool IsDisposed { get; private set; }
 
-		public ActiveValueBase(bool allowsThrowChangeNotifications = false)
-			=> _allowsThrowChangeNotifications = allowsThrowChangeNotifications;
+		public ActiveValueBase(bool alwaysThrowChangeNotifications = false)
+			=> _alwaysThrowChangeNotifications = alwaysThrowChangeNotifications;
 
 		void IDisposable.Dispose()
 		{
 			if (IsDisposed)
 				return;
 			IsDisposed = true;
+
+			PropertyChanged = null;
+			ValueChanged = null;
+
 			OnDisposed();
 		}
 
-		protected abstract void OnDisposed();
+		protected virtual void OnDisposed()
+		{
+		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
