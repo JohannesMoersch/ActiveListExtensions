@@ -91,6 +91,17 @@ namespace ActiveListExtensions.Utilities
 				List[i].Index = i;
 		}
 
+		public override void MoveRange(int oldIndex, int newIndex, int count)
+		{
+			base.MoveRange(oldIndex, newIndex, count);
+
+			var min = oldIndex < newIndex ? oldIndex : newIndex;
+			var max = (oldIndex > newIndex ? oldIndex : newIndex) + count;
+
+			for (int i = min; i < max; ++i)
+				List[i].Index = i;
+		}
+
 		public override void Reset(IEnumerable<IActiveValue<T>> values)
 		{
 			base.Reset(values);

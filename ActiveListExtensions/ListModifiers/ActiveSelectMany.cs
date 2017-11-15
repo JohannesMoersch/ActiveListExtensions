@@ -73,8 +73,22 @@ namespace ActiveListExtensions.ListModifiers
 
 		protected override void OnMoved(int oldIndex, int newIndex, TSource value)
 		{
-			OnRemoved(oldIndex, value);
-			OnAdded(newIndex, value);
+			MoveSourceCollection(oldIndex, newIndex);
+
+			var oldOffset = _listInfo[oldIndex].Offset;
+			var count = _listInfo[oldIndex].Count;
+
+			_listInfo.RemoveAt(oldIndex);
+
+			AdjustIndices(oldIndex, -count);
+
+			var newOffset = _listInfo[newIndex].Offset;
+
+			_listInfo.Insert(newIndex, new ListInfo(newOffset, count));
+
+			AdjustIndices(newIndex + 1, count);
+
+			ResultList.MoveRange(oldOffset, newOffset, count);
 		}
 
 		protected override void OnReplaced(int index, TSource oldValue, TSource newValue)

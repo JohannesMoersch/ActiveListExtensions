@@ -53,6 +53,9 @@ namespace ActiveListExtensions.Utilities
 			if (_activeValue == null)
 				return;
 
+			ValuePropertyChanged = null;
+			ValueOrValuePropertyChanged = null;
+
 			Value = default(TValue);
 
 			PropertyChangedEventManager.RemoveHandler(_activeValue, SourceChanged, nameof(IActiveValue<TValue>.Value));
@@ -70,8 +73,13 @@ namespace ActiveListExtensions.Utilities
 			Value = _activeValue.Value;
 		}
 
-		private void SourcePropertyChanged(object key, PropertyChangedEventArgs args) => ValueOrValuePropertyChanged?.Invoke();
+		private void SourcePropertyChanged(object key, PropertyChangedEventArgs args)
+		{
+			ValuePropertyChanged?.Invoke();
+			ValueOrValuePropertyChanged?.Invoke();
+		}
 
+		public event Action ValuePropertyChanged;
 		public event Action ValueOrValuePropertyChanged;
 	}
 }
