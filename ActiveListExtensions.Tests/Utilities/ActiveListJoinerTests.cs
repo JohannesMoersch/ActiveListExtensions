@@ -14,7 +14,7 @@ namespace ActiveListExtensions.Tests.Utilities
 		private static ActiveListJoinerToReadOnlyList<int, int, int> CreateEmpty(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> right)
 		{
 			right = new ObservableList<int>();
-			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l + r, null, null);
+			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l.GetOrElse(0) + r.GetOrElse(0), null, null);
 			var result = new ActiveListJoinerToReadOnlyList<int, int, int>(joiner);
 			joiner.SetRight(right);
 			return result;
@@ -23,7 +23,7 @@ namespace ActiveListExtensions.Tests.Utilities
 		private static ActiveListJoinerToReadOnlyList<int, int, int> CreateHasLeft(ActiveListJoinBehaviour joinBehaviour, out ObservableList<int> right)
 		{
 			right = new ObservableList<int>();
-			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l + r, null, null);
+			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l.GetOrElse(0) + r.GetOrElse(0), null, null);
 			var result = new ActiveListJoinerToReadOnlyList<int, int, int>(joiner);
 			joiner.SetBoth(1, right);
 			return result;
@@ -35,7 +35,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			right.Add(0, 10);
 			right.Add(1, 100);
 			right.Add(2, 1000);
-			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l + r, null, null);
+			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l.GetOrElse(0) + r.GetOrElse(0), null, null);
 			var result = new ActiveListJoinerToReadOnlyList<int, int, int>(joiner);
 			joiner.SetRight(right);
 			return result;
@@ -47,7 +47,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			right.Add(0, 10);
 			right.Add(1, 100);
 			right.Add(2, 1000);
-			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l + r, null, null);
+			var joiner = new ActiveListJoiner<int, int, int>(joinBehaviour, (l, r) => l.GetOrElse(0) + r.GetOrElse(0), null, null);
 			var result = new ActiveListJoinerToReadOnlyList<int, int, int>(joiner);
 			joiner.SetBoth(1, right);
 			return result;

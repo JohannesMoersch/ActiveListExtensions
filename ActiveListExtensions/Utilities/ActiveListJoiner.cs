@@ -17,7 +17,7 @@ namespace ActiveListExtensions.Utilities
 
 		private readonly ActiveListJoinBehaviour _joinBehaviour;
 
-		private readonly Func<TLeft, TRight, TResult> _resultSelector;
+		private readonly Func<JoinOption<TLeft>, JoinOption<TRight>, TResult> _resultSelector;
 
 		private readonly ValueWatcher<TLeft> _leftWatcher;
 
@@ -25,7 +25,7 @@ namespace ActiveListExtensions.Utilities
 		private bool SupportsLeft => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.LeftExcluding);
 		private bool SupportsRight => _joinBehaviour.HasFlag(ActiveListJoinBehaviour.RightExcluding);
 
-		public ActiveListJoiner(ActiveListJoinBehaviour joinBehaviour, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
+		public ActiveListJoiner(ActiveListJoinBehaviour joinBehaviour, Func<JoinOption<TLeft>, JoinOption<TRight>, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 		{
 			_joinBehaviour = joinBehaviour;
 
@@ -214,13 +214,13 @@ namespace ActiveListExtensions.Utilities
 		}
 
 		private TResult GetLeftResult(TLeft left)
-			=> _resultSelector.Invoke(left, default(TRight));
+			=> _resultSelector.Invoke(JoinOption.Some(left), JoinOption.None<TRight>());
 
 		private TResult GetRightResult(TRight right)
-			=> _resultSelector.Invoke(default(TLeft), right);
+			=> _resultSelector.Invoke(JoinOption.None<TLeft>(), JoinOption.Some(right));
 
 		private TResult GetResult(TLeft left, TRight right)
-			=> _resultSelector.Invoke(left, right);
+			=> _resultSelector.Invoke(JoinOption.Some(left), JoinOption.Some(right));
 
 		private void OnRightAdded(int index, TRight value)
 		{

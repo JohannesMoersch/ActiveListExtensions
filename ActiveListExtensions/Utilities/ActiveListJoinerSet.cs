@@ -10,7 +10,7 @@ namespace ActiveListExtensions.Utilities
 	{
 		private readonly ActiveListJoinBehaviour _joinBehaviour;
 		private readonly IActiveList<TRight> _right;
-		private readonly Func<TLeft, TRight, TResult> _resultSelector;
+		private readonly Func<JoinOption<TLeft>, JoinOption<TRight>, TResult> _resultSelector;
 		private readonly IEnumerable<string> _leftResultSelectorPropertiesToWatch;
 		private readonly IEnumerable<string> _rightResultSelectorPropertiesToWatch;
 
@@ -24,7 +24,7 @@ namespace ActiveListExtensions.Utilities
 
 		public int? RightSourceIndex => HasRight ? _rightJoiner.SourceIndex : (int?)null;
 
-		public ActiveListJoinerSet(ActiveListJoinBehaviour joinBehaviour, TKey key, IActiveLookup<TKey, TRight> right, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
+		public ActiveListJoinerSet(ActiveListJoinBehaviour joinBehaviour, TKey key, IActiveLookup<TKey, TRight> right, Func<JoinOption<TLeft>, JoinOption<TRight>, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 		{
 			Key = key;
 

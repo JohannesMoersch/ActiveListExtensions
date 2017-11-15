@@ -20,7 +20,7 @@ namespace ActiveListExtensions.Utilities
 
 		public bool IsLeftJoiner { get; }
 
-		public ActiveListJoinerData(bool isLeftJoiner, ActiveListJoinBehaviour joinBehaviour, TKey key, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
+		public ActiveListJoinerData(bool isLeftJoiner, ActiveListJoinBehaviour joinBehaviour, TKey key, Func<JoinOption<TLeft>, JoinOption<TRight>, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 		{
 			Key = key;
 
@@ -47,7 +47,7 @@ namespace ActiveListExtensions.Utilities
 		public int GetTargetIndex(int leftJoinerCount)
 			=> IsLeftJoiner ? SourceIndex : SourceIndex + leftJoinerCount;
 
-		private ActiveListJoiner<TLeft, TRight, TResult> CreateJoiner(ActiveListJoinBehaviour joinBehaviour, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
+		private ActiveListJoiner<TLeft, TRight, TResult> CreateJoiner(ActiveListJoinBehaviour joinBehaviour, Func<JoinOption<TLeft>, JoinOption<TRight>, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 			=> new ActiveListJoiner<TLeft, TRight, TResult>(joinBehaviour, resultSelector, leftResultSelectorPropertiesToWatch, rightResultSelectorPropertiesToWatch);
 	}
 }

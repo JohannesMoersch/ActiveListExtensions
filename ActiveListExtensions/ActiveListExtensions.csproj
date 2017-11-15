@@ -49,10 +49,12 @@
     <Compile Include="IActiveValue.cs" />
     <Compile Include="IMutableActiveList.cs" />
     <Compile Include="IMutableActiveValue.cs" />
+    <Compile Include="JoinOptionExtensions.cs" />
     <Compile Include="ListModifiers\ActiveDistinct.cs" />
     <Compile Include="ListModifiers\ActiveElementsOrEmpty.cs" />
     <Compile Include="ListModifiers\ActiveExcept.cs" />
     <Compile Include="ListModifiers\ActiveJoin.cs" />
+    <Compile Include="JoinOption.cs" />
     <Compile Include="MutableActiveListExtensions.cs" />
     <Compile Include="Utilities\ActiveListJoinBehaviour.cs" />
     <Compile Include="Utilities\ActiveListJoiner.cs" />

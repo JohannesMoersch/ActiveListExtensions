@@ -9,6 +9,19 @@ namespace ActiveListExtensions.Tests.Helpers
 {
 	public class IntegerTestClass : INotifyPropertyChanged
 	{
+		private int _key;
+		public int Key
+		{
+			get { return _key; }
+			set
+			{
+				if (_key == value)
+					return;
+				_key = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Key)));
+			}
+		}
+
 		private int _property;
 		public int Property
 		{

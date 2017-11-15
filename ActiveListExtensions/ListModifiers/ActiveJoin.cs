@@ -32,7 +32,7 @@ namespace ActiveListExtensions.ListModifiers
 
 		private readonly IActiveValue<TParameter> _parameter;
 
-		private readonly Func<TLeft, TRight, TParameter, TResult> _resultSelector;
+		private readonly Func<JoinOption<TLeft>, JoinOption<TRight>, TParameter, TResult> _resultSelector;
 
 		private readonly IEnumerable<string> _leftResultSelectorPropertiesToWatch;
 		private readonly IEnumerable<string> _rightResultSelectorPropertiesToWatch;
@@ -45,7 +45,7 @@ namespace ActiveListExtensions.ListModifiers
 
 		private bool _fullResetInProgress;
 
-		public ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveList<TLeft> source, IReadOnlyList<TRight> join, Func<TLeft, TKey> leftKeySelector, Func<TRight, TKey> rightKeySelector, Func<TLeft, TRight, TResult> resultSelector, IEnumerable<string> leftKeySelectorPropertiesToWatch, IEnumerable<string> rightKeySelectorPropertiesToWatch, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
+		public ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveList<TLeft> source, IReadOnlyList<TRight> join, Func<TLeft, TKey> leftKeySelector, Func<TRight, TKey> rightKeySelector, Func<JoinOption<TLeft>, JoinOption<TRight>, TResult> resultSelector, IEnumerable<string> leftKeySelectorPropertiesToWatch, IEnumerable<string> rightKeySelectorPropertiesToWatch, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch)
 			: this(
 				joinBehaviour,
 				source.ActiveSelect(l => new KeyValuePair<TKey, TLeft>(leftKeySelector.Invoke(l), l), leftKeySelectorPropertiesToWatch),
@@ -58,7 +58,7 @@ namespace ActiveListExtensions.ListModifiers
 		{
 		}
 
-		public ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveList<TLeft> source, IReadOnlyList<TRight> join, IActiveValue<TParameter> parameter, Func<TLeft, TParameter, TKey> leftKeySelector, Func<TRight, TParameter, TKey> rightKeySelector, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftKeySelectorPropertiesToWatch, IEnumerable<string> rightKeySelectorPropertiesToWatch, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> leftKeySelectorParameterPropertiesToWatch, IEnumerable<string> rightKeySelectorParameterPropertiesToWatch, IEnumerable<string> resultSelectorParameterPropertiesToWatch)
+		public ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveList<TLeft> source, IReadOnlyList<TRight> join, IActiveValue<TParameter> parameter, Func<TLeft, TParameter, TKey> leftKeySelector, Func<TRight, TParameter, TKey> rightKeySelector, Func<JoinOption<TLeft>, JoinOption<TRight>, TParameter, TResult> resultSelector, IEnumerable<string> leftKeySelectorPropertiesToWatch, IEnumerable<string> rightKeySelectorPropertiesToWatch, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> leftKeySelectorParameterPropertiesToWatch, IEnumerable<string> rightKeySelectorParameterPropertiesToWatch, IEnumerable<string> resultSelectorParameterPropertiesToWatch)
 			: this(
 				joinBehaviour,
 				source.ActiveSelect(parameter, (l, p) => new KeyValuePair<TKey, TLeft>(leftKeySelector.Invoke(l, p), l), leftKeySelectorPropertiesToWatch, leftKeySelectorParameterPropertiesToWatch),
@@ -71,7 +71,7 @@ namespace ActiveListExtensions.ListModifiers
 		{
 		}
 
-		private ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveList<KeyValuePair<TKey, TLeft>> left, IActiveLookup<TKey, TRight> right, IActiveValue<TParameter> parameter, Func<TLeft, TRight, TParameter, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> resultSelectorParameterPropertiesToWatch)
+		private ActiveJoin(ActiveListJoinBehaviour joinBehaviour, IActiveList<KeyValuePair<TKey, TLeft>> left, IActiveLookup<TKey, TRight> right, IActiveValue<TParameter> parameter, Func<JoinOption<TLeft>, JoinOption<TRight>, TParameter, TResult> resultSelector, IEnumerable<string> leftResultSelectorPropertiesToWatch, IEnumerable<string> rightResultSelectorPropertiesToWatch, IEnumerable<string> resultSelectorParameterPropertiesToWatch)
 		{
 			_joinBehaviour = joinBehaviour;
 			_parameter = parameter;
@@ -354,7 +354,7 @@ namespace ActiveListExtensions.ListModifiers
 			};
 			data.Joiner.ReplaceRequested += (index, newValue) =>
 			{
-				_resultList.Replace(data.Offset, newValue);
+				_resultList.Replace(data.Offset + index, newValue);
 			};
 			data.Joiner.ReplaceRangeRequested += (index, oldCount, values) =>
 			{
