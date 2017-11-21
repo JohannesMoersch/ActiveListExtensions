@@ -90,9 +90,9 @@ namespace ActiveListExtensions.Utilities
 				var parameter = GetParentParameter(node.Expression);
 				if (_stripJoinOptions && parameter != null && parameter.Type.IsGenericType && parameter.Type.GetGenericTypeDefinition() == typeof(JoinOption<>))
 					parameter = null;
-				if (parameter == null && node.Expression.NodeType == ExpressionType.Call && node.Expression is MethodCallExpression callExpression)
+				if (parameter == null && node.Expression?.NodeType == ExpressionType.Call && node.Expression is MethodCallExpression callExpression)
 					parameter = GetParameterViaGetOrElse(callExpression);
-				if (parameter == null && node.Expression.NodeType == ExpressionType.MemberAccess && node.Expression is MemberExpression expression)
+				if (parameter == null && node.Expression?.NodeType == ExpressionType.MemberAccess && node.Expression is MemberExpression expression)
 					parameter = GetParameterViaValue(expression);
 				if (parameter != null && _parameterMap.TryGetValue(parameter, out int index))
 					_properties[index].Add(node.Member.Name);

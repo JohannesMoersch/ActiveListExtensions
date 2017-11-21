@@ -147,6 +147,7 @@
     <Compile Include="Reactive\ReactiveValueTests.cs" />
     <Compile Include="Utilities\ActiveListJoinerTests.cs" />
     <Compile Include="Utilities\BooleanListTests.cs" />
+    <Compile Include="Utilities\ExpressionExtensionTests.cs" />
     <Compile Include="Utilities\ObservableListTests.cs" />
     <Compile Include="Utilities\PropertyWatcherListTests.cs" />
     <Compile Include="ValueModifiers\ActiveAggregateTests.cs" />
