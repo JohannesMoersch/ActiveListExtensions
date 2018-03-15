@@ -63,7 +63,7 @@ namespace ActiveListExtensions.ListModifiers
 		{
 			if (_takeCount.Value > _currentTakeCount)
 			{
-				var start = _currentTakeCount < SourceList.Count ? _currentTakeCount : SourceList.Count - 1;
+				var start = _currentTakeCount < SourceList.Count ? _currentTakeCount : SourceList.Count;
 
 				var max = _takeCount.Value < SourceList.Count ? _takeCount.Value : SourceList.Count;
 

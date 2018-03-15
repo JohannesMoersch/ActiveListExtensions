@@ -63,7 +63,7 @@ namespace ActiveListExtensions.ListModifiers
 		{
 			if (_skipCount.Value > _currentSkipCount)
 			{
-				var start = _currentSkipCount < SourceList.Count ? _currentSkipCount : SourceList.Count - 1;
+				var start = _currentSkipCount < SourceList.Count ? _currentSkipCount : SourceList.Count;
 
 				var max = _skipCount.Value < SourceList.Count ? _skipCount.Value : SourceList.Count;
 

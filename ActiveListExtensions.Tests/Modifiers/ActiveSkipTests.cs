@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,6 +49,96 @@ namespace ActiveListExtensions.Tests.Modifiers
 
 				validator.Validate();
 			}
+		}
+
+		[Fact]
+		public void SkipLessThanCountAndIncreaseSkip()
+		{
+			int raisedCount = 0;
+			var skipCount = ActiveValue.Create(2);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveSkip(skipCount);
+
+			sut.CollectionChanged += (s, e) => raisedCount += e.Action == NotifyCollectionChangedAction.Remove ? 1 : 0;
+
+			skipCount.Value = 3;
+
+			Assert.Equal(1, raisedCount);
+		}
+
+		[Fact]
+		public void SkipLessThanCountAndDecreaseSkip()
+		{
+			int raisedCount = 0;
+			var skipCount = ActiveValue.Create(2);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveSkip(skipCount);
+
+			sut.CollectionChanged += (s, e) => raisedCount += e.Action == NotifyCollectionChangedAction.Add ? 1 : 0;
+
+			skipCount.Value = 1;
+
+			Assert.Equal(1, raisedCount);
+		}
+
+		[Fact]
+		public void SkipCountAndIncreaseSkip()
+		{
+			int raisedCount = 0;
+			var skipCount = ActiveValue.Create(3);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveSkip(skipCount);
+
+			sut.CollectionChanged += (s, e) => ++raisedCount;
+
+			skipCount.Value = 4;
+
+			Assert.Equal(0, raisedCount);
+		}
+
+		[Fact]
+		public void SkipCountAndDecreaseSkip()
+		{
+			int raisedCount = 0;
+			var skipCount = ActiveValue.Create(3);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveSkip(skipCount);
+
+			sut.CollectionChanged += (s, e) => raisedCount += e.Action == NotifyCollectionChangedAction.Add ? 1 : 0;
+
+			skipCount.Value = 2;
+
+			Assert.Equal(1, raisedCount);
+		}
+
+		[Fact]
+		public void SkipMoreThanCountAndIncreaseSkip()
+		{
+			int raisedCount = 0;
+			var skipCount = ActiveValue.Create(4);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveSkip(skipCount);
+
+			sut.CollectionChanged += (s, e) => ++raisedCount;
+
+			skipCount.Value = 5;
+
+			Assert.Equal(0, raisedCount);
+		}
+
+		[Fact]
+		public void SkipMoreThanCountAndDecreaseSkip()
+		{
+			int raisedCount = 0;
+			var skipCount = ActiveValue.Create(4);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveSkip(skipCount);
+
+			sut.CollectionChanged += (s, e) => ++raisedCount;
+
+			skipCount.Value = 3;
+
+			Assert.Equal(0, raisedCount);
 		}
 	}
 }

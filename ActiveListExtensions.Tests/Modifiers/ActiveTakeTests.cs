@@ -7,6 +7,7 @@ using ActiveListExtensions.Tests.Helpers;
 using Xunit;
 using ActiveListExtensions.Utilities;
 using ActiveListExtensions.Tests.Utilities;
+using System.Collections.Specialized;
 
 namespace ActiveListExtensions.Tests.Modifiers
 {
@@ -48,6 +49,96 @@ namespace ActiveListExtensions.Tests.Modifiers
 
 				validator.Validate();
 			}
+		}
+
+		[Fact]
+		public void TakeLessThanCountAndIncreaseTake()
+		{
+			int raisedCount = 0;
+			var takeCount = ActiveValue.Create(2);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveTake(takeCount);
+
+			sut.CollectionChanged += (s, e) => raisedCount += e.Action == NotifyCollectionChangedAction.Add ? 1 : 0;
+
+			takeCount.Value = 3;
+
+			Assert.Equal(1, raisedCount);
+		}
+
+		[Fact]
+		public void TakeLessThanCountAndDecreaseTake()
+		{
+			int raisedCount = 0;
+			var takeCount = ActiveValue.Create(2);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveTake(takeCount);
+
+			sut.CollectionChanged += (s, e) => raisedCount += e.Action == NotifyCollectionChangedAction.Remove ? 1 : 0;
+
+			takeCount.Value = 1;
+
+			Assert.Equal(1, raisedCount);
+		}
+
+		[Fact]
+		public void TakeCountAndIncreaseTake()
+		{
+			int raisedCount = 0;
+			var takeCount = ActiveValue.Create(3);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveTake(takeCount);
+
+			sut.CollectionChanged += (s, e) => ++raisedCount;
+
+			takeCount.Value = 4;
+
+			Assert.Equal(0, raisedCount);
+		}
+
+		[Fact]
+		public void TakeCountAndDecreaseTake()
+		{
+			int raisedCount = 0;
+			var takeCount = ActiveValue.Create(3);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveTake(takeCount);
+
+			sut.CollectionChanged += (s, e) => raisedCount += e.Action == NotifyCollectionChangedAction.Remove ? 1 : 0;
+
+			takeCount.Value = 2;
+
+			Assert.Equal(1, raisedCount);
+		}
+
+		[Fact]
+		public void TakeMoreThanCountAndIncreaseTake()
+		{
+			int raisedCount = 0;
+			var takeCount = ActiveValue.Create(4);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveTake(takeCount);
+
+			sut.CollectionChanged += (s, e) => ++raisedCount;
+
+			takeCount.Value = 5;
+
+			Assert.Equal(0, raisedCount);
+		}
+
+		[Fact]
+		public void TakeMoreThanCountAndDecreaseTake()
+		{
+			int raisedCount = 0;
+			var takeCount = ActiveValue.Create(4);
+			var list = ActiveList.Create(new[] { 1, 2, 3 });
+			var sut = list.ActiveTake(takeCount);
+
+			sut.CollectionChanged += (s, e) => ++raisedCount;
+
+			takeCount.Value = 3;
+
+			Assert.Equal(0, raisedCount);
 		}
 	}
 }
