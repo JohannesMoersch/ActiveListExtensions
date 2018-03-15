@@ -31,7 +31,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			item2.ThrowChangeNotification("Things");
 			item3.ThrowChangeNotification("Test");
 
-			Assert.Equal(eventsReceived, 3);
+			Assert.Equal(3, eventsReceived);
 		}
 
 		[Fact]
@@ -52,7 +52,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			item2.ThrowChangeNotification("Things");
 			item3.ThrowChangeNotification("Test");
 
-			Assert.Equal(eventsReceived, 3);
+			Assert.Equal(3, eventsReceived);
 		}
 
 		[Fact]
@@ -76,7 +76,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			item2.ThrowChangeNotification("Things");
 			item3.ThrowChangeNotification("Test");
 
-			Assert.Equal(eventsReceived, 0);
+			Assert.Equal(0, eventsReceived);
 		}
 
 		[Fact]
@@ -97,7 +97,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			item2.ThrowChangeNotification("Abc");
 			item3.ThrowChangeNotification("Abc");
 
-			Assert.Equal(eventsReceived, 0);
+			Assert.Equal(0, eventsReceived);
 		}
 
 		[Fact]
@@ -118,7 +118,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			item2.ThrowChangeNotification("Things");
 			item3.ThrowChangeNotification("Test");
 
-			Assert.Equal(eventsReceived, 1);
+			Assert.Equal(1, eventsReceived);
 		}
 	}
 

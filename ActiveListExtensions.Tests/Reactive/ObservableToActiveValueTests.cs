@@ -17,11 +17,11 @@ namespace ActiveListExtensions.Tests.Reactive
 
 			var value = subject.ToActiveValue();
 
-			Assert.Equal(value.Value, 0);
+			Assert.Equal(0, value.Value);
 
 			subject.OnNext(10);
 
-			Assert.Equal(value.Value, 10);
+			Assert.Equal(10, value.Value);
 		}
 
 		[Fact]
@@ -46,7 +46,7 @@ namespace ActiveListExtensions.Tests.Reactive
 
 			var value = subject.ToActiveValue(10);
 
-			Assert.Equal(value.Value, 10);
+			Assert.Equal(10, value.Value);
 		}
 	}
 }

@@ -22,7 +22,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			foreach (var value in Enumerable.Range(0, 100))
 				sut.Add(RandomGenerator.GenerateRandomInteger(0, sut.Count), value);
 
-			Assert.Equal(sut.Count, 100);
+			Assert.Equal(100, sut.Count);
 		}
 
 		[Fact]
@@ -39,7 +39,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			foreach (var value in Enumerable.Range(0, 100))
 				sut.Remove(RandomGenerator.GenerateRandomInteger(0, sut.Count));
 
-			Assert.Equal(sut.Count, 0);
+			Assert.Empty(sut);
 		}
 
 		[Fact]
@@ -56,7 +56,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			foreach (var value in Enumerable.Range(0, 100))
 				sut.Replace(RandomGenerator.GenerateRandomInteger(0, sut.Count), RandomGenerator.GenerateRandomInteger(0, 1000));
 
-			Assert.Equal(sut.Count, 100);
+			Assert.Equal(100, sut.Count);
 		}
 
 		[Fact]
@@ -73,7 +73,7 @@ namespace ActiveListExtensions.Tests.Utilities
 			foreach (var value in Enumerable.Range(0, 100))
 				sut.Move(RandomGenerator.GenerateRandomInteger(0, sut.Count), RandomGenerator.GenerateRandomInteger(0, sut.Count));
 
-			Assert.Equal(sut.Count, 100);
+			Assert.Equal(100, sut.Count);
 		}
 
 		[Fact]
@@ -141,7 +141,7 @@ namespace ActiveListExtensions.Tests.Utilities
 				sut.MoveRange(start, target, count);
 			}
 
-			Assert.Equal(sut.Count, 100);
+			Assert.Equal(100, sut.Count);
 		}
 
 		[Fact]
