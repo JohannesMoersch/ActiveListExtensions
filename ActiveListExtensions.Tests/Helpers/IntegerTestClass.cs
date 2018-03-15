@@ -35,6 +35,9 @@ namespace ActiveListExtensions.Tests.Helpers
 			}
 		}
 
+		public void SetProperty(int value)
+			=> Property = value;
+
 		public event PropertyChangedEventHandler PropertyChanged;
 	}
 }

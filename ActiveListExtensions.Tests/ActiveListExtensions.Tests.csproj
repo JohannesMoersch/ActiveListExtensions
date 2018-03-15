@@ -113,6 +113,7 @@
     <Compile Include="Helpers\ValueTestHelpers.cs" />
     <Compile Include="Modifiers\ActiveConcatTests.cs" />
     <Compile Include="Modifiers\ActiveDistinctTests.cs" />
+    <Compile Include="Modifiers\ActiveDoTests.cs" />
     <Compile Include="Modifiers\ActiveElementsAtOrEmptyTests.cs" />
     <Compile Include="Modifiers\ActiveExceptTests.cs" />
     <Compile Include="Modifiers\ActiveGroupByTests.cs" />
@@ -155,9 +156,11 @@
     <Compile Include="ValueModifiers\ActiveAllTests.cs" />
     <Compile Include="ValueModifiers\ActiveAnyTests.cs" />
     <Compile Include="ValueModifiers\ActiveAverageOrDefaultTests.cs" />
+    <Compile Include="ValueModifiers\ActiveCastOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveCombineTests.cs" />
     <Compile Include="ValueModifiers\ActiveContainsTests.cs" />
     <Compile Include="ValueModifiers\ActiveCountTests.cs" />
+    <Compile Include="ValueModifiers\ActiveDoValueTests.cs" />
     <Compile Include="ValueModifiers\ActiveElementAtOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveFirstOrDefaultTests.cs" />
     <Compile Include="ValueModifiers\ActiveLastOrDefaultTests.cs" />

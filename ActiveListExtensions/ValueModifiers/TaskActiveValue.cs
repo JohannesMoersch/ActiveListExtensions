@@ -19,7 +19,7 @@ namespace ActiveListExtensions.ValueModifiers
 			{
 				if (!IsDisposed)
 					Value = t.Result;
-			}, new CancellationToken(), TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.FromCurrentSynchronizationContext());
+			}, CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.FromCurrentSynchronizationContext());
 		}
 	}
 }

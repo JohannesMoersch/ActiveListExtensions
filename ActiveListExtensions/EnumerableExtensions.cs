@@ -10,6 +10,13 @@ namespace ActiveListExtensions
 {
 	internal static class EnumerableExtensions
 	{
+		public static IEnumerable<T> Do<T>(this IEnumerable<T> source, Action<T> doAction)
+			=> source.Select(o =>
+			{
+				doAction.Invoke(o);
+				return o;
+			});
+
 		public static IReadOnlyList<T> ToReadOnlyList<T>(this IEnumerable<T> source)
 			=> ConvertToReadOnlyList<T>(source);
 

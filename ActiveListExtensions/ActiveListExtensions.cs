@@ -483,6 +483,30 @@ namespace ActiveListExtensions
 			=> new ActiveTranslateResetNotifications<TSource>(source);
 
 
+		public static IActiveList<TSource> ActiveDo<TSource>(this IActiveList<TSource> source, Expression<Action<TSource>> doAction)
+			=> ActiveDo(source, doAction.Compile(), doAction.GetReferencedProperties());
+
+		public static IActiveList<TSource> ActiveDo<TSource>(this IActiveList<TSource> source, Action<TSource> doAction, IEnumerable<string> sourcePropertiesToWatch)
+			=> source.ActiveSelect(s =>
+			{
+				doAction.Invoke(s);
+				return s;
+			}, sourcePropertiesToWatch);
+
+		public static IActiveList<TSource> ActiveDo<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Expression<Action<TSource, TParameter>> doAction)
+			=> ActiveDo(source, parameter, doAction.Compile(), doAction.GetReferencedProperties());
+
+		public static IActiveList<TSource> ActiveDo<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Action<TSource, TParameter> doAction, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			=> ActiveDo(source, parameter, doAction, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveList<TSource> ActiveDo<TSource, TParameter>(this IActiveList<TSource> source, IActiveValue<TParameter> parameter, Action<TSource, TParameter> doAction, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch)
+			=> source.ActiveSelect(parameter, (s, e) =>
+			{
+				doAction.Invoke(s, e);
+				return s;
+			}, propertiesToWatch.Item1, propertiesToWatch.Item2);
+
+
 		private static Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> CreateJoinPropertiesToWatchTuple(IEnumerable<string> leftKeySelectorPropertiesToWatch, IEnumerable<string> rightKeySelectorPropertiesToWatch, Tuple<IEnumerable<string>, IEnumerable<string>> resultSelectorPropertiesToWatch)
 			=> Tuple.Create(leftKeySelectorPropertiesToWatch, rightKeySelectorPropertiesToWatch, resultSelectorPropertiesToWatch.Item1, resultSelectorPropertiesToWatch.Item2);
 

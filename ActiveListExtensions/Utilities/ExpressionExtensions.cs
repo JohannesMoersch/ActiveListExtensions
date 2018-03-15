@@ -134,5 +134,13 @@ namespace ActiveListExtensions.Utilities
 			var properties = new PropertyVisitor().GetReferencedProperties(expression, stripJoinOptions);
 			return Tuple.Create(properties[0], properties[1], properties[2]);
 		}
+
+		public static IEnumerable<string> GetReferencedProperties<T>(this Expression<Action<T>> expression, bool stripJoinOptions = false) => new PropertyVisitor().GetReferencedProperties(expression, stripJoinOptions)[0];
+
+		public static Tuple<IEnumerable<string>, IEnumerable<string>> GetReferencedProperties<T1, T2>(this Expression<Action<T1, T2>> expression, bool stripJoinOptions = false)
+		{
+			var properties = new PropertyVisitor().GetReferencedProperties(expression, stripJoinOptions);
+			return Tuple.Create(properties[0], properties[1]);
+		}
 	}
 }

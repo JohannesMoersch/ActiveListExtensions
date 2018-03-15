@@ -73,6 +73,10 @@ namespace ActiveListExtensions
 			=> new ActiveCombine<TValue1, TValue2, TResult>(value1, value2, resultCombiner, propertiesToWatch.Item1, propertiesToWatch.Item2);
 
 
+		public static IActiveValue<TResult> ActiveCastOrDefault<TResult>(this IActiveValue<object> source, TResult defaultValue = default(TResult))
+			=> source.ActiveSelect(value => value is TResult ? (TResult)(object)value : defaultValue);
+
+
 		public static IActiveValue<TSource> ActiveFirstOrDefault<TSource>(this IActiveList<TSource> source)
 			=> ActiveFirstOrDefault(source, i => true, null);
 
@@ -442,5 +446,29 @@ namespace ActiveListExtensions
 
 		public static IActiveValue<TValue> ActiveAggregate<TSource, TValue>(this IActiveValue<TSource> source, TValue initialValue, Func<TValue, TSource, TValue> aggregator, IEnumerable<string> sourcePropertiesToWatch)
 			=> new ActiveAggregate<TSource, TValue>(initialValue, source, aggregator, sourcePropertiesToWatch);
+
+
+		public static IActiveValue<TSource> ActiveDo<TSource>(this IActiveValue<TSource> source, Expression<Action<TSource>> doAction)
+			=> ActiveDo(source, doAction.Compile(), doAction.GetReferencedProperties());
+
+		public static IActiveValue<TSource> ActiveDo<TSource>(this IActiveValue<TSource> source, Action<TSource> doAction, IEnumerable<string> sourcePropertiesToWatch)
+			=> source.ActiveSelect(s =>
+			{
+				doAction.Invoke(s);
+				return s;
+			}, sourcePropertiesToWatch);
+
+		public static IActiveValue<TSource> ActiveDo<TSource, TParameter>(this IActiveValue<TSource> source, IActiveValue<TParameter> parameter, Expression<Action<TSource, TParameter>> doAction)
+			=> ActiveDo(source, parameter, doAction.Compile(), doAction.GetReferencedProperties());
+
+		public static IActiveValue<TSource> ActiveDo<TSource, TParameter>(this IActiveValue<TSource> source, IActiveValue<TParameter> parameter, Action<TSource, TParameter> doAction, IEnumerable<string> sourcePropertiesToWatch, IEnumerable<string> parameterPropertiesToWatch)
+			=> ActiveDo(source, parameter, doAction, Tuple.Create(sourcePropertiesToWatch, parameterPropertiesToWatch));
+
+		private static IActiveValue<TSource> ActiveDo<TSource, TParameter>(this IActiveValue<TSource> source, IActiveValue<TParameter> parameter, Action<TSource, TParameter> doAction, Tuple<IEnumerable<string>, IEnumerable<string>> propertiesToWatch)
+			=> source.ActiveCombine(parameter, (s, e) =>
+			{
+				doAction.Invoke(s, e);
+				return s;
+			}, propertiesToWatch.Item1, propertiesToWatch.Item2);
 	}
 }
