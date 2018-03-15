@@ -59,6 +59,18 @@ namespace ActiveListExtensions.Tests.Modifiers
 		}
 
 		[Fact]
+		public void AddToEmpty()
+		{
+			var value = new ActiveValue<IEnumerable<int>>(new int[0]);
+
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
+
+			value.Value = new[] { 0, 1, 2 };
+
+			Assert.True(value.Value.SequenceEqual(sut));
+		}
+
+		[Fact]
 		public void AddMultiple()
 		{
 			var value = new ActiveValue<IEnumerable<int>>(new[] { 1, 2, 4, 6, 7, 8 });
@@ -78,6 +90,18 @@ namespace ActiveListExtensions.Tests.Modifiers
 			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
 
 			value.Value = new[] { 0, 0, 1, 1, 1, 2, 2 };
+
+			Assert.True(value.Value.SequenceEqual(sut));
+		}
+
+		[Fact]
+		public void RemoveAll()
+		{
+			var value = new ActiveValue<IEnumerable<int>>(new[] { 0 });
+
+			var sut = value.ToActiveList().ActiveTranslateResetNotifications();
+
+			value.Value = new int[0];
 
 			Assert.True(value.Value.SequenceEqual(sut));
 		}
