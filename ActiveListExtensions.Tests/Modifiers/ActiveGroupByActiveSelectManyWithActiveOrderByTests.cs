@@ -12,19 +12,19 @@ namespace ActiveListExtensions.Tests.Modifiers
 	public class ActiveGroupByActiveSelectManyWithActiveOrderByTests
 	{
 		[Fact]
-		public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItems(ActiveGroupByThenActiveSelectManyWithActiveOrderBy, GroupByThenSelectManyWithOrderBy, () => (RandomGenerator.GenerateRandomInteger(), RandomGenerator.GenerateRandomInteger()));
+		public void RandomlyInsertItems() => CollectionTestHelpers.RandomlyInsertItems(ActiveGroupByThenActiveSelectManyWithActiveOrderBy, GroupByThenSelectManyWithOrderBy, () => (RandomGenerator.GenerateRandomInteger(0, 10), RandomGenerator.GenerateRandomInteger()));
 
 		[Fact]
-		public void RandomlyRemoveItems() => CollectionTestHelpers.RandomlyRemoveItems(ActiveGroupByThenActiveSelectManyWithActiveOrderBy, GroupByThenSelectManyWithOrderBy, () => (RandomGenerator.GenerateRandomInteger(), RandomGenerator.GenerateRandomInteger()));
+		public void RandomlyRemoveItems() => CollectionTestHelpers.RandomlyRemoveItems(ActiveGroupByThenActiveSelectManyWithActiveOrderBy, GroupByThenSelectManyWithOrderBy, () => (RandomGenerator.GenerateRandomInteger(0, 10), RandomGenerator.GenerateRandomInteger()));
 
 		[Fact]
-		public void RandomlyReplaceItems() => CollectionTestHelpers.RandomlyReplaceItems(ActiveGroupByThenActiveSelectManyWithActiveOrderBy, GroupByThenSelectManyWithOrderBy, () => (RandomGenerator.GenerateRandomInteger(), RandomGenerator.GenerateRandomInteger()));
+		public void RandomlyReplaceItems() => CollectionTestHelpers.RandomlyReplaceItems(ActiveGroupByThenActiveSelectManyWithActiveOrderBy, GroupByThenSelectManyWithOrderBy, () => (RandomGenerator.GenerateRandomInteger(0, 10), RandomGenerator.GenerateRandomInteger()));
 
 		[Fact]
-		public void RandomlyMoveItems() => CollectionTestHelpers.RandomlyMoveItems(ActiveGroupByThenActiveSelectManyWithActiveOrderBy, GroupByThenSelectManyWithOrderBy, () => (RandomGenerator.GenerateRandomInteger(), RandomGenerator.GenerateRandomInteger()));
+		public void RandomlyMoveItems() => CollectionTestHelpers.RandomlyMoveItems(ActiveGroupByThenActiveSelectManyWithActiveOrderBy, GroupByThenSelectManyWithOrderBy, () => (RandomGenerator.GenerateRandomInteger(0, 10), RandomGenerator.GenerateRandomInteger()));
 
 		[Fact]
-		public void ResetWithRandomItems() => CollectionTestHelpers.ResetWithRandomItems(ActiveGroupByThenActiveSelectManyWithActiveOrderBy, GroupByThenSelectManyWithOrderBy, () => (RandomGenerator.GenerateRandomInteger(), RandomGenerator.GenerateRandomInteger()));
+		public void ResetWithRandomItems() => CollectionTestHelpers.ResetWithRandomItems(ActiveGroupByThenActiveSelectManyWithActiveOrderBy, GroupByThenSelectManyWithOrderBy, () => (RandomGenerator.GenerateRandomInteger(0, 10), RandomGenerator.GenerateRandomInteger()));
 
 		private IActiveList<(int key, int value)> ActiveGroupByThenActiveSelectManyWithActiveOrderBy(IActiveList<(int key, int value)> list)
 			=> list
