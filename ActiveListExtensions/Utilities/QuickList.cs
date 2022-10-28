@@ -50,7 +50,7 @@ namespace ActiveListExtensions.Utilities
 			if (index < 0 || index >= Count)
 				throw new ArgumentOutOfRangeException(nameof(index));
 
-			if (index < _count)
+			if (index < _count - 1)
 				Array.Copy(_items, index + 1, _items, index, _count - index);
 			else
 				_items[index] = default(T);
