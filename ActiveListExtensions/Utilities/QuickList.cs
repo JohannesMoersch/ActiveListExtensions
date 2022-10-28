@@ -51,7 +51,7 @@ namespace ActiveListExtensions.Utilities
 				throw new ArgumentOutOfRangeException(nameof(index));
 
 			if (index < _count)
-				Array.Copy(_items, index + 1, _items, index, _count - index - 1);
+				Array.Copy(_items, index + 1, _items, index, _count - index);
 			else
 				_items[index] = default(T);
 
