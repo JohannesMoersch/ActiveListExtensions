@@ -6,7 +6,7 @@
     <version>$version$</version>
     <authors>Johannes Moersch</authors>
     <owners>Johannes Moersch</owners>
-    <licenseUrl>https://github.com/JohannesMoersch/ActiveListExtensions/blob/master/LICENSE</licenseUrl>
+    <license type="expression">MIT</license>
     <projectUrl>https://github.com/JohannesMoersch/ActiveListExtensions</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides active list extensions for working with WPF.</description>
