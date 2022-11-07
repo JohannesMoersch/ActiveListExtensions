@@ -10,17 +10,17 @@
     <projectUrl>https://github.com/JohannesMoersch/ActiveListExtensions</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides reactive extensions for active lists and active values.</description>
-    <copyright>Copyright ©  2017</copyright>
+    <copyright>Copyright ©  2022</copyright>
     <tags>Reactive Linq List Collection WPF</tags>
     <frameworkAssemblies>
-        <frameworkAssembly assemblyName="System" targetFramework="net40" />
-        <frameworkAssembly assemblyName="WindowsBase" targetFramework="net40" />
+      <frameworkAssembly assemblyName="System" targetFramework="net40" />
+      <frameworkAssembly assemblyName="WindowsBase" targetFramework="net40" />
     </frameworkAssemblies>
     <dependencies>
-        <dependency id="ActiveListExtensions" version="2.1.0" />
-        <dependency id="System.Reactive.Interfaces" version="3.1.1" />
-        <dependency id="System.Reactive.Core" version="3.1.1" />
-        <dependency id="System.Reactive.Linq" version="3.1.1" />
+      <dependency id="ActiveListExtensions" version="2.2.1" />
+      <dependency id="System.Reactive.Interfaces" version="3.1.1" />
+      <dependency id="System.Reactive.Core" version="3.1.1" />
+      <dependency id="System.Reactive.Linq" version="3.1.1" />
     </dependencies>
   </metadata>
 </package>

@@ -33,7 +33,7 @@ namespace ActiveListExtensions.Tests.ValueModifiers
 
 				task.SetResult(-1);
 
-				await task.Task.ContinueWith(_ => { });
+				await task.Task.ContinueWith(_ => { }, TaskContinuationOptions.RunContinuationsAsynchronously);
 
 				Assert.Equal(-1, sut.Value);
 			});

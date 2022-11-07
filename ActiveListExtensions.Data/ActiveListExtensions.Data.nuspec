@@ -10,17 +10,17 @@
     <projectUrl>https://github.com/JohannesMoersch/ActiveListExtensions</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides active list extensions for data tables.</description>
-    <copyright>Copyright ©  2017</copyright>
+    <copyright>Copyright ©  2022</copyright>
     <tags>Reactive Linq List Collection WPF Data Table</tags>
     <frameworkAssemblies>
-        <frameworkAssembly assemblyName="System" targetFramework="net40" />
-        <frameworkAssembly assemblyName="System.Data" targetFramework="net40" />
-        <frameworkAssembly assemblyName="System.Data.DataSetExtensions" targetFramework="net40" />
-        <frameworkAssembly assemblyName="System.XML" targetFramework="net40" />
-        <frameworkAssembly assemblyName="WindowsBase" targetFramework="net40" />
+      <frameworkAssembly assemblyName="System" targetFramework="net40" />
+      <frameworkAssembly assemblyName="System.Data" targetFramework="net40" />
+      <frameworkAssembly assemblyName="System.Data.DataSetExtensions" targetFramework="net40" />
+      <frameworkAssembly assemblyName="System.XML" targetFramework="net40" />
+      <frameworkAssembly assemblyName="WindowsBase" targetFramework="net40" />
     </frameworkAssemblies>
     <dependencies>
-        <dependency id="ActiveListExtensions" version="2.1.0" />
+        <dependency id="ActiveListExtensions" version="2.2.1" />
     </dependencies>
   </metadata>
 </package>
